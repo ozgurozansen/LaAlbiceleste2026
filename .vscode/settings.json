@@ -1,0 +1,43 @@
+{
+    "chat.tools.terminal.autoApprove": {
+        "pkill": true,
+        "/^python3 server\\.py &$/": {
+            "approve": true,
+            "matchCommandLine": true
+        },
+        "/^pkill -f \"python3 server\\.py\" 2>/dev/null; cd /home/ozan/nesine-soccer-api && python3 server\\.py &$/": {
+            "approve": true,
+            "matchCommandLine": true
+        },
+        "/^cd /home/ozan/nesine-soccer-api && python3 - <<'EOF'\nimport json, urllib\\.request\n\nreq = urllib\\.request\\.Request\\(\n    \"https://bulten\\.nesine\\.com/api/bulten/getprebultenfull\",\n    headers=\\{\"Accept\":\"application/json\",\"User-Agent\":\"Mozilla/5\\.0\"\\},\n\\)\nwith urllib\\.request\\.urlopen\\(req, timeout=120\\) as r:\n    raw = json\\.loads\\(r\\.read\\(\\)\\.decode\\(\\)\\)\n\nevents = raw\\.get\\(\"sg\", \\{\\}\\)\\.get\\(\"EA\", \\[\\]\\)\nevents = \\[e for e in events if e\\.get\\(\"HN\"\\) or e\\.get\\(\"ENO\"\\)\\]\n\n# Collect all MTIDs with their MN and sample outcomes\nmtid_info = \\{\\}\nfor ev in events:\n    for m in ev\\.get\\(\"MA\", \\[\\]\\):\n        mid = m\\.get\\(\"MTID\"\\)\n        if mid not in mtid_info:\n            mtid_info\\[mid\\] = \\{\"MN\": m\\.get\\(\"MN\"\\), \"outcomes\": \\{\\}\\}\n        for oc in m\\.get\\(\"OCA\", \\[\\]\\):\n            n = oc\\.get\\(\"N\"\\)\n            on = oc\\.get\\(\"ON\", \"\"\\)\n            if n not in mtid_info\\[mid\\]\\[\"outcomes\"\\]:\n                mtid_info\\[mid\\]\\[\"outcomes\"\\]\\[n\\] = on\n\nwith open\\(\"config\\.json\"\\) as f:\n    cfg = json\\.load\\(f\\)\n\nknown = set\\(int\\(k\\) for k in cfg\\[\"market_type_names\"\\]\\)\nmissing = \\{mid: info for mid, info in sorted\\(mtid_info\\.items\\(\\)\\) if mid not in known\\}\nprint\\(f\"Total MTIDs in bulletin: \\{len\\(mtid_info\\)\\}, Missing from config: \\{len\\(missing\\)\\}\"\\)\nfor mid, info in sorted\\(missing\\.items\\(\\)\\):\n    ocs = \", \"\\.join\\(f\"\\{n\\}=\\{repr\\(v\\)\\}\" for n,v in sorted\\(info\\['outcomes'\\]\\.items\\(\\)\\)\\)\n    print\\(f\"  MTID \\{mid\\}: MN=\\{repr\\(info\\['MN'\\]\\)\\}  outcomes=\\[\\{ocs\\}\\]\"\\)\nEOF$/": {
+            "approve": true,
+            "matchCommandLine": true
+        },
+        "/^cd /home/ozan/nesine-soccer-api && python3 - <<'EOF'\nimport json, urllib\\.request\n\nwith open\\(\"config\\.json\"\\) as f:\n    cfg = json\\.load\\(f\\)\n\nreq = urllib\\.request\\.Request\\(\n    \"https://bulten\\.nesine\\.com/api/bulten/getprebultenfull\",\n    headers=\\{\"Accept\":\"application/json\",\"User-Agent\":\"Mozilla/5\\.0\"\\},\n\\)\nwith urllib\\.request\\.urlopen\\(req, timeout=120\\) as r:\n    raw = json\\.loads\\(r\\.read\\(\\)\\.decode\\(\\)\\)\nevents = \\[e for e in raw\\.get\\(\"sg\",\\{\\}\\)\\.get\\(\"EA\",\\[\\]\\) if e\\.get\\(\"HN\"\\) or e\\.get\\(\"ENO\"\\)\\]\n\n# Focus on: known-named markets with no outcome_labels \\+ unknown market IDs user mentioned\nknown_names = set\\(int\\(k\\) for k in cfg\\[\"market_type_names\"\\]\\)\nknown_labels = set\\(int\\(k\\) for k in cfg\\[\"outcome_labels\"\\]\\)\n# Markets that have a name but no outcome labels AND have empty ON fields\nno_labels = known_names - known_labels\n\ntarget_mtids = no_labels \\| \\{327, 709, 712, 764, 5, 220, 222, 224, 571\\}\n\nfor mtid in sorted\\(target_mtids\\):\n    samples = \\[\\]\n    for ev in events:\n        for m in ev\\.get\\(\"MA\",\\[\\]\\):\n            if m\\.get\\(\"MTID\"\\) == mtid:\n                sov = m\\.get\\(\"SOV\"\\)\n                ocs = \\[\\(o\\.get\\(\"N\"\\), o\\.get\\(\"ON\",\"\"\\), o\\.get\\(\"O\"\\)\\) for o in m\\.get\\(\"OCA\",\\[\\]\\)\\]\n                samples\\.append\\(\\(sov, ocs\\)\\)\n                break\n        if samples:\n            break\n    if samples:\n        sov, ocs = samples\\[0\\]\n        name = cfg\\[\"market_type_names\"\\]\\.get\\(str\\(mtid\\), \"UNKNOWN\"\\)\n        oc_str = \", \"\\.join\\(f\"N=\\{n\\} ON=\\{repr\\(on\\)\\}\" for n,on,_ in ocs\\[:8\\]\\)\n        print\\(f\"MTID \\{mtid\\} \\(\\{name\\}\\) SOV=\\{sov\\}: \\{oc_str\\}\"\\)\nEOF$/": {
+            "approve": true,
+            "matchCommandLine": true
+        },
+        "/^cd /home/ozan/nesine-soccer-api && python3 - <<'EOF'\nimport json, urllib\\.request\n\nwith open\\(\"config\\.json\"\\) as f:\n    cfg = json\\.load\\(f\\)\n\nreq = urllib\\.request\\.Request\\(\n    \"https://bulten\\.nesine\\.com/api/bulten/getprebultenfull\",\n    headers=\\{\"Accept\":\"application/json\",\"User-Agent\":\"Mozilla/5\\.0\"\\},\n\\)\nwith urllib\\.request\\.urlopen\\(req, timeout=120\\) as r:\n    raw = json\\.loads\\(r\\.read\\(\\)\\.decode\\(\\)\\)\nevents = \\[e for e in raw\\.get\\(\"sg\",\\{\\}\\)\\.get\\(\"EA\",\\[\\]\\) if e\\.get\\(\"HN\"\\) or e\\.get\\(\"ENO\"\\)\\]\n\n# For specific markets, collect ALL distinct N→ON pairs across all events\ntarget = \\{5, 220, 222, 224, 327, 426, 442, 444, 571, 583\\}\nresults = \\{m: \\{\\} for m in target\\}\nfor ev in events:\n    for m in ev\\.get\\(\"MA\",\\[\\]\\):\n        mid = m\\.get\\(\"MTID\"\\)\n        if mid in target:\n            for oc in m\\.get\\(\"OCA\",\\[\\]\\):\n                n = oc\\.get\\(\"N\"\\)\n                on = oc\\.get\\(\"ON\",\"\"\\)\n                if n not in results\\[mid\\] and on:\n                    results\\[mid\\]\\[n\\] = on\n\nfor mid in sorted\\(target\\):\n    name = cfg\\[\"market_type_names\"\\]\\.get\\(str\\(mid\\), \"\\?\"\\)\n    print\\(f\"MTID \\{mid\\} \\(\\{name\\}\\): \\{dict\\(sorted\\(results\\[mid\\]\\.items\\(\\)\\)\\)\\}\"\\)\nEOF$/": {
+            "approve": true,
+            "matchCommandLine": true
+        },
+        "/^python3 server\\.py$/": {
+            "approve": true,
+            "matchCommandLine": true
+        },
+        "/^python3 -c \"import json; json\\.load\\(open\\('config\\.json'\\)\\); print\\('JSON valid'\\)\"$/": {
+            "approve": true,
+            "matchCommandLine": true
+        },
+        "/^pkill -f \"python3 server\\.py\" 2>/dev/null; sleep 1 && cd /home/ozan/nesine-soccer-api && python3 server\\.py &$/": {
+            "approve": true,
+            "matchCommandLine": true
+        },
+        "gh": true,
+        "git config": true,
+        "/^sudo snap install gh$/": {
+            "approve": true,
+            "matchCommandLine": true
+        }
+    }
+}

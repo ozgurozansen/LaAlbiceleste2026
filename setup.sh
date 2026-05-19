@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# setup.sh — Development environment setup for nesine-soccer-api
+# setup.sh — Development environment setup for LaAlbiceleste2026
 # Run once after cloning: bash setup.sh
 set -euo pipefail
 

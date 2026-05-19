@@ -1,11 +1,12 @@
 #!/usr/bin/env python3
 """
-Nesine Soccer Bulletin API — pure Python stdlib server
+LaAlbiceleste2026 API — pure Python stdlib server
 Usage: python3 server.py [port]   (default port 3000)
 """
 
 import json
 import os
+import ssl
 import sys
 import time
 import urllib.request
@@ -49,6 +50,19 @@ _cache_lock = threading.Lock()
 _cache = {"data": None, "fetched_at": 0}
 
 
+# ── SSL context (handles corporate/self-signed CA chains) ────────────────────
+def _make_ssl_context():
+    ctx = ssl.create_default_context()
+    try:
+        import certifi
+        ctx.load_verify_locations(certifi.where())
+    except ImportError:
+        pass  # fall back to the default CA bundle shipped with Python
+    return ctx
+
+_SSL_CTX = _make_ssl_context()
+
+
 def fetch_bulletin():
     with _cache_lock:
         now = time.time()
@@ -62,7 +76,7 @@ def fetch_bulletin():
             "User-Agent": "Mozilla/5.0 (compatible; SoccerAPIClone/1.0)",
         },
     )
-    with urllib.request.urlopen(req, timeout=120) as resp:
+    with urllib.request.urlopen(req, timeout=120, context=_SSL_CTX) as resp:
         raw = json.loads(resp.read().decode("utf-8"))
 
     with _cache_lock:

@@ -15,7 +15,7 @@ A zero-dependency Python server that proxies and parses the football betting api
 ## Project Structure
 
 ```
-nesine-soccer-api/
+LaAlbiceleste2026/
 ├── server.py        # Python HTTP server + bulletin parser
 ├── config.json      # Sport types, market names, league mappings, outcome labels
 ├── public/
@@ -31,8 +31,8 @@ nesine-soccer-api/
 ### 1. Clone & set up
 
 ```bash
-git clone https://github.com/ozgurozansen/nesine-soccer-api.git
-cd nesine-soccer-api
+git clone https://github.com/ozgurozansen/LaAlbiceleste2026.git
+cd LaAlbiceleste2026
 bash setup.sh
 ```
 

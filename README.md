@@ -1,6 +1,6 @@
-# nesine-soccer-api
+# LaAlbiceleste2026
 
-A zero-dependency Python server that proxies and parses the [Nesine](https://nesine.com) pre-match bulletin API and serves a clean, filterable soccer bet-market viewer in the browser.
+A zero-dependency Python server that proxies and parses the football betting api pre-match bulletin API and serves a clean, filterable soccer bet-market viewer in the browser.
 
 ## Features
 

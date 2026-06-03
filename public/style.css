@@ -561,3 +561,684 @@ main { max-width: 1400px; margin: 0 auto; padding: 0 1rem 3rem; }
   .markets-grid { grid-template-columns: 1fr 1fr; }
   .modal-outcomes { grid-template-columns: 1fr 1fr; }
 }
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   GROUP STAGE PREDICTIONS  –  groupstage.html / groupstage.js
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* ── Header extras ───────────────────────────────────────────── */
+.gs-header-sep  { color: var(--muted); margin: 0 .4rem; font-weight: 400; }
+.gs-page-title  { font-size: 1rem; font-weight: 600; color: var(--text); }
+
+.gs-user-pill {
+  display: flex;
+  align-items: center;
+  gap: .55rem;
+  font-size: .85rem;
+}
+.gs-pill-name  { font-weight: 600; }
+.gs-pill-admin {
+  font-size: .65rem;
+  font-weight: 700;
+  background: var(--accent2);
+  color: #fff;
+  border-radius: 4px;
+  padding: .1rem .4rem;
+  letter-spacing: .05em;
+  text-transform: uppercase;
+}
+
+/* ── Shared buttons ──────────────────────────────────────────── */
+.btn-primary {
+  background: var(--accent);
+  color: #fff;
+  padding: .45rem 1rem;
+  border-radius: 6px;
+  font-weight: 600;
+  font-size: .88rem;
+  border: none;
+  cursor: pointer;
+  transition: opacity .15s;
+}
+.btn-primary:hover { opacity: .88; }
+.btn-secondary {
+  background: var(--surface2);
+  color: var(--text);
+  border: 1px solid var(--border);
+  padding: .4rem .9rem;
+  border-radius: 6px;
+  font-weight: 600;
+  font-size: .85rem;
+  cursor: pointer;
+  transition: border-color .15s;
+}
+.btn-secondary:hover { border-color: var(--accent); color: var(--accent); }
+.btn-ghost {
+  background: transparent;
+  border: 1px solid var(--border);
+  color: var(--muted);
+  padding: .3rem .7rem;
+  border-radius: 6px;
+  font-size: .8rem;
+  cursor: pointer;
+  transition: color .15s, border-color .15s;
+}
+.btn-ghost:hover { color: var(--red); border-color: var(--red); }
+
+/* ── Main controls bar ───────────────────────────────────────── */
+.gs-controls {
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  padding: .55rem 1.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: .5rem;
+}
+
+.gs-main-tabs {
+  display: flex;
+  gap: .35rem;
+}
+.gs-tab {
+  background: transparent;
+  border: 1px solid transparent;
+  color: var(--muted);
+  border-radius: 6px;
+  padding: .35rem .85rem;
+  font-size: .88rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: color .15s, border-color .15s, background .15s;
+}
+.gs-tab.active, .gs-tab:hover {
+  background: var(--surface2);
+  border-color: var(--border);
+  color: var(--text);
+}
+.gs-tab.active { border-color: var(--accent); color: var(--accent); }
+
+.gs-login-cta {
+  display: flex;
+  align-items: center;
+  gap: .6rem;
+  font-size: .85rem;
+  color: var(--muted);
+}
+
+/* ── Group tabs ──────────────────────────────────────────────── */
+.gs-group-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: .3rem;
+  padding: .75rem 1rem .35rem;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+.gs-group-tab {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  color: var(--muted);
+  border-radius: 20px;
+  padding: .25rem .75rem;
+  font-size: .8rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background .15s, color .15s, border-color .15s;
+}
+.gs-group-tab.active, .gs-group-tab:hover {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #fff;
+}
+
+/* ── Tab content wrapper ─────────────────────────────────────── */
+.gs-tab-content { padding-bottom: 3rem; }
+
+/* ── Match grid ──────────────────────────────────────────────── */
+.gs-matches-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 1rem;
+  padding: .25rem 1rem 1.5rem;
+  max-width: 1400px;
+  margin: 0 auto;
+}
+.gs-matches-grid.cols-1 { grid-template-columns: repeat(1, minmax(280px, 480px)); }
+.gs-matches-grid.cols-2 { grid-template-columns: repeat(2, minmax(280px, 1fr)); }
+.gs-matches-grid.cols-3 { grid-template-columns: repeat(3, minmax(280px, 1fr)); }
+.gs-matches-grid.cols-4 { grid-template-columns: repeat(4, minmax(280px, 1fr)); }
+
+/* ── Date section header (spans full grid width) ─────────────── */
+.gs-date-header {
+  grid-column: 1 / -1;
+  padding: .9rem .1rem .35rem;
+  font-size: .8rem;
+  font-weight: 700;
+  color: var(--accent);
+  text-transform: uppercase;
+  letter-spacing: .06em;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: -.25rem;
+}
+.gs-date-header:first-child { padding-top: .1rem; }
+
+/* ── Match card ──────────────────────────────────────────────── */
+.gs-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  transition: border-color .2s;
+}
+.gs-card:hover { border-color: var(--accent); }
+.gs-card-locked { border-color: var(--border); opacity: .95; }
+.gs-card-locked:hover { border-color: var(--border); }
+
+.gs-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: .7rem 1rem .45rem;
+  gap: .5rem;
+}
+.gs-card-teams {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: .4rem;
+  min-width: 0;
+  flex-wrap: wrap;
+}
+.gs-team1, .gs-team2 {
+  font-weight: 700;
+  font-size: .95rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.gs-vs {
+  font-size: .72rem;
+  color: var(--muted);
+  font-weight: 400;
+}
+
+.gs-status-badge {
+  font-size: .65rem;
+  font-weight: 700;
+  padding: .18rem .55rem;
+  border-radius: 10px;
+  text-transform: uppercase;
+  letter-spacing: .05em;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+.gs-status-upcoming  { background: var(--surface2);            color: var(--muted); }
+.gs-status-live      { background: var(--red);                 color: #fff; animation: gs-pulse 1.4s infinite; }
+.gs-status-finished  { background: rgba(34,197,94,.12);        color: var(--green); }
+
+@keyframes gs-pulse {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: .65; }
+}
+
+.gs-admin-btn {
+  background: transparent;
+  border: 1px solid var(--border);
+  color: var(--muted);
+  border-radius: 6px;
+  padding: .2rem .45rem;
+  font-size: .85rem;
+  cursor: pointer;
+  transition: border-color .15s, color .15s;
+  flex-shrink: 0;
+}
+.gs-admin-btn:hover { border-color: var(--accent); color: var(--accent); }
+
+.gs-card-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: .25rem .7rem;
+  padding: 0 1rem .55rem;
+  font-size: .72rem;
+  color: var(--muted);
+}
+.gs-meta-date { color: var(--accent); font-weight: 600; }
+
+.gs-card-body { padding: .5rem 1rem .9rem; }
+
+/* ── Guess form ──────────────────────────────────────────────── */
+.gs-guess-form { display: flex; flex-direction: column; gap: .65rem; }
+.gs-guess-section-label {
+  font-size: .7rem;
+  font-weight: 700;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: .06em;
+}
+
+.gs-score-row {
+  display: flex;
+  align-items: center;
+  gap: .5rem;
+}
+.gs-team-score {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: .2rem;
+  flex: 1;
+}
+.gs-team-name-small {
+  font-size: .72rem;
+  color: var(--muted);
+  text-align: center;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 90px;
+}
+.gs-score-input {
+  width: 58px;
+  text-align: center;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  color: var(--text);
+  padding: .4rem .3rem;
+  font-size: 1.1rem;
+  font-weight: 700;
+  outline: none;
+  -moz-appearance: textfield;
+}
+.gs-score-input::-webkit-inner-spin-button { display: none; }
+.gs-score-input:focus { border-color: var(--accent); }
+.gs-score-sep {
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: var(--muted);
+  padding: 0 .1rem;
+  margin-top: 1.2rem;
+}
+
+/* ── Bonus inputs ────────────────────────────────────────────── */
+.gs-bonus-group {
+  display: flex;
+  flex-direction: column;
+  gap: .3rem;
+}
+.gs-bonus-label {
+  display: flex;
+  align-items: flex-start;
+  gap: .4rem;
+  font-size: .78rem;
+  color: var(--text);
+  line-height: 1.35;
+}
+.gs-bonus-badge {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  font-size: .65rem;
+  padding: .05rem .3rem;
+  color: var(--accent2);
+  font-weight: 700;
+  white-space: nowrap;
+  flex-shrink: 0;
+  margin-top: .05rem;
+}
+.gs-player-input-wrap { position: relative; }
+.gs-player-input, .gs-minute-input {
+  width: 100%;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  color: var(--text);
+  padding: .4rem .7rem;
+  font-size: .85rem;
+  outline: none;
+}
+.gs-player-input:focus, .gs-minute-input:focus { border-color: var(--accent); }
+.gs-minute-input { -moz-appearance: textfield; }
+.gs-minute-input::-webkit-inner-spin-button { display: none; }
+
+/* ── Player autocomplete dropdown ───────────────────────────── */
+.gs-ac-dropdown {
+  display: none;
+  position: fixed;
+  z-index: 9999;
+  background: #12151f;
+  border: 1px solid #2a2a3e;
+  border-radius: 7px;
+  max-height: 320px;
+  overflow-y: auto;
+  box-shadow: 0 8px 28px rgba(0,0,0,.7);
+  min-width: 280px;
+}
+.gs-ac-dropdown.ac-open { display: block; }
+.gs-ac-opt {
+  padding: .38rem .7rem;
+  cursor: pointer;
+  font-size: .82rem;
+  color: #d0d0d0;
+  border-bottom: 1px solid #1c1f2e;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: .5rem;
+}
+.gs-ac-opt:last-child { border-bottom: none; }
+.gs-ac-opt.home { background: rgba(41,128,185,.10); }
+.gs-ac-opt.home:hover, .gs-ac-opt.home.ac-focused { background: rgba(41,128,185,.28); }
+.gs-ac-opt.away { background: rgba(39,174,96,.08); }
+.gs-ac-opt.away:hover, .gs-ac-opt.away.ac-focused { background: rgba(39,174,96,.22); }
+.gs-ac-meta {
+  font-size: .72rem;
+  color: #777;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+.gs-ac-sep {
+  padding: .22rem .7rem;
+  font-size: .68rem;
+  text-transform: uppercase;
+  letter-spacing: .07em;
+  color: #555;
+  background: #0e1018;
+  border-bottom: 1px solid #1c1f2e;
+  pointer-events: none;
+}
+
+/* ── Save button ─────────────────────────────────────────────── */
+.gs-save-btn {
+  align-self: flex-end;
+  min-width: 90px;
+}
+.gs-save-btn.gs-saved {
+  background: var(--surface2);
+  color: var(--green);
+  border: 1px solid var(--green);
+}
+
+/* ── No-user message ─────────────────────────────────────────── */
+.gs-no-user-msg {
+  font-size: .82rem;
+  color: var(--muted);
+  text-align: center;
+  padding: .5rem 0;
+  font-style: italic;
+}
+
+/* ── Locked view ─────────────────────────────────────────────── */
+.gs-locked-grid { display: flex; flex-direction: column; gap: .3rem; }
+.gs-locked-row {
+  display: flex;
+  align-items: baseline;
+  gap: .5rem;
+  font-size: .83rem;
+}
+.gs-locked-key {
+  color: var(--muted);
+  min-width: 90px;
+  font-size: .78rem;
+}
+.gs-locked-val { color: var(--text); }
+.gs-bonus-mini { font-size: .72rem; }
+.gs-correct    { color: var(--green); font-weight: 700; }
+.gs-answer-hint { font-size: .75rem; color: var(--muted); margin-left: .35rem; }
+
+/* ── Points badge ────────────────────────────────────────────── */
+.gs-pts-badge {
+  display: inline-block;
+  margin-top: .55rem;
+  font-size: .78rem;
+  font-weight: 700;
+  padding: .22rem .6rem;
+  border-radius: 6px;
+}
+.gs-pts-gold   { background: rgba(245,158,11,.18); color: var(--yellow); border: 1px solid rgba(245,158,11,.35); }
+.gs-pts-silver { background: rgba(79,142,247,.14); color: var(--accent); border: 1px solid rgba(79,142,247,.3); }
+.gs-pts-bronze { background: rgba(34,197,94,.12);  color: var(--green);  border: 1px solid rgba(34,197,94,.25); }
+
+/* ── Auth modal ──────────────────────────────────────────────── */
+.gs-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,.62);
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.gs-modal-backdrop.hidden { display: none; }
+.gs-modal-box {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 1.5rem;
+  width: min(420px, 95vw);
+  max-height: 90vh;
+  overflow-y: auto;
+  position: relative;
+}
+.gs-modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1rem;
+}
+.gs-modal-header h3 { font-size: 1rem; font-weight: 700; }
+.gs-modal-close {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  color: var(--muted);
+  border-radius: 50%;
+  width: 28px;
+  height: 28px;
+  font-size: .85rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+.gs-modal-close:hover { color: var(--text); }
+
+.gs-modal-tabs {
+  display: flex;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 1.25rem;
+}
+.gs-modal-tab {
+  background: transparent;
+  border: none;
+  border-bottom: 2px solid transparent;
+  color: var(--muted);
+  padding: .55rem 1rem;
+  font-size: .9rem;
+  font-weight: 600;
+  cursor: pointer;
+  margin-bottom: -1px;
+  transition: color .15s, border-color .15s;
+}
+.gs-modal-tab.active { color: var(--accent); border-bottom-color: var(--accent); }
+.gs-modal-tab:hover:not(.active) { color: var(--text); }
+
+.gs-auth-form {
+  display: flex;
+  flex-direction: column;
+  gap: .85rem;
+}
+.gs-auth-form label {
+  display: flex;
+  flex-direction: column;
+  gap: .3rem;
+  font-size: .83rem;
+  color: var(--muted);
+}
+.gs-auth-form input[type="text"],
+.gs-auth-form input[type="password"],
+.gs-auth-form input[type="number"] {
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  color: var(--text);
+  padding: .45rem .8rem;
+  font-size: .9rem;
+  outline: none;
+  width: 100%;
+  transition: border-color .15s;
+}
+.gs-auth-form input:focus { border-color: var(--accent); }
+
+.gs-form-error {
+  background: rgba(239,68,68,.1);
+  border: 1px solid rgba(239,68,68,.3);
+  color: var(--red);
+  border-radius: 6px;
+  padding: .45rem .7rem;
+  font-size: .82rem;
+}
+
+/* ── Admin panel ─────────────────────────────────────────────── */
+.gs-admin-match-title {
+  font-weight: 600;
+  font-size: .95rem;
+  margin-bottom: .75rem;
+  padding-bottom: .65rem;
+  border-bottom: 1px solid var(--border);
+}
+.gs-admin-actions {
+  display: flex;
+  gap: .6rem;
+  flex-wrap: wrap;
+}
+
+/* ── Admin score row (reuse gs-score-row, but labels are spans not small) */
+.gs-score-label {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: .3rem;
+  flex: 1;
+  font-size: .82rem;
+  color: var(--muted);
+}
+.gs-score-label input[type="number"] {
+  width: 64px;
+  text-align: center;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  color: var(--text);
+  padding: .45rem .3rem;
+  font-size: 1.1rem;
+  font-weight: 700;
+  outline: none;
+}
+.gs-score-label input[type="number"]:focus { border-color: var(--accent); }
+
+/* ── Leaderboard ─────────────────────────────────────────────── */
+.gs-lb-wrap {
+  max-width: 640px;
+  margin: 1.5rem auto;
+  padding: 0 1rem;
+}
+.gs-section-title {
+  font-size: 1.1rem;
+  font-weight: 700;
+  margin-bottom: 1rem;
+  color: var(--text);
+}
+.gs-lb-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: .9rem;
+}
+.gs-lb-table th {
+  text-align: left;
+  font-size: .72rem;
+  text-transform: uppercase;
+  letter-spacing: .06em;
+  color: var(--muted);
+  padding: .4rem .6rem;
+  border-bottom: 1px solid var(--border);
+}
+.gs-lb-table td {
+  padding: .6rem .6rem;
+  border-bottom: 1px solid var(--border);
+}
+.gs-lb-table tr:last-child td { border-bottom: none; }
+.gs-lb-rank { font-size: 1.1rem; min-width: 40px; }
+.gs-lb-name { font-weight: 600; }
+.gs-lb-pts  { text-align: right; font-weight: 700; color: var(--accent); font-size: 1rem; }
+.gs-lb-me   { background: rgba(79,142,247,.07); }
+
+/* ── Toast ───────────────────────────────────────────────────── */
+.gs-toast {
+  position: fixed;
+  bottom: 1.5rem;
+  left: 50%;
+  transform: translateX(-50%) translateY(20px);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  color: var(--text);
+  border-radius: 8px;
+  padding: .65rem 1.2rem;
+  font-size: .88rem;
+  font-weight: 600;
+  z-index: 2000;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity .25s, transform .25s;
+}
+.gs-toast.gs-toast-show {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+}
+.gs-toast.gs-toast-error {
+  border-color: rgba(239,68,68,.5);
+  color: var(--red);
+}
+
+/* ── Guest banner ────────────────────────────────────────────── */
+.gs-guest-banner {
+  position: fixed;
+  bottom: 1.5rem;
+  right: 1.5rem;
+  background: var(--surface);
+  border: 1px solid var(--accent);
+  border-radius: 10px;
+  padding: .8rem 1.1rem;
+  display: flex;
+  align-items: center;
+  gap: .75rem;
+  font-size: .85rem;
+  z-index: 900;
+  box-shadow: 0 4px 20px rgba(0,0,0,.4);
+}
+
+/* ── Empty state ─────────────────────────────────────────────── */
+.gs-empty {
+  text-align: center;
+  color: var(--muted);
+  padding: 2.5rem 1rem;
+  font-size: .9rem;
+  grid-column: 1 / -1;
+}
+
+/* ── Responsive tweaks ───────────────────────────────────────── */
+@media (max-width: 640px) {
+  .gs-matches-grid,
+  .gs-matches-grid.cols-1,
+  .gs-matches-grid.cols-2,
+  .gs-matches-grid.cols-3,
+  .gs-matches-grid.cols-4 { grid-template-columns: 1fr; padding: .5rem; }
+  .gs-group-tabs   { padding: .5rem .5rem .25rem; }
+  .gs-controls     { padding: .45rem .75rem; }
+  .gs-locked-key   { min-width: 70px; }
+  .gs-admin-actions { flex-direction: column; }
+  .gs-lb-wrap      { padding: 0 .5rem; }
+}

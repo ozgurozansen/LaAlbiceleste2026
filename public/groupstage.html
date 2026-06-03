@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>LaAlbiceleste2026 – Grup Aşaması / Group Stage</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+<!-- ═══════════════════════════════════════ HEADER ═══════════════════════════ -->
+<header>
+  <div class="header-inner">
+    <div class="logo">
+      <a href="/" style="color:inherit;text-decoration:none">⚽ LaAlbiceleste2026</a>
+      <span class="gs-header-sep">›</span>
+      <span id="hdr-title" class="gs-page-title">Grup Aşaması</span>
+    </div>
+    <div class="header-right">
+      <div id="user-pill" class="gs-user-pill hidden"></div>
+      <div class="lang-toggle">
+        <button class="lang-btn active" data-lang="tr">TR</button>
+        <button class="lang-btn"        data-lang="en">EN</button>
+      </div>
+    </div>
+  </div>
+</header>
+
+<!-- ═══════════════════════════════════════ AUTH MODAL ═══════════════════════ -->
+<div id="auth-modal" class="gs-modal-backdrop hidden" role="dialog" aria-modal="true">
+  <div class="gs-modal-box">
+    <div class="gs-modal-tabs">
+      <button class="gs-modal-tab active" id="tab-login"
+              data-i18n="login">Giriş Yap</button>
+      <button class="gs-modal-tab" id="tab-register"
+              data-i18n="register">Kayıt Ol</button>
+    </div>
+
+    <!-- Login form -->
+    <form id="login-form" class="gs-auth-form" autocomplete="on">
+      <label>
+        <span data-i18n="username">Kullanıcı Adı</span>
+        <input type="text" id="login-username" autocomplete="username"
+               placeholder="kullanici_adi" required />
+      </label>
+      <label>
+        <span data-i18n="password">Şifre</span>
+        <input type="password" id="login-password" autocomplete="current-password"
+               placeholder="••••••" required />
+      </label>
+      <div id="login-error" class="gs-form-error hidden"></div>
+      <button type="submit" class="btn-primary" data-i18n="login">Giriş Yap</button>
+    </form>
+
+    <!-- Register form -->
+    <form id="register-form" class="gs-auth-form hidden" autocomplete="on">
+      <label>
+        <span data-i18n="username">Kullanıcı Adı</span>
+        <input type="text" id="reg-username" autocomplete="username"
+               placeholder="kullanici_adi (a-z, 0-9, _)" required />
+      </label>
+      <label>
+        <span data-i18n="displayName">Görünen Ad</span>
+        <input type="text" id="reg-display" autocomplete="name"
+               placeholder="Ad Soyad" required />
+      </label>
+      <label>
+        <span data-i18n="password">Şifre</span>
+        <input type="password" id="reg-password" autocomplete="new-password"
+               placeholder="••••••" required />
+      </label>
+      <div id="register-error" class="gs-form-error hidden"></div>
+      <button type="submit" class="btn-primary" data-i18n="register">Kayıt Ol</button>
+    </form>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════ MAIN APP ═════════════════════════ -->
+<div id="app" class="hidden">
+
+  <!-- ── Top control bar ──────────────────────────────────────────────────── -->
+  <div class="gs-controls">
+    <div class="gs-main-tabs">
+      <button class="gs-tab active" data-tab="predictions" data-i18n="tab_predictions">
+        Tahminler
+      </button>
+      <button class="gs-tab" data-tab="leaderboard" data-i18n="tab_leaderboard">
+        Sıralama
+      </button>
+    </div>
+    <div id="login-cta" class="gs-login-cta hidden">
+      <span data-i18n="notLoggedIn">Tahmin için giriş yapın</span>
+      <button id="btn-open-auth" class="btn-secondary" data-i18n="login">Giriş Yap</button>
+    </div>
+  </div>
+
+  <!-- ── Predictions tab ──────────────────────────────────────────────────── -->
+  <div id="tab-predictions" class="gs-tab-content">
+    <!-- Group A … L tabs -->
+    <div class="gs-group-tabs" id="group-tabs"></div>
+    <!-- Match cards grid -->
+    <div id="matches-container" class="gs-matches-grid"></div>
+  </div>
+
+  <!-- ── Leaderboard tab ──────────────────────────────────────────────────── -->
+  <div id="tab-leaderboard" class="gs-tab-content hidden">
+    <div class="gs-lb-wrap">
+      <h2 class="gs-section-title" data-i18n="leaderboard">Sıralama</h2>
+      <div id="leaderboard-container"></div>
+    </div>
+  </div>
+
+</div>
+
+<!-- ═══════════════════════════════════════ GUEST BANNER ═════════════════════ -->
+<div id="guest-banner" class="gs-guest-banner hidden">
+  <span data-i18n="notLoggedIn">Tahmin girmek için giriş yapın</span>
+  <button id="btn-guest-auth" class="btn-secondary" data-i18n="login">Giriş Yap</button>
+</div>
+
+<!-- ═══════════════════════════════════════ TOAST ════════════════════════════ -->
+<div id="toast" class="gs-toast hidden"></div>
+
+<!-- ═══════════════════════════════════════ ADMIN RESULT MODAL ═══════════════ -->
+<div id="admin-modal" class="gs-modal-backdrop hidden" role="dialog" aria-modal="true">
+  <div class="gs-modal-box">
+    <div class="gs-modal-header">
+      <h3 data-i18n="enterResult">Sonuç Gir</h3>
+      <button class="gs-modal-close" id="admin-modal-close">✕</button>
+    </div>
+    <form id="admin-result-form" class="gs-auth-form">
+      <input type="hidden" id="admin-match-index" />
+      <div id="admin-match-title" class="gs-admin-match-title"></div>
+
+      <div class="gs-score-row">
+        <label class="gs-score-label">
+          <span id="admin-team1-label">-</span>
+          <input type="number" id="admin-home-score" min="0" max="30" value="0" />
+        </label>
+        <span class="gs-score-sep">:</span>
+        <label class="gs-score-label">
+          <span id="admin-team2-label">-</span>
+          <input type="number" id="admin-away-score" min="0" max="30" value="0" />
+        </label>
+      </div>
+
+      <label>
+        <span id="admin-fh-label" data-i18n="fhBonusAnswer">1. Yarı Bonus Cevabı</span>
+        <input type="text" id="admin-fh-answer" placeholder="–" />
+      </label>
+      <label>
+        <span id="admin-sh-label" data-i18n="shBonusAnswer">2. Yarı Bonus Cevabı</span>
+        <input type="text" id="admin-sh-answer" placeholder="–" />
+      </label>
+
+      <div id="admin-error" class="gs-form-error hidden"></div>
+      <div class="gs-admin-actions">
+        <button type="submit" class="btn-primary" data-i18n="save">Kaydet</button>
+        <button type="button" id="btn-fetch-api" class="btn-secondary"
+                data-i18n="fetchResult">API'den Çek</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<script src="groupstage.js"></script>
+</body>
+</html>

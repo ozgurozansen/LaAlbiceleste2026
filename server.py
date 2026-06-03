@@ -4,6 +4,7 @@ LaAlbiceleste2026 API — pure Python stdlib server
 Usage: python3 server.py [port]   (default port 3000)
 """
 
+import http.client
 import json
 import os
 import ssl
@@ -14,11 +15,16 @@ import urllib.parse
 import threading
 import mimetypes
 from http.server import HTTPServer, BaseHTTPRequestHandler, ThreadingHTTPServer
+import hashlib
+import re
+import uuid
+from datetime import datetime, timezone, timedelta
 
-PORT = int(sys.argv[1]) if len(sys.argv) > 1 else 3000
+PORT = int(sys.argv[1]) if len(sys.argv) > 1 else 8000
 BULLETIN_URL = "https://bulten.nesine.com/api/bulten/getprebultenfull"
 CACHE_TTL = 60  # seconds
 PUBLIC_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "public")
+DATA_DIR   = os.path.join(os.path.dirname(os.path.abspath(__file__)), "data")
 CONFIG_FILE = os.path.join(os.path.dirname(os.path.abspath(__file__)), "config.json")
 
 
@@ -45,6 +51,248 @@ OUTCOME_LABELS_TR = {int(k): {int(n): v for n, v in oc.items()}
 SPORT_TYPES_TR    = {int(k): v for k, v in CONFIG.get("sport_types_tr", {}).items()}
 _TR_TO_EN         = CONFIG.get("tr_to_en", {})
 
+# ── Group-stage data paths ────────────────────────────────────────────────────
+_GS_FILE    = os.path.join(DATA_DIR, "groupstage2026.json")
+_BFH_FILE   = os.path.join(DATA_DIR, "bonusfirsthalf.txt")
+_BSH_FILE   = os.path.join(DATA_DIR, "bonussecondhalf.txt")
+_SQUAD_FILE = os.path.join(DATA_DIR, "squad.json")
+_USERS_FILE = os.path.join(DATA_DIR, "users.json")
+_GUESS_FILE = os.path.join(DATA_DIR, "guesses.json")
+_RES_FILE   = os.path.join(DATA_DIR, "match_results.json")
+
+POINTS_CFG  = CONFIG.get("points", {"correct_score": 5, "correct_result": 3,
+                                     "correct_fh_bonus": 1, "correct_sh_bonus": 1})
+
+
+def _load_bonus_file(path):
+    items = []
+    try:
+        with open(path, encoding="utf-8") as f:
+            for line in f:
+                line = line.strip()
+                if not line:
+                    continue
+                m = re.match(r'^(.+?)\s*\((.+)\)\s*$', line)
+                tr_text = m.group(1).strip() if m else line
+                en_text = m.group(2).strip() if m else line
+                input_type = "player" if "kim" in tr_text.lower() else "minute"
+                items.append({"tr": tr_text, "en": en_text, "inputType": input_type})
+    except FileNotFoundError:
+        pass
+    return items
+
+
+_BONUS_FH = _load_bonus_file(_BFH_FILE)
+_BONUS_SH = _load_bonus_file(_BSH_FILE)
+
+
+def _load_all_matches():
+    try:
+        with open(_GS_FILE, encoding="utf-8") as f:
+            return json.load(f).get("matches", [])
+    except (FileNotFoundError, json.JSONDecodeError):
+        return []
+
+
+def _load_squad_data():
+    try:
+        with open(_SQUAD_FILE, encoding="utf-8") as f:
+            return json.load(f)
+    except (FileNotFoundError, json.JSONDecodeError):
+        return {}
+
+
+def _build_squad_lookup(squad):
+    lookup = {}
+    for grp in squad.get("groups", []):
+        for team in grp.get("teams", []):
+            name = team.get("team", "")
+            lookup[name] = [
+                {"name": p["name"], "position": p.get("position", ""),
+                 "number": p.get("jersey_number")}
+                for p in team.get("players", [])
+            ]
+    return lookup
+
+
+_ALL_MATCHES   = _load_all_matches()
+_SQUAD_LOOKUP  = _build_squad_lookup(_load_squad_data())
+_data_lock     = threading.Lock()
+_tokens        = {}   # token -> {username, expires}
+
+
+# ── Time helpers ──────────────────────────────────────────────────────────────
+def _parse_kickoff_utc(date_str, time_str):
+    m = re.match(r'(\d+):(\d+)\s*UTC([+-]\d+(?:\.\d+)?)', time_str or "")
+    if not m:
+        return None
+    h, mn, off = int(m.group(1)), int(m.group(2)), float(m.group(3))
+    try:
+        dt = datetime.strptime(f"{date_str} {h:02d}:{mn:02d}", "%Y-%m-%d %H:%M")
+        dt = dt - timedelta(hours=off)
+        return dt.replace(tzinfo=timezone.utc)
+    except ValueError:
+        return None
+
+
+def _match_status(ko_utc):
+    if ko_utc is None:
+        return "upcoming"
+    now = datetime.now(timezone.utc)
+    if now < ko_utc:
+        return "upcoming"
+    if now < ko_utc + timedelta(hours=2, minutes=30):
+        return "live"
+    return "finished"
+
+
+def _enrich_match(idx, m):
+    n_fh = len(_BONUS_FH)
+    n_sh = len(_BONUS_SH)
+    fhb  = _BONUS_FH[idx % n_fh] if n_fh else None
+    shb  = _BONUS_SH[idx % n_sh] if n_sh else None
+    ko   = _parse_kickoff_utc(m.get("date", ""), m.get("time", ""))
+    return {
+        **m,
+        "index":          idx,
+        "isGroupStage":   "group" in m,
+        "utcKickoff":     ko.isoformat() if ko else None,
+        "status":         _match_status(ko),
+        "firstHalfBonus": fhb,
+        "secondHalfBonus": shb,
+    }
+
+
+# ── Auth helpers ──────────────────────────────────────────────────────────────
+def _hash_pw(pw):
+    return hashlib.sha256(pw.encode("utf-8")).hexdigest()
+
+
+def _create_token(username):
+    token = str(uuid.uuid4())
+    exp   = (datetime.now(timezone.utc) + timedelta(hours=24)).isoformat()
+    with _data_lock:
+        _tokens[token] = {"username": username, "expires": exp}
+    return token
+
+
+def _validate_token(token):
+    if not token:
+        return None
+    with _data_lock:
+        t = _tokens.get(token)
+    if not t:
+        return None
+    if datetime.now(timezone.utc) > datetime.fromisoformat(t["expires"]):
+        with _data_lock:
+            _tokens.pop(token, None)
+        return None
+    return t["username"]
+
+
+# ── JSON file helpers ─────────────────────────────────────────────────────────
+def _jload(path, default):
+    try:
+        with open(path, encoding="utf-8") as f:
+            return json.load(f)
+    except (FileNotFoundError, json.JSONDecodeError):
+        return default
+
+
+def _jsave(path, data):
+    os.makedirs(os.path.dirname(path), exist_ok=True)
+    with open(path, "w", encoding="utf-8") as f:
+        json.dump(data, f, ensure_ascii=False, indent=2)
+
+
+def _is_admin(username):
+    users = _jload(_USERS_FILE, {"users": {}})
+    return users.get("users", {}).get(username, {}).get("isAdmin", False)
+
+
+# ── Scoring ────────────────────────────────────────────────────────────────────
+def _calc_points(guess, result_score, fh_answer, sh_answer):
+    pts = {"score": 0, "result": 0, "fhBonus": 0, "shBonus": 0, "total": 0}
+    if not guess or not result_score:
+        return pts
+    cfg = POINTS_CFG
+    gh, ga = guess.get("homeScore"), guess.get("awayScore")
+    rh, ra = result_score.get("home"),  result_score.get("away")
+    if None not in (gh, ga, rh, ra):
+        if gh == rh and ga == ra:
+            pts["score"]  = cfg.get("correct_score",  5)
+            pts["result"] = cfg.get("correct_result", 3)
+        elif ((gh > ga and rh > ra) or
+              (gh == ga and rh == ra) or
+              (gh < ga and rh < ra)):
+            pts["result"] = cfg.get("correct_result", 3)
+    def _norm(v):
+        return str(v).strip().lower() if v is not None else ""
+    if _norm(guess.get("fhBonus")) and _norm(fh_answer) and \
+            _norm(guess.get("fhBonus")) == _norm(fh_answer):
+        pts["fhBonus"] = cfg.get("correct_fh_bonus", 1)
+    if _norm(guess.get("shBonus")) and _norm(sh_answer) and \
+            _norm(guess.get("shBonus")) == _norm(sh_answer):
+        pts["shBonus"] = cfg.get("correct_sh_bonus", 1)
+    pts["total"] = sum(pts[k] for k in ("score", "result", "fhBonus", "shBonus"))
+    return pts
+
+
+def _compute_leaderboard():
+    guesses_data = _jload(_GUESS_FILE, {"guesses": {}})
+    results_data = _jload(_RES_FILE,   {"results": {}})
+    users_data   = _jload(_USERS_FILE, {"users": {}})
+    results  = results_data.get("results", {})
+    lb = []
+    for uname, uinfo in users_data.get("users", {}).items():
+        user_guesses = guesses_data.get("guesses", {}).get(uname, {})
+        total = 0
+        match_pts = {}
+        for idx_s, res in results.items():
+            g = user_guesses.get(idx_s)
+            if g:
+                p = _calc_points(g, res.get("score"),
+                                 res.get("fhBonusAnswer"), res.get("shBonusAnswer"))
+                match_pts[idx_s] = p
+                total += p["total"]
+        lb.append({"username": uname,
+                   "displayName": uinfo.get("displayName", uname),
+                   "totalPoints": total, "matchPoints": match_pts})
+    lb.sort(key=lambda x: -x["totalPoints"])
+    return lb
+
+
+def _fetch_result_api(match):
+    """Try football-data.org for a finished result."""
+    cfg     = CONFIG.get("results_api", {})
+    api_key = cfg.get("api_key", "")
+    if not api_key:
+        return None
+    base = cfg.get("base_url", "https://api.football-data.org/v4")
+    comp = cfg.get("competition_code", "WC")
+    date = match.get("date", "")
+    url  = f"{base}/competitions/{comp}/matches?dateFrom={date}&dateTo={date}"
+    req  = urllib.request.Request(url, headers={
+        "X-Auth-Token": api_key,
+        "User-Agent":   "LaAlbiceleste2026/1.0"
+    })
+    try:
+        with urllib.request.urlopen(req, timeout=10, context=_SSL_CTX) as resp:
+            data = json.loads(resp.read().decode("utf-8"))
+        t1 = match.get("team1", "").lower()
+        t2 = match.get("team2", "").lower()
+        for m in data.get("matches", []):
+            hn = m.get("homeTeam", {}).get("name", "").lower()
+            an = m.get("awayTeam", {}).get("name", "").lower()
+            if (t1 in hn or hn in t1) and (t2 in an or an in t2):
+                ft = m.get("score", {}).get("fullTime", {})
+                if m.get("status") == "FINISHED" and ft.get("home") is not None:
+                    return {"home": ft["home"], "away": ft["away"]}
+    except Exception as exc:
+        print(f"[results-api] {exc}")
+    return None
+
+
 # ── In-memory cache ──────────────────────────────────────────────────────────
 _cache_lock = threading.Lock()
 _cache = {"data": None, "fetched_at": 0}
@@ -63,7 +311,7 @@ def _make_ssl_context():
 _SSL_CTX = _make_ssl_context()
 
 
-def fetch_bulletin():
+def fetch_bulletin(retries=3):
     with _cache_lock:
         now = time.time()
         if _cache["data"] is not None and now - _cache["fetched_at"] < CACHE_TTL:
@@ -76,8 +324,20 @@ def fetch_bulletin():
             "User-Agent": "Mozilla/5.0 (compatible; SoccerAPIClone/1.0)",
         },
     )
-    with urllib.request.urlopen(req, timeout=120, context=_SSL_CTX) as resp:
-        raw = json.loads(resp.read().decode("utf-8"))
+    last_exc = None
+    for attempt in range(retries):
+        try:
+            with urllib.request.urlopen(req, timeout=120, context=_SSL_CTX) as resp:
+                raw = json.loads(resp.read().decode("utf-8"))
+            break
+        except http.client.IncompleteRead as exc:
+            last_exc = exc
+            if attempt < retries - 1:
+                time.sleep(2 ** attempt)
+        except Exception:
+            raise
+    else:
+        raise last_exc
 
     with _cache_lock:
         _cache["data"] = raw
@@ -187,10 +447,19 @@ def format_market(market, lang="tr"):
         type_name_display = MARKET_TYPE_NAMES_TR.get(mtid) or mn or f"Pazar #{mtid}"
     else:
         type_name_display = MARKET_TYPE_NAMES.get(mtid) or (_TR_TO_EN.get(mn, mn) if mn else None) or f"Market #{mtid}"
-    # Append handicap line for corner handicap markets (e.g. "Corner Handicap (0:2.5)")
-    if mtid in (798, 799) and sov != 0:
+    # Append handicap line for European Handicap markets (e.g. "Handicap Match Result (0:1)")
+    if mtid in _EH_MTIDS and sov != 0:
+        if sov < 0:
+            type_name_display = f"{type_name_display} (0:{abs(sov):g})"
+        else:
+            type_name_display = f"{type_name_display} ({sov:g}:0)"
+    # Append handicap line for corner handicap markets (e.g. "Corner Handicap (0:2.5)" or "Corner Handicap (0.5:0)")
+    elif mtid in (798, 799) and sov != 0:
         spread = f"{abs(sov):g}"
-        type_name_display = f"{type_name_display} (0:{spread})"
+        if sov < 0:
+            type_name_display = f"{type_name_display} (0:{spread})"
+        else:
+            type_name_display = f"{type_name_display} ({spread}:0)"
     # Append spread for Result + Over/Under (e.g. "Result + Over/Under (+3.5)")
     elif mtid == 272 and sov != 0:
         sign = "+" if sov > 0 else ""
@@ -410,7 +679,64 @@ class Handler(BaseHTTPRequestHandler):
                 raw, _ = fetch_bulletin()
                 self.send_json(200, raw)
                 return
+            # ── /api/auth/* ────────────────────────────────────────────────
+            if path == "/api/auth/me":
+                token    = qs.get("token", [""])[0]
+                username = _validate_token(token)
+                if not username:
+                    self.send_json(401, {"error": "Not authenticated"})
+                    return
+                users = _jload(_USERS_FILE, {"users": {}})
+                user  = users.get("users", {}).get(username, {})
+                self.send_json(200, {
+                    "username":    username,
+                    "displayName": user.get("displayName", username),
+                    "isAdmin":     user.get("isAdmin", False),
+                })
+                return
 
+            # ── /api/groupstage/matches ────────────────────────────────────
+            if path == "/api/groupstage/matches":
+                enriched = [_enrich_match(i, m) for i, m in enumerate(_ALL_MATCHES)
+                            if "group" in m]
+                self.send_json(200, {"matches": enriched})
+                return
+
+            # ── /api/groupstage/squads ─────────────────────────────────────
+            if path == "/api/groupstage/squads":
+                self.send_json(200, {"squads": _SQUAD_LOOKUP})
+                return
+
+            # ── /api/groupstage/guesses ────────────────────────────────────
+            if path == "/api/groupstage/guesses":
+                token    = qs.get("token", [""])[0]
+                username = _validate_token(token)
+                if not username:
+                    self.send_json(401, {"error": "Unauthorized"})
+                    return
+                gdata = _jload(_GUESS_FILE, {"guesses": {}})
+                self.send_json(200, {
+                    "guesses": gdata.get("guesses", {}).get(username, {})
+                })
+                return
+
+            # ── /api/groupstage/results ────────────────────────────────────
+            if path == "/api/groupstage/results":
+                token    = qs.get("token", [""])[0]
+                username = _validate_token(token)
+                rdata    = _jload(_RES_FILE, {"results": {}})
+                if username and _is_admin(username):
+                    self.send_json(200, rdata)
+                else:
+                    pub = {k: {"score": v.get("score"), "scored": v.get("scored", False)}
+                           for k, v in rdata.get("results", {}).items()}
+                    self.send_json(200, {"results": pub})
+                return
+
+            # ── /api/groupstage/leaderboard ────────────────────────────────
+            if path == "/api/groupstage/leaderboard":
+                self.send_json(200, {"leaderboard": _compute_leaderboard()})
+                return
             # ── Static files ───────────────────────────────────────────────
             if path == "/":
                 self.send_file(os.path.join(PUBLIC_DIR, "index.html"))
@@ -423,6 +749,182 @@ class Handler(BaseHTTPRequestHandler):
                     return
                 self.send_file(os.path.join(PUBLIC_DIR, rel))
 
+        except Exception as exc:
+            import traceback
+            traceback.print_exc()
+            self.send_json(500, {"error": str(exc)})
+
+    def do_OPTIONS(self):
+        self.send_response(200)
+        self.send_header("Access-Control-Allow-Origin",  "*")
+        self.send_header("Access-Control-Allow-Methods", "GET, POST, OPTIONS")
+        self.send_header("Access-Control-Allow-Headers", "Content-Type")
+        self.end_headers()
+
+    def do_POST(self):
+        parsed = urllib.parse.urlparse(self.path)
+        path   = parsed.path.rstrip("/") or "/"
+        cl     = int(self.headers.get("Content-Length", 0))
+        body   = self.rfile.read(cl) if cl else b""
+        try:
+            data = json.loads(body.decode("utf-8")) if body else {}
+        except (json.JSONDecodeError, UnicodeDecodeError):
+            data = {}
+        try:
+            # ── /api/auth/register ─────────────────────────────────────────
+            if path == "/api/auth/register":
+                uname   = (data.get("username") or "").strip().lower()
+                pw      = data.get("password") or ""
+                display = (data.get("displayName") or uname).strip()
+                if not uname or not pw:
+                    self.send_json(400, {"error": "Username and password required"})
+                    return
+                if not (3 <= len(uname) <= 30):
+                    self.send_json(400, {"error": "Username: 3–30 characters"})
+                    return
+                if not re.match(r'^[a-z0-9_]+$', uname):
+                    self.send_json(400, {"error": "Username: lowercase letters, digits, underscores only"})
+                    return
+                with _data_lock:
+                    users = _jload(_USERS_FILE, {"users": {}})
+                    if uname in users.get("users", {}):
+                        self.send_json(409, {"error": "Username already taken"})
+                        return
+                    users.setdefault("users", {})[uname] = {
+                        "displayName": display,
+                        "password":    _hash_pw(pw),
+                        "isAdmin":     False,
+                        "createdAt":   datetime.now(timezone.utc).isoformat(),
+                    }
+                    _jsave(_USERS_FILE, users)
+                token = _create_token(uname)
+                self.send_json(201, {"token": token, "username": uname,
+                                     "displayName": display, "isAdmin": False})
+                return
+
+            # ── /api/auth/login ────────────────────────────────────────────
+            if path == "/api/auth/login":
+                uname = (data.get("username") or "").strip().lower()
+                pw    = data.get("password") or ""
+                users = _jload(_USERS_FILE, {"users": {}})
+                user  = users.get("users", {}).get(uname)
+                if not user or user.get("password") != _hash_pw(pw):
+                    self.send_json(401, {"error": "Invalid username or password"})
+                    return
+                token = _create_token(uname)
+                self.send_json(200, {
+                    "token":       token,
+                    "username":    uname,
+                    "displayName": user.get("displayName", uname),
+                    "isAdmin":     user.get("isAdmin", False),
+                })
+                return
+
+            # ── /api/auth/logout ───────────────────────────────────────────
+            if path == "/api/auth/logout":
+                token = data.get("token") or ""
+                with _data_lock:
+                    _tokens.pop(token, None)
+                self.send_json(200, {"ok": True})
+                return
+
+            # ── /api/groupstage/guess ──────────────────────────────────────
+            if path == "/api/groupstage/guess":
+                token    = data.get("token") or ""
+                username = _validate_token(token)
+                if not username:
+                    self.send_json(401, {"error": "Unauthorized"})
+                    return
+                idx = data.get("matchIndex")
+                if idx is None or not isinstance(idx, int):
+                    self.send_json(400, {"error": "matchIndex required (int)"})
+                    return
+                if not (0 <= idx < len(_ALL_MATCHES)):
+                    self.send_json(400, {"error": "Invalid matchIndex"})
+                    return
+                m  = _ALL_MATCHES[idx]
+                ko = _parse_kickoff_utc(m.get("date", ""), m.get("time", ""))
+                if ko and datetime.now(timezone.utc) >= ko:
+                    self.send_json(403, {"error": "Match has already started – no changes allowed"})
+                    return
+                try:
+                    hs = int(data["homeScore"])
+                    as_ = int(data["awayScore"])
+                    if not (0 <= hs <= 30 and 0 <= as_ <= 30):
+                        raise ValueError()
+                except (KeyError, ValueError, TypeError):
+                    self.send_json(400, {"error": "homeScore and awayScore must be integers 0–30"})
+                    return
+                guess = {
+                    "homeScore": hs, "awayScore": as_,
+                    "fhBonus":   data.get("fhBonus"),
+                    "shBonus":   data.get("shBonus"),
+                    "savedAt":   datetime.now(timezone.utc).isoformat(),
+                }
+                with _data_lock:
+                    gdata = _jload(_GUESS_FILE, {"guesses": {}})
+                    gdata.setdefault("guesses", {}).setdefault(username, {})[str(idx)] = guess
+                    _jsave(_GUESS_FILE, gdata)
+                self.send_json(200, {"ok": True, "guess": guess})
+                return
+
+            # ── /api/groupstage/result  (admin: set result + bonus answers) ─
+            if path == "/api/groupstage/result":
+                token    = data.get("token") or ""
+                username = _validate_token(token)
+                if not username or not _is_admin(username):
+                    self.send_json(403, {"error": "Admin access required"})
+                    return
+                idx = data.get("matchIndex")
+                hs  = data.get("homeScore")
+                as_ = data.get("awayScore")
+                if None in (idx, hs, as_):
+                    self.send_json(400, {"error": "matchIndex, homeScore, awayScore required"})
+                    return
+                with _data_lock:
+                    rdata = _jload(_RES_FILE, {"results": {}})
+                    rdata.setdefault("results", {})[str(idx)] = {
+                        "score":        {"home": int(hs), "away": int(as_)},
+                        "fhBonusAnswer": data.get("fhBonusAnswer"),
+                        "shBonusAnswer": data.get("shBonusAnswer"),
+                        "scored":        True,
+                        "enteredAt":     datetime.now(timezone.utc).isoformat(),
+                    }
+                    _jsave(_RES_FILE, rdata)
+                self.send_json(200, {"ok": True, "leaderboard": _compute_leaderboard()})
+                return
+
+            # ── /api/groupstage/score  (admin: auto-fetch result from API) ─
+            if path == "/api/groupstage/score":
+                token    = data.get("token") or ""
+                username = _validate_token(token)
+                if not username or not _is_admin(username):
+                    self.send_json(403, {"error": "Admin access required"})
+                    return
+                idx = data.get("matchIndex")
+                if idx is None or not (0 <= int(idx) < len(_ALL_MATCHES)):
+                    self.send_json(400, {"error": "Invalid matchIndex"})
+                    return
+                match  = _ALL_MATCHES[int(idx)]
+                result = _fetch_result_api(match)
+                if not result:
+                    self.send_json(503, {"error": (
+                        "Could not fetch result from API. "
+                        "Configure results_api.api_key in config.json or use /api/groupstage/result."
+                    )})
+                    return
+                with _data_lock:
+                    rdata = _jload(_RES_FILE, {"results": {}})
+                    existing = rdata.setdefault("results", {}).get(str(idx), {})
+                    existing.update({"score": result, "scored": True,
+                                     "fetchedAt": datetime.now(timezone.utc).isoformat()})
+                    rdata["results"][str(idx)] = existing
+                    _jsave(_RES_FILE, rdata)
+                self.send_json(200, {"ok": True, "result": result,
+                                     "leaderboard": _compute_leaderboard()})
+                return
+
+            self.send_json(404, {"error": "Not found"})
         except Exception as exc:
             import traceback
             traceback.print_exc()

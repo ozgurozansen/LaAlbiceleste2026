@@ -27,6 +27,11 @@ done
 info "All stdlib modules OK."
 
 # ── Optional: create a virtual environment for future dependencies ────────────
+if [[ -d ".venv" ]] && [[ ! -f ".venv/Scripts/activate" ]] && [[ ! -f ".venv/bin/activate" ]]; then
+    warn ".venv/ exists but is incomplete — recreating..."
+    rm -rf .venv
+fi
+
 if [[ ! -d ".venv" ]]; then
     info "Creating virtual environment in .venv/ ..."
     "$PYTHON" -m venv .venv
@@ -36,7 +41,13 @@ else
 fi
 
 # ── Activate venv and upgrade pip (no-op for current server, useful for devs) ─
-source .venv/bin/activate
+if [[ -f ".venv/Scripts/activate" ]]; then
+    source .venv/Scripts/activate
+elif [[ -f ".venv/bin/activate" ]]; then
+    source .venv/bin/activate
+else
+    error "Could not find venv activate script in .venv/Scripts/ or .venv/bin/."
+fi
 info "Upgrading pip..."
 pip install --quiet --upgrade pip
 
@@ -56,8 +67,9 @@ echo ""
 echo -e "${GREEN}Setup complete!${NC}"
 echo ""
 echo "  To start the server:"
-echo "    source .venv/bin/activate"
-echo "    python3 server.py          # port 3000"
+echo "    source .venv/Scripts/activate  # Windows"
+echo "    source .venv/bin/activate      # Linux/macOS"
+echo "    python3 server.py          # port 8000"
 echo "    python3 server.py 8080     # custom port"
 echo ""
 echo "  Then open http://localhost:3000 in your browser."

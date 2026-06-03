@@ -201,7 +201,8 @@ const PREVIEW_DEFS = [
   { typeIds: [12],       spreadFilter: 2.5, labelTr: 'A/Ü 2.5', labelEn: 'O/U 2.5'  },
   { typeIds: [100, 101, 268, 791, 884],     labelTr: 'HND',      labelEn: 'HCP'      },
   { typeIds: [3],                           labelTr: 'ÇŞ',       labelEn: 'DC'       },
-  { typeIds: [9],                           labelTr: 'KG',       labelEn: 'BTTS'     },
+  // KG (BTTS) typeId TBD — MTID 9 is actually 2. Yarı Sonucu
+  // { typeIds: [??],                        labelTr: 'KG',       labelEn: 'BTTS'     },
 ];
 
 function buildMatchPreview(match) {

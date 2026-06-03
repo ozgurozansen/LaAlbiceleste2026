@@ -38,6 +38,29 @@
         "/^sudo snap install gh$/": {
             "approve": true,
             "matchCommandLine": true
+        },
+        "netstat": true,
+        "/^python server\\.py$/": {
+            "approve": true,
+            "matchCommandLine": true
+        },
+        "/^python scrape_squads\\.py$/": {
+            "approve": true,
+            "matchCommandLine": true
+        },
+        "&": true,
+        "/^python -c \"import json; d=json\\.load\\(open\\('data/groupstage2026\\.json',encoding='utf-8'\\)\\); teams=sorted\\(set\\(t for m in d\\['matches'\\] for t in \\[m\\['team1'\\],m\\['team2'\\]\\]\\)\\); print\\('\\\\n'\\.join\\(teams\\)\\)\"$/": {
+            "approve": true,
+            "matchCommandLine": true
+        },
+        "/^python -c \"\nimport json\nwith open\\('data/squad\\.json', encoding='utf-8'\\) as f:\n    data = json\\.load\\(f\\)\nfor g in data\\['groups'\\]:\n    print\\(f\\\\\"\\\\n\\{g\\['group'\\]\\}\\\\\"\\)\n    for t in g\\['teams'\\]:\n        print\\(f\\\\\"  \\{t\\['team'\\]:<35\\} \\{len\\(t\\['players'\\]\\)\\} players\\\\\"\\)\n\"$/": {
+            "approve": true,
+            "matchCommandLine": true
+        },
+        "/^python -c \"import json; data=json\\.load\\(open\\('data/squad\\.json',encoding='utf-8'\\)\\); \\[print\\(f'\\{g\\[chr\\(103\\)\\+\\(chr\\(114\\)\\+chr\\(111\\)\\+chr\\(117\\)\\+chr\\(112\\)\\)\\]\\}: '\\+', '\\.join\\(f'\\{t\\[chr\\(116\\)\\+\\(chr\\(101\\)\\+chr\\(97\\)\\+chr\\(109\\)\\)\\]\\}=\\{len\\(t\\[chr\\(112\\)\\+\\(chr\\(108\\)\\+chr\\(97\\)\\+chr\\(121\\)\\+chr\\(101\\)\\+chr\\(114\\)\\+chr\\(115\\)\\)\\]\\)\\}' for t in g\\['teams'\\]\\)\\) for g in data\\['groups'\\]\\]\"$/": {
+            "approve": true,
+            "matchCommandLine": true
         }
-    }
+    },
+    "python.defaultInterpreterPath": "${workspaceFolder}/.venv/Scripts/python.exe"
 }

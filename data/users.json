@@ -1,0 +1,10 @@
+{
+  "users": {
+    "lavlibolintest": {
+      "displayName": "lavlibolin",
+      "password": "09dc1bb2b25a72c6a5deecbd211750ba6f81b0bd809a2475eefcad2c11ab9091",
+      "isAdmin": true,
+      "createdAt": "2026-06-03T12:56:13.825941+00:00"
+    }
+  }
+}

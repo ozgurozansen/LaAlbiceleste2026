@@ -95,6 +95,7 @@ const I18N = {
     loginFail:      'Hatalı kullanıcı adı veya şifre',
     registerFail:   'Kayıt başarısız',
     noGuess:        'Tahmin girilmedi',
+    loginToView:    'Tahmini görüntülemek için giriş yapın',
     enterMinute:    'Dakika girin (1-120)',
     enterMinuteFH:  'Dakika girin (1-45+)',
     enterMinuteSH:  'Dakika girin (46-90+)',
@@ -150,6 +151,7 @@ const I18N = {
     loginFail:      'Invalid username or password',
     registerFail:   'Registration failed',
     noGuess:        'No prediction entered',
+    loginToView:    'Login to view prediction',
     enterMinute:    'Enter minute (1-120)',
     enterMinuteFH:  'Enter minute (1-45+)',
     enterMinuteSH:  'Enter minute (46-90+)',
@@ -183,6 +185,7 @@ const S = {
   leaderboard: [],
   activeGroup: 'A',
   adminMatchIdx: null,
+  points: { correct_score: 5, correct_result: 3, correct_fh_bonus: 1, correct_sh_bonus: 1 },
 };
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
@@ -308,6 +311,7 @@ function hideAuthModal() {
 async function loadMatches() {
   const r    = await GET('/api/groupstage/matches');
   S.matches  = r.matches || [];
+  if (r.points) S.points = r.points;
 }
 
 async function loadSquads() {
@@ -502,7 +506,7 @@ function renderMatchCard(m) {
   const status  = matchStatus(m);
   const guess   = S.guesses[idxS];
   const res     = S.results[idxS];
-  const isLocked = (status === 'live' || status === 'finished');
+  const isLocked = (status === 'live' || status === 'finished') || !!res?.score;
 
   // Compute current user's points if result is known
   let pts = null;
@@ -521,7 +525,9 @@ function renderMatchCard(m) {
   // ── Score + bonus display (locked view) ──────────────────────────────────
   let lockedContent = '';
   if (isLocked) {
-    const myScore = guess ? `${guess.homeScore} – ${guess.awayScore}` : `<em>${t('noGuess')}</em>`;
+    const myScore = guess
+      ? `${guess.homeScore} – ${guess.awayScore}`
+      : `<em>${t(S.user ? 'noGuess' : 'loginToView')}</em>`;
     const resScore = res?.score ? `<strong>${res.score.home} – ${res.score.away}</strong>` : '? – ?';
     const myFh  = guess?.fhBonus  ?? '–';
     const mySh  = guess?.shBonus  ?? '–';
@@ -533,11 +539,25 @@ function renderMatchCard(m) {
     const shMatch = res?.shBonusAnswer && guess?.shBonus &&
       String(guess.shBonus).trim().toLowerCase() === String(res.shBonusAnswer).trim().toLowerCase();
 
+    // ── Outcome icons ────────────────────────────────────────────────────
+    let scoreIcon = '';
+    if (pts && guess) {
+      if (pts.score === 5)       scoreIcon = '<span class="gs-icon gs-icon-correct">✓</span>';
+      else if (pts.result === 3) scoreIcon = '<span class="gs-icon gs-icon-partial">✓</span>';
+      else                       scoreIcon = '<span class="gs-icon gs-icon-wrong">✗</span>';
+    }
+    const fhIcon = ansFh !== '–' && myFh !== '–'
+      ? (fhMatch ? '<span class="gs-icon gs-icon-correct">✓</span>' : '<span class="gs-icon gs-icon-wrong">✗</span>')
+      : '';
+    const shIcon = ansSh !== '–' && mySh !== '–'
+      ? (shMatch ? '<span class="gs-icon gs-icon-correct">✓</span>' : '<span class="gs-icon gs-icon-wrong">✗</span>')
+      : '';
+
     lockedContent = `
       <div class="gs-locked-grid">
         <div class="gs-locked-row">
           <span class="gs-locked-key">${t('myGuess')}</span>
-          <span class="gs-locked-val">${myScore}</span>
+          <span class="gs-locked-val">${myScore}${scoreIcon}</span>
         </div>
         <div class="gs-locked-row">
           <span class="gs-locked-key">${t('result')}</span>
@@ -547,7 +567,7 @@ function renderMatchCard(m) {
         <div class="gs-locked-row">
           <span class="gs-locked-key gs-bonus-mini">${t('firstHalf')}: ${escHtml(fhLabel)}</span>
           <span class="gs-locked-val ${fhMatch ? 'gs-correct' : ''}">
-            ${escHtml(String(myFh))}
+            ${escHtml(String(myFh))}${fhIcon}
             ${ansFh !== '–' ? `<span class="gs-answer-hint">↳ ${escHtml(String(ansFh))}</span>` : ''}
           </span>
         </div>` : ''}
@@ -555,7 +575,7 @@ function renderMatchCard(m) {
         <div class="gs-locked-row">
           <span class="gs-locked-key gs-bonus-mini">${t('secondHalf')}: ${escHtml(shLabel)}</span>
           <span class="gs-locked-val ${shMatch ? 'gs-correct' : ''}">
-            ${escHtml(String(mySh))}
+            ${escHtml(String(mySh))}${shIcon}
             ${ansSh !== '–' ? `<span class="gs-answer-hint">↳ ${escHtml(String(ansSh))}</span>` : ''}
           </span>
         </div>` : ''}
@@ -627,21 +647,22 @@ function renderMatchCard(m) {
 function calcPoints(guess, resultScore, fhAnswer, shAnswer) {
   const pts = { score: 0, result: 0, fhBonus: 0, shBonus: 0, total: 0 };
   if (!guess || !resultScore) return pts;
+  const cfg = S.points;
   const { homeScore: gh, awayScore: ga } = guess;
   const { home: rh, away: ra }           = resultScore;
   if ([gh, ga, rh, ra].every(v => v !== null && v !== undefined)) {
     if (gh === rh && ga === ra) {
-      pts.score  = 5;
-      pts.result = 3;
+      pts.score  = cfg.correct_score  ?? 5;
+      pts.result = cfg.correct_result ?? 3;
     } else if ((gh > ga && rh > ra) || (gh === ga && rh === ra) || (gh < ga && rh < ra)) {
-      pts.result = 3;
+      pts.result = cfg.correct_result ?? 3;
     }
   }
   const norm = v => String(v ?? '').trim().toLowerCase();
   if (norm(guess.fhBonus) && norm(fhAnswer) && norm(guess.fhBonus) === norm(fhAnswer))
-    pts.fhBonus = 1;
+    pts.fhBonus = cfg.correct_fh_bonus ?? 1;
   if (norm(guess.shBonus) && norm(shAnswer) && norm(guess.shBonus) === norm(shAnswer))
-    pts.shBonus = 1;
+    pts.shBonus = cfg.correct_sh_bonus ?? 1;
   pts.total = pts.score + pts.result + pts.fhBonus + pts.shBonus;
   return pts;
 }

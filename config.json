@@ -1,13 +1,13 @@
 {
   "defaults": {
     "sport": 1,
-    "leagues": [10014]
+    "leagues": [10151]
   },
   "sports": [
     { "id": 1, "name": "Football" }
   ],
   "leagues": [
-    { "code": 10014, "name": "Champions League", "sport": 1 }
+    { "code": 10151, "name": "Dünya Kupası", "sport": 1 }
   ],
   "sport_types": {
     "1": "Football", "2": "Basketball", "3": "Ice Hockey", "4": "Volleyball",
@@ -394,7 +394,7 @@
     }
   ],
   "points": {
-    "correct_score":    5,
+    "correct_score":    2,
     "correct_result":   3,
     "correct_fh_bonus": 1,
     "correct_sh_bonus": 1

@@ -699,7 +699,7 @@ class Handler(BaseHTTPRequestHandler):
             if path == "/api/groupstage/matches":
                 enriched = [_enrich_match(i, m) for i, m in enumerate(_ALL_MATCHES)
                             if "group" in m]
-                self.send_json(200, {"matches": enriched})
+                self.send_json(200, {"matches": enriched, "points": POINTS_CFG})
                 return
 
             # ── /api/groupstage/squads ─────────────────────────────────────
@@ -892,6 +892,24 @@ class Handler(BaseHTTPRequestHandler):
                     }
                     _jsave(_RES_FILE, rdata)
                 self.send_json(200, {"ok": True, "leaderboard": _compute_leaderboard()})
+                return
+
+            # ── /api/groupstage/result/clear  (admin: delete a result) ─
+            if path == "/api/groupstage/result/clear":
+                token    = data.get("token") or ""
+                username = _validate_token(token)
+                if not username or not _is_admin(username):
+                    self.send_json(403, {"error": "Admin access required"})
+                    return
+                idx = data.get("matchIndex")
+                if idx is None:
+                    self.send_json(400, {"error": "matchIndex required"})
+                    return
+                with _data_lock:
+                    rdata = _jload(_RES_FILE, {"results": {}})
+                    rdata.setdefault("results", {}).pop(str(idx), None)
+                    _jsave(_RES_FILE, rdata)
+                self.send_json(200, {"ok": True})
                 return
 
             # ── /api/groupstage/score  (admin: auto-fetch result from API) ─

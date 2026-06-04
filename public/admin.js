@@ -207,6 +207,7 @@ function buildCard(m) {
         <button class="adm-fetch-btn" onclick="fetchFromApi(${idx})">
           🌐 API'den Çek
         </button>
+        ${entered ? `<button class="adm-clear-btn" onclick="clearResult(${idx})">🗑 Sonucu Sil</button>` : ''}
       </div>
       <div id="msg-${idx}" class="adm-msg"></div>
     </div>
@@ -368,6 +369,33 @@ async function saveResult(idx) {
   } else {
     msg.className = 'adm-msg err';
     msg.textContent = d.error || 'Kayıt başarısız.';
+  }
+}
+
+async function clearResult(idx) {
+  if (!confirm(`Maç #${idx} sonucunu silmek istediğinizden emin misiniz?`)) return;
+  const msg = $(`msg-${idx}`);
+  msg.className = 'adm-msg';
+  msg.textContent = 'Siliniyor…';
+
+  const d = await api('POST', '/api/groupstage/result/clear', {
+    token: S.token,
+    matchIndex: idx,
+  });
+
+  if (d.ok) {
+    delete S.results[String(idx)];
+    msg.className = 'adm-msg ok';
+    msg.textContent = '✓ Sonuç silindi';
+    // Rebuild the card to show save form again
+    const old = $(`card-${idx}`);
+    if (old) {
+      const m = S.matches.find(m => m.index === idx);
+      if (m) old.replaceWith(buildCard(m));
+    }
+  } else {
+    msg.className = 'adm-msg err';
+    msg.textContent = d.error || 'Silinemedi.';
   }
 }
 

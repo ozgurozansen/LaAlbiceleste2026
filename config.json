@@ -405,5 +405,10 @@
     "competition_code": "WC",
     "base_url":         "https://api.football-data.org/v4"
   },
+  "stage_redirect": {
+    "group_stage_path": "/groupstage.html",
+    "knockout_stage_path": "/knockout.html",
+    "force_stage": ""
+  },
   "admin_password": "admin"
 }

@@ -65,6 +65,15 @@
                placeholder="Ad Soyad" required />
       </label>
       <label>
+        <span data-i18n="supportedTeam">Taraf</span>
+        <select id="reg-team"></select>
+      </label>
+      <label>
+        <span data-i18n="logoLabel">Logo</span>
+        <input type="file" id="reg-logo" accept="image/*" />
+        <span class="gs-form-hint" data-i18n="logoHint">Varsa logo yükleyin (opsiyonel)</span>
+      </label>
+      <label>
         <span data-i18n="password">Şifre</span>
         <input type="password" id="reg-password" autocomplete="new-password"
                placeholder="••••••" required />
@@ -83,6 +92,9 @@
     <div class="gs-main-tabs">
       <button class="gs-tab active" data-tab="predictions" data-i18n="tab_predictions">
         Tahminler
+      </button>
+      <button class="gs-tab" data-tab="guesses" data-i18n="tab_guesses">
+        Girilen Tahminler
       </button>
       <button class="gs-tab" data-tab="leaderboard" data-i18n="tab_leaderboard">
         Sıralama
@@ -108,6 +120,14 @@
       <h2 class="gs-section-title" data-i18n="leaderboard">Sıralama</h2>
       <div id="leaderboard-container"></div>
     </div>
+  </div>
+
+  <!-- ── Submitted guesses tab ───────────────────────────────────────────── -->
+  <div id="tab-guesses" class="gs-tab-content hidden">
+    <div class="gs-lb-wrap">
+      <h2 class="gs-section-title" data-i18n="submittedGuesses">Girilen Tahminler</h2>
+    </div>
+    <div id="guesses-container" class="gs-guess-list"></div>
   </div>
 
 </div>

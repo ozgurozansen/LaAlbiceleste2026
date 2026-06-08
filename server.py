@@ -5,6 +5,7 @@ Usage: python3 server.py [port]   (default port 3000)
 """
 
 import http.client
+import ipaddress
 import json
 import os
 import ssl
@@ -18,6 +19,7 @@ from http.server import HTTPServer, BaseHTTPRequestHandler, ThreadingHTTPServer
 import hashlib
 import re
 import uuid
+import random
 from datetime import datetime, timezone, timedelta
 
 PORT = int(sys.argv[1]) if len(sys.argv) > 1 else 8000
@@ -62,6 +64,26 @@ _RES_FILE   = os.path.join(DATA_DIR, "match_results.json")
 
 POINTS_CFG  = CONFIG.get("points", {"correct_score": 5, "correct_result": 3,
                                      "correct_fh_bonus": 1, "correct_sh_bonus": 1})
+STAGE_REDIRECT_CFG = CONFIG.get("stage_redirect", {})
+
+
+def _clean_stage_path(path, fallback):
+    val = str(path or "").strip()
+    if not val:
+        return fallback
+    if not val.startswith("/"):
+        val = "/" + val
+    return val
+
+
+_GROUP_STAGE_PATH = _clean_stage_path(
+    STAGE_REDIRECT_CFG.get("group_stage_path", "/groupstage.html"),
+    "/groupstage.html",
+)
+_KNOCKOUT_STAGE_PATH = _clean_stage_path(
+    STAGE_REDIRECT_CFG.get("knockout_stage_path", "/knockout.html"),
+    "/knockout.html",
+)
 
 
 def _load_bonus_file(path):
@@ -82,8 +104,34 @@ def _load_bonus_file(path):
     return items
 
 
-_BONUS_FH = _load_bonus_file(_BFH_FILE)
-_BONUS_SH = _load_bonus_file(_BSH_FILE)
+def _shuffle_bonus_items(items, salt):
+    if len(items) <= 1:
+        return items
+    seed_source = f"{salt}\n" + "\n".join(
+        f"{item.get('tr','')}|{item.get('en','')}|{item.get('inputType','')}" for item in items
+    )
+    seed = int(hashlib.sha256(seed_source.encode("utf-8")).hexdigest(), 16)
+    shuffled = list(items)
+    random.Random(seed).shuffle(shuffled)
+    return shuffled
+
+
+def _build_bonus_schedule(items, match_count, salt):
+    if not items or match_count <= 0:
+        return []
+    repeats, remainder = divmod(match_count, len(items))
+    pool = list(items) * repeats + list(items[:remainder])
+    seed_source = f"schedule:{salt}:{match_count}\n" + "\n".join(
+        f"{item.get('tr','')}|{item.get('en','')}|{item.get('inputType','')}" for item in pool
+    )
+    seed = int(hashlib.sha256(seed_source.encode("utf-8")).hexdigest(), 16)
+    rng = random.Random(seed)
+    rng.shuffle(pool)
+    return pool
+
+
+_BONUS_FH = _shuffle_bonus_items(_load_bonus_file(_BFH_FILE), "fh")
+_BONUS_SH = _shuffle_bonus_items(_load_bonus_file(_BSH_FILE), "sh")
 
 
 def _load_all_matches():
@@ -117,8 +165,18 @@ def _build_squad_lookup(squad):
 
 _ALL_MATCHES   = _load_all_matches()
 _SQUAD_LOOKUP  = _build_squad_lookup(_load_squad_data())
+_GROUP_MATCHES = [m for m in _ALL_MATCHES if "group" in m]
+_BONUS_FH_SCHEDULE = _build_bonus_schedule(_BONUS_FH, len(_GROUP_MATCHES), "fh")
+_BONUS_SH_SCHEDULE = _build_bonus_schedule(_BONUS_SH, len(_GROUP_MATCHES), "sh")
 _data_lock     = threading.Lock()
 _tokens        = {}   # token -> {username, expires}
+_SUPPORTED_TEAMS = sorted({
+    t
+    for m in _ALL_MATCHES
+    if "group" in m
+    for t in (m.get("team1"), m.get("team2"))
+    if t
+})
 
 
 # ── Time helpers ──────────────────────────────────────────────────────────────
@@ -146,11 +204,39 @@ def _match_status(ko_utc):
     return "finished"
 
 
-def _enrich_match(idx, m):
-    n_fh = len(_BONUS_FH)
-    n_sh = len(_BONUS_SH)
-    fhb  = _BONUS_FH[idx % n_fh] if n_fh else None
-    shb  = _BONUS_SH[idx % n_sh] if n_sh else None
+def _is_group_stage_finished():
+    group_matches = [m for m in _ALL_MATCHES if "group" in m]
+    if not group_matches:
+        return False
+    kickoffs = [
+        _parse_kickoff_utc(m.get("date", ""), m.get("time", ""))
+        for m in group_matches
+    ]
+    kickoffs = [ko for ko in kickoffs if ko is not None]
+    if not kickoffs:
+        return False
+
+    last_group_kickoff = max(kickoffs)
+    group_stage_end = last_group_kickoff + timedelta(hours=9)
+    return datetime.now(timezone.utc) >= group_stage_end
+
+
+def _active_stage_name():
+    force_stage = str(STAGE_REDIRECT_CFG.get("force_stage", "")).strip().lower()
+    if force_stage in ("group", "knockout"):
+        return force_stage
+    return "knockout" if _is_group_stage_finished() else "group"
+
+
+def _active_stage_target():
+    return _KNOCKOUT_STAGE_PATH if _active_stage_name() == "knockout" else _GROUP_STAGE_PATH
+
+
+def _enrich_match(idx, m, bonus_idx=None):
+    if bonus_idx is None:
+        bonus_idx = idx
+    fhb  = _BONUS_FH_SCHEDULE[bonus_idx] if bonus_idx < len(_BONUS_FH_SCHEDULE) else None
+    shb  = _BONUS_SH_SCHEDULE[bonus_idx] if bonus_idx < len(_BONUS_SH_SCHEDULE) else None
     ko   = _parse_kickoff_utc(m.get("date", ""), m.get("time", ""))
     return {
         **m,
@@ -257,6 +343,8 @@ def _compute_leaderboard():
                 total += p["total"]
         lb.append({"username": uname,
                    "displayName": uinfo.get("displayName", uname),
+                   "supportedTeam": uinfo.get("supportedTeam"),
+                   "logoData": uinfo.get("logoData"),
                    "totalPoints": total, "matchPoints": match_pts})
     lb.sort(key=lambda x: -x["totalPoints"])
     return lb
@@ -296,6 +384,9 @@ def _fetch_result_api(match):
 # ── In-memory cache ──────────────────────────────────────────────────────────
 _cache_lock = threading.Lock()
 _cache = {"data": None, "fetched_at": 0}
+_tz_cache_lock = threading.Lock()
+_tz_cache = {}
+_TZ_CACHE_TTL = 3600
 
 
 # ── SSL context (handles corporate/self-signed CA chains) ────────────────────
@@ -309,6 +400,84 @@ def _make_ssl_context():
     return ctx
 
 _SSL_CTX = _make_ssl_context()
+
+
+def _is_public_ip(ip_str):
+    try:
+        ip_obj = ipaddress.ip_address(ip_str)
+        return not (
+            ip_obj.is_private or ip_obj.is_loopback or ip_obj.is_link_local
+            or ip_obj.is_multicast or ip_obj.is_reserved or ip_obj.is_unspecified
+        )
+    except ValueError:
+        return False
+
+
+def _extract_client_ip(handler):
+    headers = (
+        handler.headers.get("CF-Connecting-IP", ""),
+        handler.headers.get("X-Real-IP", ""),
+        handler.headers.get("X-Forwarded-For", ""),
+    )
+
+    for raw in headers:
+        if not raw:
+            continue
+        parts = [p.strip() for p in raw.split(",") if p.strip()]
+        for candidate in parts:
+            if _is_public_ip(candidate):
+                return candidate
+        if parts:
+            return parts[0]
+
+    remote = (handler.client_address or [""])[0]
+    return remote or ""
+
+
+def _fetch_ip_timezone(ip):
+    if not ip or not _is_public_ip(ip):
+        return None
+
+    now = time.time()
+    with _tz_cache_lock:
+        cached = _tz_cache.get(ip)
+        if cached and now - cached["at"] < _TZ_CACHE_TTL:
+            return cached["data"]
+
+    providers = (
+        {
+            "url": f"https://ipapi.co/{urllib.parse.quote(ip)}/json/",
+            "parser": lambda d: {
+                "timeZone": d.get("timezone"),
+                "country": d.get("country_name"),
+                "countryCode": d.get("country_code"),
+            },
+        },
+        {
+            "url": f"https://ipwho.is/{urllib.parse.quote(ip)}",
+            "parser": lambda d: {
+                "timeZone": (d.get("timezone") or {}).get("id"),
+                "country": d.get("country"),
+                "countryCode": d.get("country_code"),
+            },
+        },
+    )
+
+    for provider in providers:
+        try:
+            req = urllib.request.Request(provider["url"], headers={"User-Agent": "LaAlbiceleste2026/1.0"})
+            with urllib.request.urlopen(req, timeout=4, context=_SSL_CTX) as resp:
+                payload = json.loads(resp.read().decode("utf-8"))
+            info = provider["parser"](payload)
+            tz = info.get("timeZone")
+            if tz:
+                with _tz_cache_lock:
+                    _tz_cache[ip] = {"at": now, "data": info}
+                return info
+        except Exception:
+            continue
+
+    return None
 
 
 def fetch_bulletin(retries=3):
@@ -674,6 +843,32 @@ class Handler(BaseHTTPRequestHandler):
                 self.send_json(200, load_config())
                 return
 
+            # ── /api/client-context ───────────────────────────────────────
+            if path == "/api/client-context":
+                client_ip = _extract_client_ip(self)
+                tz_info = _fetch_ip_timezone(client_ip) or {}
+                self.send_json(200, {
+                    "ip": client_ip,
+                    "timeZone": tz_info.get("timeZone"),
+                    "country": tz_info.get("country"),
+                    "countryCode": tz_info.get("countryCode"),
+                })
+                return
+
+            # ── /api/stage/redirect-target ───────────────────────────────
+            if path == "/api/stage/redirect-target":
+                self.send_json(200, {
+                    "stage": _active_stage_name(),
+                    "target": _active_stage_target(),
+                    "groupStageFinished": _is_group_stage_finished(),
+                    "config": {
+                        "groupStagePath": _GROUP_STAGE_PATH,
+                        "knockoutStagePath": _KNOCKOUT_STAGE_PATH,
+                        "forceStage": STAGE_REDIRECT_CFG.get("force_stage", ""),
+                    },
+                })
+                return
+
             # ── /api/raw ───────────────────────────────────────────────────
             if path == "/api/raw":
                 raw, _ = fetch_bulletin()
@@ -692,13 +887,20 @@ class Handler(BaseHTTPRequestHandler):
                     "username":    username,
                     "displayName": user.get("displayName", username),
                     "isAdmin":     user.get("isAdmin", False),
+                    "supportedTeam": user.get("supportedTeam"),
+                    "logoData": user.get("logoData"),
                 })
                 return
 
             # ── /api/groupstage/matches ────────────────────────────────────
             if path == "/api/groupstage/matches":
-                enriched = [_enrich_match(i, m) for i, m in enumerate(_ALL_MATCHES)
-                            if "group" in m]
+                enriched = []
+                bonus_idx = 0
+                for i, m in enumerate(_ALL_MATCHES):
+                    if "group" not in m:
+                        continue
+                    enriched.append(_enrich_match(i, m, bonus_idx=bonus_idx))
+                    bonus_idx += 1
                 self.send_json(200, {"matches": enriched, "points": POINTS_CFG})
                 return
 
@@ -720,6 +922,57 @@ class Handler(BaseHTTPRequestHandler):
                 })
                 return
 
+            # ── /api/groupstage/guesses/all ────────────────────────────────
+            if path == "/api/groupstage/guesses/all":
+                gdata = _jload(_GUESS_FILE, {"guesses": {}})
+                udata = _jload(_USERS_FILE, {"users": {}})
+                rdata = _jload(_RES_FILE,   {"results": {}})
+
+                matches_out = {}
+                for idx, m in enumerate(_ALL_MATCHES):
+                    if "group" not in m:
+                        continue
+                    ko = _parse_kickoff_utc(m.get("date", ""), m.get("time", ""))
+                    status = _match_status(ko)
+                    if status == "upcoming":
+                        continue
+
+                    idx_s = str(idx)
+                    res_entry = rdata.get("results", {}).get(idx_s, {})
+                    res_score = res_entry.get("score")
+                    fh_ans = res_entry.get("fhBonusAnswer")
+                    sh_ans = res_entry.get("shBonusAnswer")
+
+                    guesses_list = []
+                    for uname, user_guesses in gdata.get("guesses", {}).items():
+                        g = user_guesses.get(idx_s)
+                        if not g:
+                            continue
+                        display = udata.get("users", {}).get(uname, {}).get("displayName", uname)
+                        pts = None
+                        if res_score:
+                            pts = _calc_points(g, res_score, fh_ans, sh_ans)
+                        guesses_list.append({
+                            "username": uname,
+                            "displayName": display,
+                            "homeScore": g.get("homeScore"),
+                            "awayScore": g.get("awayScore"),
+                            "fhBonus": g.get("fhBonus"),
+                            "shBonus": g.get("shBonus"),
+                            "points": pts,
+                        })
+
+                    matches_out[idx_s] = {
+                        "status": status,
+                        "result": res_score,
+                        "fhBonusAnswer": fh_ans,
+                        "shBonusAnswer": sh_ans,
+                        "guesses": guesses_list,
+                    }
+
+                self.send_json(200, {"matches": matches_out})
+                return
+
             # ── /api/groupstage/results ────────────────────────────────────
             if path == "/api/groupstage/results":
                 token    = qs.get("token", [""])[0]
@@ -728,8 +981,15 @@ class Handler(BaseHTTPRequestHandler):
                 if username and _is_admin(username):
                     self.send_json(200, rdata)
                 else:
-                    pub = {k: {"score": v.get("score"), "scored": v.get("scored", False)}
-                           for k, v in rdata.get("results", {}).items()}
+                    pub = {
+                        k: {
+                            "score": v.get("score"),
+                            "scored": v.get("scored", False),
+                            "fhBonusAnswer": v.get("fhBonusAnswer") if v.get("scored") else None,
+                            "shBonusAnswer": v.get("shBonusAnswer") if v.get("scored") else None,
+                        }
+                        for k, v in rdata.get("results", {}).items()
+                    }
                     self.send_json(200, {"results": pub})
                 return
 
@@ -776,6 +1036,8 @@ class Handler(BaseHTTPRequestHandler):
                 uname   = (data.get("username") or "").strip().lower()
                 pw      = data.get("password") or ""
                 display = (data.get("displayName") or uname).strip()
+                supported_team = (data.get("supportedTeam") or "").strip()
+                logo_data = data.get("logoData")
                 if not uname or not pw:
                     self.send_json(400, {"error": "Username and password required"})
                     return
@@ -785,6 +1047,16 @@ class Handler(BaseHTTPRequestHandler):
                 if not re.match(r'^[a-z0-9_]+$', uname):
                     self.send_json(400, {"error": "Username: lowercase letters, digits, underscores only"})
                     return
+                if supported_team and supported_team not in _SUPPORTED_TEAMS:
+                    self.send_json(400, {"error": "Invalid supported team"})
+                    return
+                if logo_data:
+                    if not isinstance(logo_data, str) or not logo_data.startswith("data:image/"):
+                        self.send_json(400, {"error": "Invalid logo data"})
+                        return
+                    if len(logo_data) > 200000:
+                        self.send_json(400, {"error": "Logo is too large"})
+                        return
                 with _data_lock:
                     users = _jload(_USERS_FILE, {"users": {}})
                     if uname in users.get("users", {}):
@@ -794,12 +1066,16 @@ class Handler(BaseHTTPRequestHandler):
                         "displayName": display,
                         "password":    _hash_pw(pw),
                         "isAdmin":     False,
+                        "supportedTeam": supported_team or None,
+                        "logoData":     logo_data or None,
                         "createdAt":   datetime.now(timezone.utc).isoformat(),
                     }
                     _jsave(_USERS_FILE, users)
                 token = _create_token(uname)
                 self.send_json(201, {"token": token, "username": uname,
-                                     "displayName": display, "isAdmin": False})
+                                     "displayName": display, "isAdmin": False,
+                                     "supportedTeam": supported_team or None,
+                                     "logoData": logo_data or None})
                 return
 
             # ── /api/auth/login ────────────────────────────────────────────
@@ -817,6 +1093,8 @@ class Handler(BaseHTTPRequestHandler):
                     "username":    uname,
                     "displayName": user.get("displayName", uname),
                     "isAdmin":     user.get("isAdmin", False),
+                    "supportedTeam": user.get("supportedTeam"),
+                    "logoData": user.get("logoData"),
                 })
                 return
 

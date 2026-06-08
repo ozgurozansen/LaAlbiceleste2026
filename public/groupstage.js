@@ -67,6 +67,12 @@ const I18N = {
     username:       'Kullanıcı Adı',
     password:       'Şifre',
     displayName:    'Görünen Ad',
+    supportedTeam:  'Taraf',
+    selectTeam:     'Takım seçin…',
+    logoLabel:      'Logo',
+    logoHint:       'Varsa logo yükleyin (opsiyonel)',
+    logoTooLarge:   'Logo çok büyük (maks 2 MB)',
+    logoInvalid:    'Logo okunamadı',
     save:           'Kaydet',
     edit:           'Düzenle',
     saving:         'Kaydediliyor…',
@@ -74,7 +80,8 @@ const I18N = {
     fhBonus:        '1. Yarı Bonus',
     shBonus:        '2. Yarı Bonus',
     leaderboard:    'Sıralama',
-    tab_predictions:'Tahminler',
+    tab_predictions:'Tahmin Yap',
+    tab_guesses:    'Girilen Tahminler',
     tab_leaderboard:'Sıralama',
     rank:           'Sıra',
     player:         'Oyuncu',
@@ -99,6 +106,7 @@ const I18N = {
     enterMinute:    'Dakika girin (1-120)',
     enterMinuteFH:  'Dakika girin (1-45+)',
     enterMinuteSH:  'Dakika girin (46-90+)',
+    enterMinuteStop:'Dakika girin (1-90+)',
     firstHalf:      '1. Yarı',
     secondHalf:     '2. Yarı',
     selectPlayer:   'Oyuncu seçin…',
@@ -114,6 +122,9 @@ const I18N = {
     away:           'Deplasman',
     yourPts:        'Puanın',
     noResults:      'Henüz sonuç girilmedi',
+    submittedGuesses:'Girilen Tahminler',
+    noGuesses:      'Henüz tahmin girilmedi',
+    noStartedMatches:'Henüz başlayan maç yok',
   },
   en: {
     title:          'Group Stage Predictions',
@@ -123,6 +134,12 @@ const I18N = {
     username:       'Username',
     password:       'Password',
     displayName:    'Display Name',
+    supportedTeam:  'Supported Team',
+    selectTeam:     'Select team…',
+    logoLabel:      'Logo',
+    logoHint:       'Upload a logo if you have one (optional)',
+    logoTooLarge:   'Logo is too large (max 2 MB)',
+    logoInvalid:    'Could not read logo',
     save:           'Save',
     edit:           'Edit',
     saving:         'Saving…',
@@ -131,6 +148,7 @@ const I18N = {
     shBonus:        '2nd Half Bonus',
     leaderboard:    'Leaderboard',
     tab_predictions:'Predictions',
+    tab_guesses:    'Submitted Guesses',
     tab_leaderboard:'Standings',
     rank:           'Rank',
     player:         'Player',
@@ -155,6 +173,7 @@ const I18N = {
     enterMinute:    'Enter minute (1-120)',
     enterMinuteFH:  'Enter minute (1-45+)',
     enterMinuteSH:  'Enter minute (46-90+)',
+    enterMinuteStop:'Enter minute (1-90+)',
     firstHalf:      '1st Half',
     secondHalf:     '2nd Half',
     selectPlayer:   'Select player…',
@@ -170,6 +189,9 @@ const I18N = {
     away:           'Away',
     yourPts:        'Your Points',
     noResults:      'No results recorded yet',
+    submittedGuesses:'Submitted Guesses',
+    noGuesses:      'No guesses submitted yet',
+    noStartedMatches:'No matches have started yet',
   },
 };
 
@@ -177,11 +199,13 @@ const I18N = {
 const S = {
   lang:    localStorage.getItem('gs_lang') || 'tr',
   token:   localStorage.getItem('gs_token') || '',
-  user:    null,          // {username, displayName, isAdmin}
+  user:    null,          // {username, displayName, isAdmin, supportedTeam, logoData}
+  visitorTimeZone: Intl.DateTimeFormat().resolvedOptions().timeZone || 'UTC',
   matches: [],            // enriched group-stage matches
   squads:  {},            // teamName -> [{name, position, number}]
   guesses: {},            // matchIndex(str) -> {homeScore,awayScore,fhBonus,shBonus}
   results: {},            // matchIndex(str) -> {score:{home,away}, scored}
+  allGuesses: {},          // matchIndex(str) -> {status,result,guesses[]}
   leaderboard: [],
   activeGroup: 'A',
   adminMatchIdx: null,
@@ -197,6 +221,67 @@ const el  = (tag, cls, html) => {
   if (html) e.innerHTML   = html;
   return e;
 };
+
+const TEAM_FLAG_CODES = {
+  'Algeria': 'dz',
+  'Argentina': 'ar',
+  'Australia': 'au',
+  'Austria': 'at',
+  'Belgium': 'be',
+  'Bosnia & Herzegovina': 'ba',
+  'Brazil': 'br',
+  'Canada': 'ca',
+  'Cape Verde': 'cv',
+  'Colombia': 'co',
+  'Croatia': 'hr',
+  'Curaçao': 'cw',
+  'Czech Republic': 'cz',
+  'DR Congo': 'cd',
+  'Ecuador': 'ec',
+  'Egypt': 'eg',
+  'England': 'gb-eng',
+  'France': 'fr',
+  'Germany': 'de',
+  'Ghana': 'gh',
+  'Haiti': 'ht',
+  'Iran': 'ir',
+  'Iraq': 'iq',
+  'Ivory Coast': 'ci',
+  'Japan': 'jp',
+  'Jordan': 'jo',
+  'Mexico': 'mx',
+  'Morocco': 'ma',
+  'Netherlands': 'nl',
+  'New Zealand': 'nz',
+  'Norway': 'no',
+  'Paraguay': 'py',
+  'Portugal': 'pt',
+  'Qatar': 'qa',
+  'Saudi Arabia': 'sa',
+  'Scotland': 'gb-sct',
+  'Senegal': 'sn',
+  'South Africa': 'za',
+  'South Korea': 'kr',
+  'Spain': 'es',
+  'Sweden': 'se',
+  'Switzerland': 'ch',
+  'Tunisia': 'tn',
+  'Turkey': 'tr',
+  'USA': 'us',
+  'Uruguay': 'uy',
+  'Uzbekistan': 'uz',
+};
+
+function teamFlagCode(team) {
+  return team ? (TEAM_FLAG_CODES[team] || '') : '';
+}
+
+function buildFlagMarkup(team, className) {
+  const code = teamFlagCode(team);
+  if (!code) return '';
+  const src = `https://flagcdn.com/w20/${code}.png`;
+  return `<img class="${className} gs-flag-img" src="${src}" alt="" loading="lazy" />`;
+}
 
 function showToast(msg, isError = false) {
   const toast = $('toast');
@@ -250,7 +335,13 @@ async function doLogin(e) {
   try {
     const r   = await POST('/api/auth/login', { username, password });
     S.token   = r.token;
-    S.user    = { username: r.username, displayName: r.displayName, isAdmin: r.isAdmin };
+    S.user    = {
+      username: r.username,
+      displayName: r.displayName,
+      isAdmin: r.isAdmin,
+      supportedTeam: r.supportedTeam || null,
+      logoData: r.logoData || null,
+    };
     localStorage.setItem('gs_token', r.token);
     hideAuthModal();
     await loadUserData();
@@ -268,11 +359,33 @@ async function doRegister(e) {
   const username    = $('reg-username').value.trim();
   const displayName = $('reg-display').value.trim();
   const password    = $('reg-password').value;
+  const supportedTeam = $('reg-team')?.value || '';
+  const logoInput = $('reg-logo');
   $('register-error').classList.add('hidden');
   try {
-    const r   = await POST('/api/auth/register', { username, displayName, password });
+    let logoData = null;
+    if (logoInput && logoInput.files && logoInput.files[0]) {
+      const file = logoInput.files[0];
+      if (file.size > 2000000) {
+        throw new Error(t('logoTooLarge'));
+      }
+      logoData = await readLogoFile(file);
+    }
+    const r   = await POST('/api/auth/register', {
+      username,
+      displayName,
+      password,
+      supportedTeam: supportedTeam || null,
+      logoData,
+    });
     S.token   = r.token;
-    S.user    = { username: r.username, displayName: r.displayName, isAdmin: r.isAdmin };
+    S.user    = {
+      username: r.username,
+      displayName: r.displayName,
+      isAdmin: r.isAdmin,
+      supportedTeam: r.supportedTeam || null,
+      logoData: r.logoData || null,
+    };
     localStorage.setItem('gs_token', r.token);
     hideAuthModal();
     await loadUserData();
@@ -283,6 +396,15 @@ async function doRegister(e) {
     $('register-error').textContent = err.message || t('registerFail');
     $('register-error').classList.remove('hidden');
   }
+}
+
+function readLogoFile(file) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(reader.result);
+    reader.onerror = () => reject(new Error(t('logoInvalid')));
+    reader.readAsDataURL(file);
+  });
 }
 
 function doLogout() {
@@ -334,6 +456,20 @@ async function loadLeaderboard() {
   S.leaderboard = r.leaderboard || [];
 }
 
+async function loadAllGuesses() {
+  const r = await GET('/api/groupstage/guesses/all');
+  S.allGuesses = r.matches || {};
+}
+
+async function loadVisitorContext() {
+  try {
+    const r = await GET('/api/client-context');
+    if (r.timeZone) S.visitorTimeZone = r.timeZone;
+  } catch (_) {
+    // Fallback to browser timezone when IP geolocation is unavailable.
+  }
+}
+
 // ── Groups list ───────────────────────────────────────────────────────────────
 function groups() {
   return [...new Set(S.matches.map(m => m.group))].sort();
@@ -355,6 +491,7 @@ function formatKickoff(m) {
   try {
     return new Intl.DateTimeFormat(S.lang === 'tr' ? 'tr-TR' : 'en-GB', {
       month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit',
+      timeZone: S.visitorTimeZone,
       timeZoneName: 'short',
     }).format(new Date(m.utcKickoff));
   } catch { return `${m.date} ${m.time}`; }
@@ -472,7 +609,10 @@ function buildBonusInput(bonus, matchIdx, half, currentValue) {
       </div>`;
   } else {
     const val = currentValue !== undefined && currentValue !== null ? currentValue : '';
-    const minutePlaceholder = half === 'fh' ? t('enterMinuteFH') : t('enterMinuteSH');
+    const isStoppageTime = bonus.tr === 'Oynanmayan süre' || bonus.en === 'Stoppage time';
+    const minutePlaceholder = isStoppageTime
+      ? t('enterMinuteStop')
+      : (half === 'fh' ? t('enterMinuteFH') : t('enterMinuteSH'));
     return `
       <div class="gs-bonus-group">
         <label class="gs-bonus-label" for="${id}">
@@ -491,11 +631,41 @@ function escHtml(s) {
     .replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 }
 
+function getParticipatingTeams() {
+  const teams = new Set();
+  S.matches.forEach(m => {
+    if (m.group) {
+      if (m.team1) teams.add(m.team1);
+      if (m.team2) teams.add(m.team2);
+    }
+  });
+  return [...teams].sort((a, b) => teamName(a).localeCompare(teamName(b)));
+}
+
+function populateTeamSelect(selectedTeam) {
+  const select = $('reg-team');
+  if (!select) return;
+  const teams = getParticipatingTeams();
+  const current = selectedTeam ?? select.value;
+  const options = teams.map(team =>
+    `<option value="${escHtml(team)}">${escHtml(teamName(team))}</option>`
+  ).join('');
+  select.innerHTML = `<option value="">${t('selectTeam')}</option>${options}`;
+  if (current) select.value = current;
+}
+
+function buildLogoMarkup(logoData, imgClass, defaultClass) {
+  if (logoData) {
+    return `<img class="${imgClass}" src="${logoData}" alt="" />`;
+  }
+  return `<span class="${imgClass} ${defaultClass}">⚽</span>`;
+}
+
 // ── Points badge ─────────────────────────────────────────────────────────────
 function pointsBadge(pts) {
   if (!pts) return '';
   const total = pts.total;
-  const cls   = total >= 8 ? 'gs-pts-gold' : total >= 4 ? 'gs-pts-silver' : 'gs-pts-bronze';
+  const cls   = total <= 0 ? 'gs-pts-red' : total <= 3 ? 'gs-pts-yellow' : 'gs-pts-green';
   return `<span class="gs-pts-badge ${cls}">+${total} ${t('totalPts')}</span>`;
 }
 
@@ -542,9 +712,9 @@ function renderMatchCard(m) {
     // ── Outcome icons ────────────────────────────────────────────────────
     let scoreIcon = '';
     if (pts && guess) {
-      if (pts.score === 5)       scoreIcon = '<span class="gs-icon gs-icon-correct">✓</span>';
-      else if (pts.result === 3) scoreIcon = '<span class="gs-icon gs-icon-partial">✓</span>';
-      else                       scoreIcon = '<span class="gs-icon gs-icon-wrong">✗</span>';
+      if (pts.score > 0)       scoreIcon = '<span class="gs-icon gs-icon-correct">✓</span>';
+      else if (pts.result > 0) scoreIcon = '<span class="gs-icon gs-icon-partial">✓</span>';
+      else                     scoreIcon = '<span class="gs-icon gs-icon-wrong">✗</span>';
     }
     const fhIcon = ansFh !== '–' && myFh !== '–'
       ? (fhMatch ? '<span class="gs-icon gs-icon-correct">✓</span>' : '<span class="gs-icon gs-icon-wrong">✗</span>')
@@ -775,10 +945,18 @@ function renderLeaderboard() {
   const medals = ['🥇', '🥈', '🥉'];
   const rows = S.leaderboard.map((entry, i) => {
     const medal = medals[i] || `${i + 1}.`;
+    const logoHtml = buildLogoMarkup(entry.logoData, 'gs-lb-logo', 'gs-lb-logo-default');
+    const flagHtml = buildFlagMarkup(entry.supportedTeam, 'gs-lb-flag');
     return `
       <tr class="${S.user?.username === entry.username ? 'gs-lb-me' : ''}">
         <td class="gs-lb-rank">${medal}</td>
-        <td class="gs-lb-name">${escHtml(entry.displayName)}</td>
+        <td class="gs-lb-name">
+          <span class="gs-lb-user">
+            ${logoHtml}
+            <span>${escHtml(entry.displayName)}</span>
+            ${flagHtml}
+          </span>
+        </td>
         <td class="gs-lb-pts">${entry.totalPoints}</td>
       </tr>`;
   }).join('');
@@ -793,6 +971,93 @@ function renderLeaderboard() {
       </thead>
       <tbody>${rows}</tbody>
     </table>`;
+}
+
+// ── Submitted guesses renderer ─────────────────────────────────────────────
+function renderSubmittedGuesses() {
+  const container = $('guesses-container');
+  if (!container) return;
+
+  const entries = S.allGuesses || {};
+  const keys = Object.keys(entries);
+  if (keys.length === 0) {
+    container.innerHTML = `<div class="gs-guess-empty">${t('noStartedMatches')}</div>`;
+    return;
+  }
+
+  const matchMap = new Map(S.matches.map(m => [String(m.index), m]));
+  const sorted = keys
+    .map(k => ({ key: k, match: matchMap.get(k) }))
+    .filter(x => x.match)
+    .sort((a, b) => {
+      const da = a.match.utcKickoff || `${a.match.date}T00:00:00Z`;
+      const db = b.match.utcKickoff || `${b.match.date}T00:00:00Z`;
+      return da < db ? -1 : da > db ? 1 : 0;
+    });
+
+  const cards = sorted.map(({ key, match }) => {
+    const entry = entries[key] || {};
+    const result = entry.result;
+    const fhAns = entry.fhBonusAnswer;
+    const shAns = entry.shBonusAnswer;
+    const guesses = entry.guesses || [];
+    const resultLabel = result ? `${result.home} – ${result.away}` : '';
+    const statusLabel = t(entry.status || matchStatus(match));
+
+    const rows = guesses.length
+      ? guesses.map(g => {
+          const pts = g.points;
+          let icon = '';
+          if (result) {
+            if (pts && pts.score > 0) icon = '<span class="gs-icon gs-icon-correct">✓</span>';
+            else if (pts && pts.result > 0) icon = '<span class="gs-icon gs-icon-partial">✓</span>';
+            else icon = '<span class="gs-icon gs-icon-wrong">✗</span>';
+          }
+          const ptsClass = pts
+            ? (pts.total <= 0 ? 'gs-pts-red' : pts.total <= 3 ? 'gs-pts-yellow' : 'gs-pts-green')
+            : '';
+          const ptsHtml = pts
+            ? `<span class="gs-guess-points ${ptsClass}">+${pts.total} ${t('points')}</span>`
+            : '';
+          const norm = v => String(v ?? '').trim().toLowerCase();
+          const fhMatch = fhAns && g.fhBonus && norm(g.fhBonus) === norm(fhAns);
+          const shMatch = shAns && g.shBonus && norm(g.shBonus) === norm(shAns);
+          const fhIcon = fhAns && g.fhBonus
+            ? (fhMatch ? '<span class="gs-icon gs-icon-correct">✓</span>' : '<span class="gs-icon gs-icon-wrong">✗</span>')
+            : '';
+          const shIcon = shAns && g.shBonus
+            ? (shMatch ? '<span class="gs-icon gs-icon-correct">✓</span>' : '<span class="gs-icon gs-icon-wrong">✗</span>')
+            : '';
+          const scoreLabel = `${g.homeScore} – ${g.awayScore}${icon}`;
+          const fhLabel = g.fhBonus ? `${t('firstHalf')}: ${escHtml(String(g.fhBonus))}${fhIcon}` : '';
+          const shLabel = g.shBonus ? `${t('secondHalf')}: ${escHtml(String(g.shBonus))}${shIcon}` : '';
+          const bonusHtml = `<div class="gs-guess-bonuses">
+                <span class="gs-guess-bonus">${scoreLabel}</span>
+                ${fhLabel ? `<span class="gs-guess-bonus">${fhLabel}</span>` : ''}
+                ${shLabel ? `<span class="gs-guess-bonus">${shLabel}</span>` : ''}
+              </div>`;
+          return `
+            <div class="gs-guess-row">
+              <div class="gs-guess-user">
+                <span class="gs-guess-name">${escHtml(g.displayName || g.username)}</span>
+                ${bonusHtml}
+              </div>
+              ${ptsHtml}
+            </div>`;
+        }).join('')
+      : `<div class="gs-guess-empty">${t('noGuesses')}</div>`;
+
+    return `
+      <div class="gs-guess-card">
+        <div class="gs-guess-card-header">
+          <div class="gs-guess-card-title">${escHtml(teamName(match.team1))} vs ${escHtml(teamName(match.team2))}</div>
+          <div class="gs-guess-result">${result ? `${t('result')}: <strong>${resultLabel}</strong>` : `${statusLabel}: ${formatKickoff(match)}`}</div>
+        </div>
+        <div class="gs-guess-rows">${rows}</div>
+      </div>`;
+  }).join('');
+
+  container.innerHTML = cards || `<div class="gs-guess-empty">${t('noStartedMatches')}</div>`;
 }
 
 // ── Login CTA (visible when not logged in) ────────────────────────────────────
@@ -813,8 +1078,12 @@ function renderUserPill() {
   const pill = $('user-pill');
   if (!pill) return;
   if (S.user) {
+    const logoHtml = buildLogoMarkup(S.user.logoData, 'gs-user-logo', 'gs-user-logo-default');
+    const flagHtml = buildFlagMarkup(S.user.supportedTeam, 'gs-user-flag');
     pill.innerHTML = `
+      ${logoHtml}
       <span class="gs-pill-name">${escHtml(S.user.displayName)}</span>
+      ${flagHtml}
       ${S.user.isAdmin ? '<span class="gs-pill-admin">ADMIN</span>' : ''}
       <button id="btn-logout" class="btn-ghost">${t('logout')}</button>`;
     pill.classList.remove('hidden');
@@ -900,9 +1169,13 @@ function switchMainTab(name) {
     b.classList.toggle('active', b.dataset.tab === name);
   });
   $('tab-predictions').classList.toggle('hidden', name !== 'predictions');
+  $('tab-guesses').classList.toggle('hidden', name !== 'guesses');
   $('tab-leaderboard').classList.toggle('hidden', name !== 'leaderboard');
   if (name === 'leaderboard') {
     loadLeaderboard().then(renderLeaderboard);
+  }
+  if (name === 'guesses') {
+    loadAllGuesses().then(renderSubmittedGuesses);
   }
 }
 
@@ -914,6 +1187,7 @@ async function init() {
       S.lang = btn.dataset.lang;
       localStorage.setItem('gs_lang', S.lang);
       applyLang();
+      populateTeamSelect();
       renderGroupTabs();
       renderCurrentGroup();
       renderUserPill();
@@ -961,7 +1235,8 @@ async function init() {
 
   // Load data
   _acSetup();
-  await Promise.all([checkAuth(), loadMatches(), loadSquads()]);
+  await Promise.all([checkAuth(), loadMatches(), loadSquads(), loadVisitorContext()]);
+  populateTeamSelect();
   if (S.user) await loadUserData();
 
   // Show app
@@ -972,11 +1247,19 @@ async function init() {
   renderGroupTabs();
   renderCurrentGroup();
 
+  if (!$('tab-guesses').classList.contains('hidden')) {
+    await loadAllGuesses();
+    renderSubmittedGuesses();
+  }
+
   // Auto-refresh live match statuses every 60s
   setInterval(() => {
     const hasLive = S.matches.some(m => matchStatus(m) === 'live');
     if (hasLive) {
       loadUserData().then(renderCurrentGroup);
+      if (!$('tab-guesses').classList.contains('hidden')) {
+        loadAllGuesses().then(renderSubmittedGuesses);
+      }
     }
   }, 60_000);
 }

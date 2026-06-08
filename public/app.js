@@ -12,6 +12,11 @@ let expandedIds = new Set();
 let collapsedGroups = new Set();
 let appConfig = {};
 let lang = 'tr';
+let visitorContext = {
+  timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone || 'UTC',
+  country: '',
+  countryCode: '',
+};
 
 /* ── DOM refs ───────────────────────────────────────────────── */
 const searchEl     = document.getElementById('search');
@@ -65,6 +70,19 @@ async function loadMatches() {
     showError(err.message);
   } finally {
     showLoading(false);
+  }
+}
+
+async function loadVisitorContext() {
+  try {
+    const res = await fetch('/api/client-context');
+    if (!res.ok) return;
+    const json = await res.json();
+    if (json.timeZone) visitorContext.timeZone = json.timeZone;
+    if (json.country) visitorContext.country = json.country;
+    if (json.countryCode) visitorContext.countryCode = json.countryCode;
+  } catch (_) {
+    // Fallback to browser timezone when IP geolocation is unavailable.
   }
 }
 
@@ -278,6 +296,7 @@ function buildMatchCard(match) {
   const isOpen = expandedIds.has(String(match.id));
   const grouped = groupMarkets(match.markets);
   const previewHtml = buildMatchPreview(match);
+  const kickoff = formatMatchStart(match);
 
   const marketsHtml = !match.markets.length
     ? `<div class="markets-section"><p style="padding:.75rem 1rem;color:var(--muted);font-size:.82rem">No markets available</p></div>`
@@ -288,9 +307,9 @@ function buildMatchCard(match) {
     <div class="match-header" data-id="${match.id}">
       <div class="match-header-top">
         <div class="match-time">
-          <span class="date">${match.date}</span>
-          <span class="time">${match.time}</span>
-          <span class="date">${match.day || ''}</span>
+          <span class="date">${kickoff.date}</span>
+          <span class="time">${kickoff.time}</span>
+          <span class="date">${kickoff.zone}</span>
         </div>
         <div class="match-teams">
           <div class="team-name">${esc(match.homeTeam)}</div>
@@ -353,9 +372,11 @@ function openMarketModal(matchId, marketId) {
       <span class="modal-outcome-odds">${o.odds}</span>
     </div>`).join('');
 
+  const kickoff = formatMatchStart(match);
+
   modalContent.innerHTML = `
     <div class="modal-match-title">${esc(match.homeTeam)} <span style="color:var(--muted)">vs</span> ${esc(match.awayTeam)}</div>
-    <div style="font-size:.78rem;color:var(--muted);margin-bottom:.75rem">${match.date} • ${match.time}</div>
+    <div style="font-size:.78rem;color:var(--muted);margin-bottom:.75rem">${kickoff.date} • ${kickoff.time} ${kickoff.zone}</div>
     <div class="modal-market-name">${esc(market.typeName)}${spreadLabel}</div>
     <div class="modal-outcomes">${outcomesHtml}</div>`;
 
@@ -390,6 +411,56 @@ function truncate(str, n) { return str.length > n ? str.slice(0, n) + '…' : st
 function formatSpread(v) {
   if (v === 0) return '';
   return v > 0 ? `+${v}` : String(v);
+}
+
+function toDateFromTimestamp(ts) {
+  const n = Number(ts);
+  if (!Number.isFinite(n)) return null;
+  const ms = n > 1e12 ? n : n * 1000;
+  const dt = new Date(ms);
+  return Number.isNaN(dt.getTime()) ? null : dt;
+}
+
+function formatMatchStart(match) {
+  const dt = toDateFromTimestamp(match.startTimestamp);
+  if (!dt) {
+    return {
+      date: match.date || '',
+      time: match.time || '',
+      zone: visitorContext.timeZone || 'UTC',
+    };
+  }
+
+  try {
+    const locale = lang === 'tr' ? 'tr-TR' : 'en-GB';
+    const date = new Intl.DateTimeFormat(locale, {
+      month: 'short',
+      day: 'numeric',
+      timeZone: visitorContext.timeZone,
+    }).format(dt);
+    const time = new Intl.DateTimeFormat(locale, {
+      hour: '2-digit',
+      minute: '2-digit',
+      hour12: false,
+      timeZone: visitorContext.timeZone,
+    }).format(dt);
+    const zonePart = new Intl.DateTimeFormat(locale, {
+      timeZone: visitorContext.timeZone,
+      timeZoneName: 'short',
+    }).formatToParts(dt).find(p => p.type === 'timeZoneName');
+
+    return {
+      date,
+      time,
+      zone: zonePart ? zonePart.value : visitorContext.timeZone,
+    };
+  } catch (_) {
+    return {
+      date: match.date || '',
+      time: match.time || '',
+      zone: visitorContext.timeZone || 'UTC',
+    };
+  }
 }
 
 /* ── Event listeners ─────────────────────────────────────────── */
@@ -451,6 +522,7 @@ document.querySelectorAll('.lang-btn').forEach(btn => {
 
 /* ── Boot ────────────────────────────────────────────────────── */
 async function boot() {
+  await loadVisitorContext();
   try {
     const res = await fetch('/api/config');
     if (res.ok) {

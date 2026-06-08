@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>LaAlbiceleste2026</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <header>
+    <div class="header-inner">
+      <div class="logo">
+        <a href="/"><img src="img/logo-la2026.png" alt="LaAlbiceleste 2026" class="header-logo" /></a>
+      </div>
+      <div class="header-right">
+        <div class="header-meta" id="cache-info"></div>
+        <div class="lang-toggle">
+          <button class="lang-btn active" data-lang="tr">TR</button>
+          <button class="lang-btn" data-lang="en">EN</button>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <div class="controls">
+    <div class="search-row">
+      <input type="text" id="search" placeholder="Search team..." />
+      <select id="date-filter">
+        <option value="">All dates</option>
+      </select>
+      <button id="btn-refresh">↻ Refresh</button>
+      <button id="btn-toggle-filters" title="Toggle filters">▾ Filters</button>
+    </div>
+    <div id="filters-panel" class="filters-panel">
+      <div id="sport-tabs" class="sport-tabs"></div>
+      <div id="league-filter" class="league-filter hidden"></div>
+    </div>
+  </div>
+
+  <main>
+    <div id="summary-bar" class="summary-bar"></div>
+    <div id="matches-list" class="matches-list"></div>
+    <div id="loading" class="loading hidden">Loading...</div>
+    <div id="error-msg" class="error-msg hidden"></div>
+  </main>
+
+  <!-- Market detail modal -->
+  <div id="modal" class="modal hidden" role="dialog" aria-modal="true">
+    <div class="modal-backdrop" id="modal-backdrop"></div>
+    <div class="modal-box">
+      <button class="modal-close" id="modal-close" aria-label="Close">✕</button>
+      <div id="modal-content"></div>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>

@@ -1,8 +1,6 @@
 İlk sarı kartı kim görür (Who gets the first yellow card)
-İlk sarı kart dakikası (Minute of the first yellow card)
 İlk golü kim atar (Who will score the first)
 İlk gol dakikası (Minute of the first goal)
 Son sarı kartı kim görür (Who gets the last yellow card)
-Son sarı kart dakikası (Minute of the last yellow card)
 Son golü kim atar (Who will score the last)
 Son gol dakikası (Minute of the final goal)

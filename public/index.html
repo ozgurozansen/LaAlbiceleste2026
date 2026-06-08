@@ -3,56 +3,33 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>LaAlbiceleste2026 </title>
+  <title>LaAlbiceleste2026</title>
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-  <header>
-    <div class="header-inner">
-      <div class="logo">
-        <a href="/"><img src="img/logo-la2026.png" alt="LaAlbiceleste 2026" class="header-logo" /></a>
-      </div>
-      <div class="header-right">
-        <div class="header-meta" id="cache-info"></div>
-        <div class="lang-toggle">
-          <button class="lang-btn active" data-lang="tr">TR</button>
-          <button class="lang-btn" data-lang="en">EN</button>
-        </div>
-      </div>
+  <main style="min-height:100vh;display:grid;place-items:center;padding:24px;text-align:center;">
+    <div>
+      <img src="img/logo-la2026.png" alt="LaAlbiceleste 2026" style="width:112px;height:auto;margin-bottom:16px;" />
+      <h1 style="margin:0 0 8px 0;font-size:24px;">LaAlbiceleste2026</h1>
+      <p id="route-status" style="margin:0;color:#666;">Routing...</p>
     </div>
-  </header>
-
-  <div class="controls">
-    <div class="search-row">
-      <input type="text" id="search" placeholder="Search team…" />
-      <select id="date-filter">
-        <option value="">All dates</option>
-      </select>
-      <button id="btn-refresh">↻ Refresh</button>
-      <button id="btn-toggle-filters" title="Toggle filters">▾ Filters</button>
-    </div>
-    <div id="filters-panel" class="filters-panel">
-      <div id="sport-tabs" class="sport-tabs"></div>
-      <div id="league-filter" class="league-filter hidden"></div>
-    </div>
-  </div>
-
-  <main>
-    <div id="summary-bar" class="summary-bar"></div>
-    <div id="matches-list" class="matches-list"></div>
-    <div id="loading" class="loading hidden">Loading…</div>
-    <div id="error-msg" class="error-msg hidden"></div>
   </main>
 
-  <!-- Market detail modal -->
-  <div id="modal" class="modal hidden" role="dialog" aria-modal="true">
-    <div class="modal-backdrop" id="modal-backdrop"></div>
-    <div class="modal-box">
-      <button class="modal-close" id="modal-close" aria-label="Close">✕</button>
-      <div id="modal-content"></div>
-    </div>
-  </div>
-
-  <script src="app.js"></script>
+  <script>
+    (async function routeByStage() {
+      var fallback = '/groupstage.html';
+      var statusEl = document.getElementById('route-status');
+      try {
+        var res = await fetch('/api/stage/redirect-target');
+        var json = await res.json();
+        if (!res.ok) throw new Error(json.error || 'Failed to resolve stage');
+        var target = (json && typeof json.target === 'string' && json.target) ? json.target : fallback;
+        window.location.replace(target);
+      } catch (err) {
+        if (statusEl) statusEl.textContent = 'Redirect failed, opening group stage...';
+        window.location.replace(fallback);
+      }
+    })();
+  </script>
 </body>
 </html>

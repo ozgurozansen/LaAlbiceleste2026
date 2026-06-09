@@ -1,0 +1,728 @@
+{
+  "generatedAt": "2026-06-09T13:21:33.163744+00:00",
+  "matchCount": 72,
+  "fhSchedule": [
+    {
+      "tr": "İlk golü kim atar",
+      "en": "Who will score the first",
+      "inputType": "player"
+    },
+    {
+      "tr": "Son golü kim atar",
+      "en": "Who will score the last",
+      "inputType": "player"
+    },
+    {
+      "tr": "Son sarı kartı kim görür",
+      "en": "Who gets the last yellow card",
+      "inputType": "player"
+    },
+    {
+      "tr": "İlk golü kim atar",
+      "en": "Who will score the first",
+      "inputType": "player"
+    },
+    {
+      "tr": "Son gol dakikası",
+      "en": "Minute of the final goal",
+      "inputType": "minute"
+    },
+    {
+      "tr": "İlk gol dakikası",
+      "en": "Minute of the first goal",
+      "inputType": "minute"
+    },
+    {
+      "tr": "Son gol dakikası",
+      "en": "Minute of the final goal",
+      "inputType": "minute"
+    },
+    {
+      "tr": "İlk sarı kartı kim görür",
+      "en": "Who gets the first yellow card",
+      "inputType": "player"
+    },
+    {
+      "tr": "Son golü kim atar",
+      "en": "Who will score the last",
+      "inputType": "player"
+    },
+    {
+      "tr": "İlk gol dakikası",
+      "en": "Minute of the first goal",
+      "inputType": "minute"
+    },
+    {
+      "tr": "Son sarı kartı kim görür",
+      "en": "Who gets the last yellow card",
+      "inputType": "player"
+    },
+    {
+      "tr": "İlk sarı kartı kim görür",
+      "en": "Who gets the first yellow card",
+      "inputType": "player"
+    },
+    {
+      "tr": "İlk gol dakikası",
+      "en": "Minute of the first goal",
+      "inputType": "minute"
+    },
+    {
+      "tr": "İlk sarı kartı kim görür",
+      "en": "Who gets the first yellow card",
+      "inputType": "player"
+    },
+    {
+      "tr": "İlk golü kim atar",
+      "en": "Who will score the first",
+      "inputType": "player"
+    },
+    {
+      "tr": "İlk gol dakikası",
+      "en": "Minute of the first goal",
+      "inputType": "minute"
+    },
+    {
+      "tr": "Son sarı kartı kim görür",
+      "en": "Who gets the last yellow card",
+      "inputType": "player"
+    },
+    {
+      "tr": "İlk sarı kartı kim görür",
+      "en": "Who gets the first yellow card",
+      "inputType": "player"
+    },
+    {
+      "tr": "Son sarı kartı kim görür",
+      "en": "Who gets the last yellow card",
+      "inputType": "player"
+    },
+    {
+      "tr": "İlk golü kim atar",
+      "en": "Who will score the first",
+      "inputType": "player"
+    },
+    {
+      "tr": "İlk sarı kartı kim görür",
+      "en": "Who gets the first yellow card",
+      "inputType": "player"
+    },
+    {
+      "tr": "Son sarı kartı kim görür",
+      "en": "Who gets the last yellow card",
+      "inputType": "player"
+    },
+    {
+      "tr": "İlk golü kim atar",
+      "en": "Who will score the first",
+      "inputType": "player"
+    },
+    {
+      "tr": "Son sarı kartı kim görür",
+      "en": "Who gets the last yellow card",
+      "inputType": "player"
+    },
+    {
+      "tr": "Son golü kim atar",
+      "en": "Who will score the last",
+      "inputType": "player"
+    },
+    {
+      "tr": "Son sarı kartı kim görür",
+      "en": "Who gets the last yellow card",
+      "inputType": "player"
+    },
+    {
+      "tr": "Son golü kim atar",
+      "en": "Who will score the last",
+      "inputType": "player"
+    },
+    {
+      "tr": "İlk gol dakikası",
+      "en": "Minute of the first goal",
+      "inputType": "minute"
+    },
+    {
+      "tr": "Son gol dakikası",
+      "en": "Minute of the final goal",
+      "inputType": "minute"
+    },
+    {
+      "tr": "Son sarı kartı kim görür",
+      "en": "Who gets the last yellow card",
+      "inputType": "player"
+    },
+    {
+      "tr": "İlk golü kim atar",
+      "en": "Who will score the first",
+      "inputType": "player"
+    },
+    {
+      "tr": "Son golü kim atar",
+      "en": "Who will score the last",
+      "inputType": "player"
+    },
+    {
+      "tr": "İlk sarı kartı kim görür",
+      "en": "Who gets the first yellow card",
+      "inputType": "player"
+    },
+    {
+      "tr": "İlk golü kim atar",
+      "en": "Who will score the first",
+      "inputType": "player"
+    },
+    {
+      "tr": "İlk gol dakikası",
+      "en": "Minute of the first goal",
+      "inputType": "minute"
+    },
+    {
+      "tr": "Son golü kim atar",
+      "en": "Who will score the last",
+      "inputType": "player"
+    },
+    {
+      "tr": "Son golü kim atar",
+      "en": "Who will score the last",
+      "inputType": "player"
+    },
+    {
+      "tr": "Son gol dakikası",
+      "en": "Minute of the final goal",
+      "inputType": "minute"
+    },
+    {
+      "tr": "Son gol dakikası",
+      "en": "Minute of the final goal",
+      "inputType": "minute"
+    },
+    {
+      "tr": "İlk gol dakikası",
+      "en": "Minute of the first goal",
+      "inputType": "minute"
+    },
+    {
+      "tr": "Son golü kim atar",
+      "en": "Who will score the last",
+      "inputType": "player"
+    },
+    {
+      "tr": "İlk sarı kartı kim görür",
+      "en": "Who gets the first yellow card",
+      "inputType": "player"
+    },
+    {
+      "tr": "İlk gol dakikası",
+      "en": "Minute of the first goal",
+      "inputType": "minute"
+    },
+    {
+      "tr": "İlk golü kim atar",
+      "en": "Who will score the first",
+      "inputType": "player"
+    },
+    {
+      "tr": "İlk gol dakikası",
+      "en": "Minute of the first goal",
+      "inputType": "minute"
+    },
+    {
+      "tr": "İlk gol dakikası",
+      "en": "Minute of the first goal",
+      "inputType": "minute"
+    },
+    {
+      "tr": "İlk golü kim atar",
+      "en": "Who will score the first",
+      "inputType": "player"
+    },
+    {
+      "tr": "Son sarı kartı kim görür",
+      "en": "Who gets the last yellow card",
+      "inputType": "player"
+    },
+    {
+      "tr": "Son golü kim atar",
+      "en": "Who will score the last",
+      "inputType": "player"
+    },
+    {
+      "tr": "Son golü kim atar",
+      "en": "Who will score the last",
+      "inputType": "player"
+    },
+    {
+      "tr": "Son gol dakikası",
+      "en": "Minute of the final goal",
+      "inputType": "minute"
+    },
+    {
+      "tr": "Son sarı kartı kim görür",
+      "en": "Who gets the last yellow card",
+      "inputType": "player"
+    },
+    {
+      "tr": "İlk sarı kartı kim görür",
+      "en": "Who gets the first yellow card",
+      "inputType": "player"
+    },
+    {
+      "tr": "Son golü kim atar",
+      "en": "Who will score the last",
+      "inputType": "player"
+    },
+    {
+      "tr": "İlk golü kim atar",
+      "en": "Who will score the first",
+      "inputType": "player"
+    },
+    {
+      "tr": "İlk sarı kartı kim görür",
+      "en": "Who gets the first yellow card",
+      "inputType": "player"
+    },
+    {
+      "tr": "İlk sarı kartı kim görür",
+      "en": "Who gets the first yellow card",
+      "inputType": "player"
+    },
+    {
+      "tr": "Son gol dakikası",
+      "en": "Minute of the final goal",
+      "inputType": "minute"
+    },
+    {
+      "tr": "Son gol dakikası",
+      "en": "Minute of the final goal",
+      "inputType": "minute"
+    },
+    {
+      "tr": "Son sarı kartı kim görür",
+      "en": "Who gets the last yellow card",
+      "inputType": "player"
+    },
+    {
+      "tr": "İlk gol dakikası",
+      "en": "Minute of the first goal",
+      "inputType": "minute"
+    },
+    {
+      "tr": "Son golü kim atar",
+      "en": "Who will score the last",
+      "inputType": "player"
+    },
+    {
+      "tr": "Son gol dakikası",
+      "en": "Minute of the final goal",
+      "inputType": "minute"
+    },
+    {
+      "tr": "İlk golü kim atar",
+      "en": "Who will score the first",
+      "inputType": "player"
+    },
+    {
+      "tr": "Son gol dakikası",
+      "en": "Minute of the final goal",
+      "inputType": "minute"
+    },
+    {
+      "tr": "İlk sarı kartı kim görür",
+      "en": "Who gets the first yellow card",
+      "inputType": "player"
+    },
+    {
+      "tr": "İlk golü kim atar",
+      "en": "Who will score the first",
+      "inputType": "player"
+    },
+    {
+      "tr": "İlk sarı kartı kim görür",
+      "en": "Who gets the first yellow card",
+      "inputType": "player"
+    },
+    {
+      "tr": "İlk gol dakikası",
+      "en": "Minute of the first goal",
+      "inputType": "minute"
+    },
+    {
+      "tr": "Son gol dakikası",
+      "en": "Minute of the final goal",
+      "inputType": "minute"
+    },
+    {
+      "tr": "Son sarı kartı kim görür",
+      "en": "Who gets the last yellow card",
+      "inputType": "player"
+    },
+    {
+      "tr": "Son gol dakikası",
+      "en": "Minute of the final goal",
+      "inputType": "minute"
+    }
+  ],
+  "shSchedule": [
+    {
+      "tr": "Son golü kim atar",
+      "en": "Who will score the last",
+      "inputType": "player"
+    },
+    {
+      "tr": "Son sarı kartı kim görür",
+      "en": "Who gets the last yellow card",
+      "inputType": "player"
+    },
+    {
+      "tr": "Maçın adamı kim olur",
+      "en": "Who will be the Man of the Match",
+      "inputType": "player"
+    },
+    {
+      "tr": "İlk oyuncu değişikliği dakikası",
+      "en": "Minute of the first substitution",
+      "inputType": "minute"
+    },
+    {
+      "tr": "Son golü kim atar",
+      "en": "Who will score the last",
+      "inputType": "player"
+    },
+    {
+      "tr": "İlk oyuncu değişikliği dakikası",
+      "en": "Minute of the first substitution",
+      "inputType": "minute"
+    },
+    {
+      "tr": "Maçın adamı kim olur",
+      "en": "Who will be the Man of the Match",
+      "inputType": "player"
+    },
+    {
+      "tr": "Maçın adamı kim olur",
+      "en": "Who will be the Man of the Match",
+      "inputType": "player"
+    },
+    {
+      "tr": "Son sarı kartı kim görür",
+      "en": "Who gets the last yellow card",
+      "inputType": "player"
+    },
+    {
+      "tr": "Son oyuncu değişikliği dakikası",
+      "en": "Minute of the last substitution",
+      "inputType": "minute"
+    },
+    {
+      "tr": "Son oyuncu değişikliği dakikası",
+      "en": "Minute of the last substitution",
+      "inputType": "minute"
+    },
+    {
+      "tr": "Oynanmayan süre",
+      "en": "Stoppage time",
+      "inputType": "minute"
+    },
+    {
+      "tr": "Oynanmayan süre",
+      "en": "Stoppage time",
+      "inputType": "minute"
+    },
+    {
+      "tr": "Son oyuncu değişikliği dakikası",
+      "en": "Minute of the last substitution",
+      "inputType": "minute"
+    },
+    {
+      "tr": "Son golü kim atar",
+      "en": "Who will score the last",
+      "inputType": "player"
+    },
+    {
+      "tr": "Son sarı kartı kim görür",
+      "en": "Who gets the last yellow card",
+      "inputType": "player"
+    },
+    {
+      "tr": "Son oyuncu değişikliği dakikası",
+      "en": "Minute of the last substitution",
+      "inputType": "minute"
+    },
+    {
+      "tr": "Maçın adamı kim olur",
+      "en": "Who will be the Man of the Match",
+      "inputType": "player"
+    },
+    {
+      "tr": "Son sarı kartı kim görür",
+      "en": "Who gets the last yellow card",
+      "inputType": "player"
+    },
+    {
+      "tr": "İlk oyuncu değişikliği dakikası",
+      "en": "Minute of the first substitution",
+      "inputType": "minute"
+    },
+    {
+      "tr": "Oynanmayan süre",
+      "en": "Stoppage time",
+      "inputType": "minute"
+    },
+    {
+      "tr": "Maçın adamı kim olur",
+      "en": "Who will be the Man of the Match",
+      "inputType": "player"
+    },
+    {
+      "tr": "Son sarı kartı kim görür",
+      "en": "Who gets the last yellow card",
+      "inputType": "player"
+    },
+    {
+      "tr": "Son sarı kartı kim görür",
+      "en": "Who gets the last yellow card",
+      "inputType": "player"
+    },
+    {
+      "tr": "Maçın adamı kim olur",
+      "en": "Who will be the Man of the Match",
+      "inputType": "player"
+    },
+    {
+      "tr": "Son golü kim atar",
+      "en": "Who will score the last",
+      "inputType": "player"
+    },
+    {
+      "tr": "Son golü kim atar",
+      "en": "Who will score the last",
+      "inputType": "player"
+    },
+    {
+      "tr": "Oynanmayan süre",
+      "en": "Stoppage time",
+      "inputType": "minute"
+    },
+    {
+      "tr": "Oynanmayan süre",
+      "en": "Stoppage time",
+      "inputType": "minute"
+    },
+    {
+      "tr": "İlk oyuncu değişikliği dakikası",
+      "en": "Minute of the first substitution",
+      "inputType": "minute"
+    },
+    {
+      "tr": "Oynanmayan süre",
+      "en": "Stoppage time",
+      "inputType": "minute"
+    },
+    {
+      "tr": "İlk oyuncu değişikliği dakikası",
+      "en": "Minute of the first substitution",
+      "inputType": "minute"
+    },
+    {
+      "tr": "Son golü kim atar",
+      "en": "Who will score the last",
+      "inputType": "player"
+    },
+    {
+      "tr": "İlk oyuncu değişikliği dakikası",
+      "en": "Minute of the first substitution",
+      "inputType": "minute"
+    },
+    {
+      "tr": "Maçın adamı kim olur",
+      "en": "Who will be the Man of the Match",
+      "inputType": "player"
+    },
+    {
+      "tr": "İlk oyuncu değişikliği dakikası",
+      "en": "Minute of the first substitution",
+      "inputType": "minute"
+    },
+    {
+      "tr": "Maçın adamı kim olur",
+      "en": "Who will be the Man of the Match",
+      "inputType": "player"
+    },
+    {
+      "tr": "İlk oyuncu değişikliği dakikası",
+      "en": "Minute of the first substitution",
+      "inputType": "minute"
+    },
+    {
+      "tr": "Oynanmayan süre",
+      "en": "Stoppage time",
+      "inputType": "minute"
+    },
+    {
+      "tr": "Son golü kim atar",
+      "en": "Who will score the last",
+      "inputType": "player"
+    },
+    {
+      "tr": "Son golü kim atar",
+      "en": "Who will score the last",
+      "inputType": "player"
+    },
+    {
+      "tr": "Son sarı kartı kim görür",
+      "en": "Who gets the last yellow card",
+      "inputType": "player"
+    },
+    {
+      "tr": "Son oyuncu değişikliği dakikası",
+      "en": "Minute of the last substitution",
+      "inputType": "minute"
+    },
+    {
+      "tr": "Son oyuncu değişikliği dakikası",
+      "en": "Minute of the last substitution",
+      "inputType": "minute"
+    },
+    {
+      "tr": "Oynanmayan süre",
+      "en": "Stoppage time",
+      "inputType": "minute"
+    },
+    {
+      "tr": "Son oyuncu değişikliği dakikası",
+      "en": "Minute of the last substitution",
+      "inputType": "minute"
+    },
+    {
+      "tr": "Maçın adamı kim olur",
+      "en": "Who will be the Man of the Match",
+      "inputType": "player"
+    },
+    {
+      "tr": "Son oyuncu değişikliği dakikası",
+      "en": "Minute of the last substitution",
+      "inputType": "minute"
+    },
+    {
+      "tr": "Oynanmayan süre",
+      "en": "Stoppage time",
+      "inputType": "minute"
+    },
+    {
+      "tr": "Son sarı kartı kim görür",
+      "en": "Who gets the last yellow card",
+      "inputType": "player"
+    },
+    {
+      "tr": "Son sarı kartı kim görür",
+      "en": "Who gets the last yellow card",
+      "inputType": "player"
+    },
+    {
+      "tr": "Maçın adamı kim olur",
+      "en": "Who will be the Man of the Match",
+      "inputType": "player"
+    },
+    {
+      "tr": "Son oyuncu değişikliği dakikası",
+      "en": "Minute of the last substitution",
+      "inputType": "minute"
+    },
+    {
+      "tr": "Oynanmayan süre",
+      "en": "Stoppage time",
+      "inputType": "minute"
+    },
+    {
+      "tr": "Son golü kim atar",
+      "en": "Who will score the last",
+      "inputType": "player"
+    },
+    {
+      "tr": "İlk oyuncu değişikliği dakikası",
+      "en": "Minute of the first substitution",
+      "inputType": "minute"
+    },
+    {
+      "tr": "Son sarı kartı kim görür",
+      "en": "Who gets the last yellow card",
+      "inputType": "player"
+    },
+    {
+      "tr": "Son sarı kartı kim görür",
+      "en": "Who gets the last yellow card",
+      "inputType": "player"
+    },
+    {
+      "tr": "Son sarı kartı kim görür",
+      "en": "Who gets the last yellow card",
+      "inputType": "player"
+    },
+    {
+      "tr": "Son oyuncu değişikliği dakikası",
+      "en": "Minute of the last substitution",
+      "inputType": "minute"
+    },
+    {
+      "tr": "Son golü kim atar",
+      "en": "Who will score the last",
+      "inputType": "player"
+    },
+    {
+      "tr": "Oynanmayan süre",
+      "en": "Stoppage time",
+      "inputType": "minute"
+    },
+    {
+      "tr": "İlk oyuncu değişikliği dakikası",
+      "en": "Minute of the first substitution",
+      "inputType": "minute"
+    },
+    {
+      "tr": "Son oyuncu değişikliği dakikası",
+      "en": "Minute of the last substitution",
+      "inputType": "minute"
+    },
+    {
+      "tr": "İlk oyuncu değişikliği dakikası",
+      "en": "Minute of the first substitution",
+      "inputType": "minute"
+    },
+    {
+      "tr": "Maçın adamı kim olur",
+      "en": "Who will be the Man of the Match",
+      "inputType": "player"
+    },
+    {
+      "tr": "İlk oyuncu değişikliği dakikası",
+      "en": "Minute of the first substitution",
+      "inputType": "minute"
+    },
+    {
+      "tr": "Maçın adamı kim olur",
+      "en": "Who will be the Man of the Match",
+      "inputType": "player"
+    },
+    {
+      "tr": "Son oyuncu değişikliği dakikası",
+      "en": "Minute of the last substitution",
+      "inputType": "minute"
+    },
+    {
+      "tr": "Son golü kim atar",
+      "en": "Who will score the last",
+      "inputType": "player"
+    },
+    {
+      "tr": "Son golü kim atar",
+      "en": "Who will score the last",
+      "inputType": "player"
+    },
+    {
+      "tr": "Oynanmayan süre",
+      "en": "Stoppage time",
+      "inputType": "minute"
+    }
+  ]
+}

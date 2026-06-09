@@ -61,6 +61,7 @@ _SQUAD_FILE = os.path.join(DATA_DIR, "squad.json")
 _USERS_FILE = os.path.join(DATA_DIR, "users.json")
 _GUESS_FILE = os.path.join(DATA_DIR, "guesses.json")
 _RES_FILE   = os.path.join(DATA_DIR, "match_results.json")
+_BONUS_ASSIGN_FILE = os.path.join(DATA_DIR, "bonus_assignments.json")
 
 POINTS_CFG  = CONFIG.get("points", {"correct_score": 5, "correct_result": 3,
                                      "correct_fh_bonus": 1, "correct_sh_bonus": 1})
@@ -104,34 +105,45 @@ def _load_bonus_file(path):
     return items
 
 
-def _shuffle_bonus_items(items, salt):
-    if len(items) <= 1:
-        return items
-    seed_source = f"{salt}\n" + "\n".join(
-        f"{item.get('tr','')}|{item.get('en','')}|{item.get('inputType','')}" for item in items
-    )
-    seed = int(hashlib.sha256(seed_source.encode("utf-8")).hexdigest(), 16)
-    shuffled = list(items)
-    random.Random(seed).shuffle(shuffled)
-    return shuffled
-
-
-def _build_bonus_schedule(items, match_count, salt):
+def _build_bonus_schedule(items, match_count):
     if not items or match_count <= 0:
         return []
     repeats, remainder = divmod(match_count, len(items))
     pool = list(items) * repeats + list(items[:remainder])
-    seed_source = f"schedule:{salt}:{match_count}\n" + "\n".join(
-        f"{item.get('tr','')}|{item.get('en','')}|{item.get('inputType','')}" for item in pool
-    )
-    seed = int(hashlib.sha256(seed_source.encode("utf-8")).hexdigest(), 16)
-    rng = random.Random(seed)
-    rng.shuffle(pool)
+    random.SystemRandom().shuffle(pool)
     return pool
 
 
-_BONUS_FH = _shuffle_bonus_items(_load_bonus_file(_BFH_FILE), "fh")
-_BONUS_SH = _shuffle_bonus_items(_load_bonus_file(_BSH_FILE), "sh")
+def _load_or_create_bonus_assignments(fh_items, sh_items, match_count):
+    if match_count <= 0:
+        return [], []
+
+    try:
+        with open(_BONUS_ASSIGN_FILE, "r", encoding="utf-8") as f:
+            existing = json.load(f)
+        fh_sched = existing.get("fhSchedule") or []
+        sh_sched = existing.get("shSchedule") or []
+        if len(fh_sched) == match_count and len(sh_sched) == match_count:
+            return fh_sched, sh_sched
+    except (FileNotFoundError, json.JSONDecodeError, OSError):
+        pass
+
+    fh_sched = _build_bonus_schedule(fh_items, match_count)
+    sh_sched = _build_bonus_schedule(sh_items, match_count)
+    os.makedirs(os.path.dirname(_BONUS_ASSIGN_FILE), exist_ok=True)
+    snapshot = {
+        "generatedAt": datetime.now(timezone.utc).isoformat(),
+        "matchCount": match_count,
+        "fhSchedule": fh_sched,
+        "shSchedule": sh_sched,
+    }
+    with open(_BONUS_ASSIGN_FILE, "w", encoding="utf-8") as f:
+        json.dump(snapshot, f, ensure_ascii=False, indent=2)
+    return fh_sched, sh_sched
+
+
+_BONUS_FH = _load_bonus_file(_BFH_FILE)
+_BONUS_SH = _load_bonus_file(_BSH_FILE)
 
 
 def _load_all_matches():
@@ -166,8 +178,11 @@ def _build_squad_lookup(squad):
 _ALL_MATCHES   = _load_all_matches()
 _SQUAD_LOOKUP  = _build_squad_lookup(_load_squad_data())
 _GROUP_MATCHES = [m for m in _ALL_MATCHES if "group" in m]
-_BONUS_FH_SCHEDULE = _build_bonus_schedule(_BONUS_FH, len(_GROUP_MATCHES), "fh")
-_BONUS_SH_SCHEDULE = _build_bonus_schedule(_BONUS_SH, len(_GROUP_MATCHES), "sh")
+_BONUS_FH_SCHEDULE, _BONUS_SH_SCHEDULE = _load_or_create_bonus_assignments(
+    _BONUS_FH,
+    _BONUS_SH,
+    len(_GROUP_MATCHES),
+)
 _data_lock     = threading.Lock()
 _tokens        = {}   # token -> {username, expires}
 _SUPPORTED_TEAMS = sorted({
@@ -347,6 +362,23 @@ def _compute_leaderboard():
                    "logoData": uinfo.get("logoData"),
                    "totalPoints": total, "matchPoints": match_pts})
     lb.sort(key=lambda x: -x["totalPoints"])
+
+    # Honor user pinned at #1 with the theoretical maximum points for group stage.
+    max_per_match = (
+        POINTS_CFG.get("correct_score", 5)
+        + POINTS_CFG.get("correct_result", 3)
+        + POINTS_CFG.get("correct_fh_bonus", 1)
+        + POINTS_CFG.get("correct_sh_bonus", 1)
+    )
+    honor_total = len(_GROUP_MATCHES) * max_per_match
+    lb.insert(0, {
+        "username": "honor_pa_pa",
+        "displayName": "Pa&Pa",
+        "supportedTeam": "Belgium",
+        "logoData": "/img/papa.png",
+        "totalPoints": honor_total,
+        "matchPoints": {},
+    })
     return lb
 
 

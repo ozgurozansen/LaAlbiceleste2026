@@ -396,8 +396,8 @@
   "points": {
     "correct_score":    2,
     "correct_result":   3,
-    "correct_fh_bonus": 1,
-    "correct_sh_bonus": 1
+    "correct_fh_bonus": 2,
+    "correct_sh_bonus": 2
   },
   "results_api": {
     "provider":         "football-data",

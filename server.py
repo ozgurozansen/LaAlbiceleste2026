@@ -22,7 +22,7 @@ import uuid
 import random
 from datetime import datetime, timezone, timedelta
 
-PORT = int(sys.argv[1]) if len(sys.argv) > 1 else 8000
+PORT = int(sys.argv[1]) if len(sys.argv) > 1 else int(os.environ.get("PORT", "8000"))
 BULLETIN_URL = "https://bulten.nesine.com/api/bulten/getprebultenfull"
 CACHE_TTL = 60  # seconds
 PUBLIC_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "public")

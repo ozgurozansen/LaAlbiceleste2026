@@ -46,4 +46,4 @@ ENV PORT=8080
 EXPOSE $PORT
 
 # Define the command to start your application
-CMD ["python", "app.py"]
+CMD ["python", "server.py"]

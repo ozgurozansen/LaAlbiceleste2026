@@ -14,6 +14,8 @@
   --text: #e2e8f0;
   --muted: #8892a4;
   --radius: 10px;
+  --gs-header-offset: 128px;
+  --gs-controls-offset: 52px;
 }
 
 html { font-size: 15px; }
@@ -606,12 +608,29 @@ main { max-width: 1400px; margin: 0 auto; padding: 0 1rem 3rem; }
   display: inline-flex;
   align-items: center;
 }
+.gs-pill-profile-trigger {
+  display: inline-flex;
+  align-items: center;
+  gap: .55rem;
+  min-width: 0;
+  cursor: pointer;
+  user-select: none;
+}
+.gs-pill-profile-trigger:hover .gs-pill-name,
+.gs-pill-profile-trigger:focus-visible .gs-pill-name {
+  color: var(--accent);
+}
 .gs-pill-name  {
   font-weight: 600;
   max-width: 180px;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+}
+.gs-pill-profile-trigger:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+  border-radius: 8px;
 }
 .gs-pill-admin {
   font-size: .65rem;
@@ -666,11 +685,49 @@ main { max-width: 1400px; margin: 0 auto; padding: 0 1rem 3rem; }
   background: var(--surface);
   border-bottom: 1px solid var(--border);
   padding: .55rem 1.5rem;
+  position: sticky;
+  top: var(--gs-header-offset);
+  z-index: 98;
   display: flex;
   align-items: center;
   justify-content: space-between;
   flex-wrap: wrap;
   gap: .5rem;
+}
+
+.gs-status-filters {
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  padding: .45rem 1.5rem .65rem;
+  position: sticky;
+  top: calc(var(--gs-header-offset) + var(--gs-controls-offset));
+  z-index: 97;
+  display: flex;
+  gap: .45rem;
+  flex-wrap: wrap;
+}
+
+.gs-status-filter-btn {
+  background: transparent;
+  border: 1px solid #444;
+  color: #aaa;
+  border-radius: 20px;
+  padding: .35rem .9rem;
+  font-size: .82rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: border-color .15s, color .15s, background .15s;
+}
+
+.gs-status-filter-btn.active {
+  background: #2980b9;
+  border-color: #2980b9;
+  color: #fff;
+}
+
+.gs-status-filter-btn:hover:not(.active) {
+  border-color: #aaa;
+  color: #fff;
 }
 
 .gs-main-tabs {
@@ -1390,6 +1447,10 @@ main { max-width: 1400px; margin: 0 auto; padding: 0 1rem 3rem; }
 
 /* ── Responsive: group stage layout ─────────────────────────── */
 @media (max-width: 980px) {
+  :root {
+    --gs-header-offset: 110px;
+    --gs-controls-offset: 52px;
+  }
   .header-inner {
     height: auto;
     padding: .75rem 0;
@@ -1412,15 +1473,30 @@ main { max-width: 1400px; margin: 0 auto; padding: 0 1rem 3rem; }
 }
 
 @media (max-width: 720px) {
+  :root {
+    --gs-header-offset: 100px;
+    --gs-controls-offset: 86px;
+  }
   header { padding: 0 1rem; }
   .header-logo { height: 64px; }
-  .gs-page-title { font-size: .95rem; }
+  .logo { flex-wrap: nowrap; }
+  .gs-header-sep { margin: 0 .2rem; }
+  .gs-page-title {
+    font-size: .82rem;
+    max-width: 150px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
   .gs-user-logo { width: 24px; height: 24px; }
   .gs-pill-name { max-width: 140px; }
   .gs-controls {
     padding: .6rem 1rem;
     flex-direction: column;
     align-items: flex-start;
+  }
+  .gs-status-filters {
+    padding: .45rem 1rem .65rem;
   }
   .gs-main-tabs {
     width: 100%;

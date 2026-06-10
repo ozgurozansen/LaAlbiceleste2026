@@ -64,8 +64,13 @@ const I18N = {
     login:          'Giriş Yap',
     register:       'Kayıt Ol',
     logout:         'Çıkış',
+    cancel:         'İptal',
+    editProfile:    'Profili Düzenle',
     username:       'Kullanıcı Adı',
     password:       'Şifre',
+    currentPassword:'Mevcut Şifre',
+    newPassword:    'Yeni Şifre',
+    newPasswordHint:'Boş bırakırsanız şifre değişmez',
     displayName:    'Görünen Ad',
     supportedTeam:  'Taraf',
     selectTeam:     'Takım seçin…',
@@ -73,6 +78,11 @@ const I18N = {
     logoHint:       'Varsa logo yükleyin (opsiyonel)',
     logoTooLarge:   'Logo çok büyük (maks 2 MB)',
     logoInvalid:    'Logo okunamadı',
+    profileModalTitle:'Profil Bilgilerini Düzenle',
+    profileAuthHint:'Değişiklikleri kaydetmek için mevcut şifrenizi girin',
+    profileSaved:   '✓ Profil güncellendi',
+    profileFail:    'Profil güncellenemedi',
+    currentPasswordFail:'Mevcut şifre yanlış',
     save:           'Kaydet',
     edit:           'Düzenle',
     saving:         'Kaydediliyor…',
@@ -83,6 +93,11 @@ const I18N = {
     tab_predictions:'Tahmin Yap',
     tab_guesses:    'Girilen Tahminler',
     tab_leaderboard:'Sıralama',
+    filterAll:      'Tümü',
+    filterLive:     'Canlı',
+    filterFinished: 'Bitti',
+    filterUpcoming: 'Yaklaşan',
+    noMatchesForFilter: 'Bu filtre için maç bulunamadı',
     rank:           'Sıra',
     player:         'Oyuncu',
     points:         'Puan',
@@ -131,8 +146,13 @@ const I18N = {
     login:          'Login',
     register:       'Register',
     logout:         'Logout',
+    cancel:         'Cancel',
+    editProfile:    'Edit Profile',
     username:       'Username',
     password:       'Password',
+    currentPassword:'Current Password',
+    newPassword:    'New Password',
+    newPasswordHint:'Leave blank to keep your current password',
     displayName:    'Display Name',
     supportedTeam:  'Supported Team',
     selectTeam:     'Select team…',
@@ -140,6 +160,11 @@ const I18N = {
     logoHint:       'Upload a logo if you have one (optional)',
     logoTooLarge:   'Logo is too large (max 2 MB)',
     logoInvalid:    'Could not read logo',
+    profileModalTitle:'Edit Profile Details',
+    profileAuthHint:'Enter your current password to save changes',
+    profileSaved:   '✓ Profile updated',
+    profileFail:    'Could not update profile',
+    currentPasswordFail:'Current password is incorrect',
     save:           'Save',
     edit:           'Edit',
     saving:         'Saving…',
@@ -150,6 +175,11 @@ const I18N = {
     tab_predictions:'Predictions',
     tab_guesses:    'Submitted Guesses',
     tab_leaderboard:'Standings',
+    filterAll:      'All',
+    filterLive:     'Live',
+    filterFinished: 'Finished',
+    filterUpcoming: 'Upcoming',
+    noMatchesForFilter: 'No matches for this filter',
     rank:           'Rank',
     player:         'Player',
     points:         'Points',
@@ -208,9 +238,12 @@ const S = {
   allGuesses: {},          // matchIndex(str) -> {status,result,guesses[]}
   leaderboard: [],
   activeGroup: 'A',
+  matchFilter: 'all',
   adminMatchIdx: null,
   points: { correct_score: 5, correct_result: 3, correct_fh_bonus: 1, correct_sh_bonus: 1 },
 };
+
+const LOGO_MAX_BYTES = 2 * 1024 * 1024;
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 const t   = k  => (I18N[S.lang] || I18N.tr)[k] || k;
@@ -221,6 +254,14 @@ const el  = (tag, cls, html) => {
   if (html) e.innerHTML   = html;
   return e;
 };
+
+function updateStickyOffsets() {
+  const header = document.querySelector('header');
+  const controls = $('app') ? document.querySelector('.gs-controls') : null;
+  const rootStyle = document.documentElement.style;
+  if (header) rootStyle.setProperty('--gs-header-offset', `${header.offsetHeight}px`);
+  if (controls) rootStyle.setProperty('--gs-controls-offset', `${controls.offsetHeight}px`);
+}
 
 const TEAM_FLAG_CODES = {
   'Algeria': 'dz',
@@ -366,7 +407,7 @@ async function doRegister(e) {
     let logoData = null;
     if (logoInput && logoInput.files && logoInput.files[0]) {
       const file = logoInput.files[0];
-      if (file.size > 2000000) {
+      if (file.size > LOGO_MAX_BYTES) {
         throw new Error(t('logoTooLarge'));
       }
       logoData = await readLogoFile(file);
@@ -427,6 +468,24 @@ function hideAuthModal() {
   $('auth-modal').classList.add('hidden');
   $('login-form').reset();
   $('register-form').reset();
+}
+
+function showProfileModal() {
+  if (!S.user) return;
+  hideAuthModal();
+  populateTeamSelect('profile-team', S.user.supportedTeam || '');
+  $('profile-current-password').value = '';
+  $('profile-new-password').value = '';
+  $('profile-logo').value = '';
+  $('profile-error').classList.add('hidden');
+  $('profile-modal').classList.remove('hidden');
+  $('profile-current-password').focus();
+}
+
+function hideProfileModal() {
+  $('profile-modal').classList.add('hidden');
+  $('profile-form').reset();
+  $('profile-logo').value = '';
 }
 
 // ── Data loading ──────────────────────────────────────────────────────────────
@@ -642,8 +701,8 @@ function getParticipatingTeams() {
   return [...teams].sort((a, b) => teamName(a).localeCompare(teamName(b)));
 }
 
-function populateTeamSelect(selectedTeam) {
-  const select = $('reg-team');
+function populateTeamSelect(selectId = 'reg-team', selectedTeam) {
+  const select = $(selectId);
   if (!select) return;
   const teams = getParticipatingTeams();
   const current = selectedTeam ?? select.value;
@@ -860,7 +919,16 @@ function renderCurrentGroup() {
     container.innerHTML = `<div class="gs-empty">${t('noResults')}</div>`;
     return;
   }
-  const sorted = [...S.matches].sort((a, b) => {
+  const filtered = S.matches.filter(m => {
+    const status = matchStatus(m);
+    if (S.matchFilter === 'all') return true;
+    return status === S.matchFilter;
+  });
+  if (filtered.length === 0) {
+    container.innerHTML = `<div class="gs-empty">${t('noMatchesForFilter')}</div>`;
+    return;
+  }
+  const sorted = [...filtered].sort((a, b) => {
     const da = a.utcKickoff || `${a.date}T00:00:00Z`;
     const db = b.utcKickoff || `${b.date}T00:00:00Z`;
     return da < db ? -1 : da > db ? 1 : 0;
@@ -992,7 +1060,7 @@ function renderSubmittedGuesses() {
     .sort((a, b) => {
       const da = a.match.utcKickoff || `${a.match.date}T00:00:00Z`;
       const db = b.match.utcKickoff || `${b.match.date}T00:00:00Z`;
-      return da < db ? -1 : da > db ? 1 : 0;
+      return da < db ? 1 : da > db ? -1 : 0;
     });
 
   const cards = sorted.map(({ key, match }) => {
@@ -1000,6 +1068,8 @@ function renderSubmittedGuesses() {
     const result = entry.result;
     const fhAns = entry.fhBonusAnswer;
     const shAns = entry.shBonusAnswer;
+    const fhAnsLabel = fhAns ? escHtml(String(fhAns)) : '–';
+    const shAnsLabel = shAns ? escHtml(String(shAns)) : '–';
     const guesses = entry.guesses || [];
     const resultLabel = result ? `${result.home} – ${result.away}` : '';
     const statusLabel = t(entry.status || matchStatus(match));
@@ -1031,6 +1101,8 @@ function renderSubmittedGuesses() {
           const scoreLabel = `${g.homeScore} – ${g.awayScore}${icon}`;
           const fhLabel = g.fhBonus ? `${t('firstHalf')}: ${escHtml(String(g.fhBonus))}${fhIcon}` : '';
           const shLabel = g.shBonus ? `${t('secondHalf')}: ${escHtml(String(g.shBonus))}${shIcon}` : '';
+          const logoHtml = buildLogoMarkup(g.logoData, 'gs-lb-logo', 'gs-lb-logo-default');
+          const flagHtml = buildFlagMarkup(g.supportedTeam, 'gs-lb-flag');
           const bonusHtml = `<div class="gs-guess-bonuses">
                 <span class="gs-guess-bonus">${scoreLabel}</span>
                 ${fhLabel ? `<span class="gs-guess-bonus">${fhLabel}</span>` : ''}
@@ -1039,7 +1111,11 @@ function renderSubmittedGuesses() {
           return `
             <div class="gs-guess-row">
               <div class="gs-guess-user">
-                <span class="gs-guess-name">${escHtml(g.displayName || g.username)}</span>
+                <span class="gs-lb-user">
+                  ${logoHtml}
+                  <span class="gs-guess-name">${escHtml(g.displayName || g.username)}</span>
+                  ${flagHtml}
+                </span>
                 ${bonusHtml}
               </div>
               ${ptsHtml}
@@ -1051,7 +1127,9 @@ function renderSubmittedGuesses() {
       <div class="gs-guess-card">
         <div class="gs-guess-card-header">
           <div class="gs-guess-card-title">${escHtml(teamName(match.team1))} vs ${escHtml(teamName(match.team2))}</div>
-          <div class="gs-guess-result">${result ? `${t('result')}: <strong>${resultLabel}</strong>` : `${statusLabel}: ${formatKickoff(match)}`}</div>
+          <div class="gs-guess-result">${result
+            ? `${t('result')}: <strong>${resultLabel}</strong> · ${t('firstHalf')}: <strong>${fhAnsLabel}</strong> · ${t('secondHalf')}: <strong>${shAnsLabel}</strong>`
+            : `${statusLabel}: ${formatKickoff(match)}`}</div>
         </div>
         <div class="gs-guess-rows">${rows}</div>
       </div>`;
@@ -1081,17 +1159,76 @@ function renderUserPill() {
     const logoHtml = buildLogoMarkup(S.user.logoData, 'gs-user-logo', 'gs-user-logo-default');
     const flagHtml = buildFlagMarkup(S.user.supportedTeam, 'gs-user-flag');
     pill.innerHTML = `
-      ${logoHtml}
-      <span class="gs-pill-name">${escHtml(S.user.displayName)}</span>
-      ${flagHtml}
-      ${S.user.isAdmin ? '<span class="gs-pill-admin">ADMIN</span>' : ''}
+      <div id="btn-open-profile" class="gs-pill-profile-trigger" role="button" tabindex="0" aria-label="${escHtml(t('editProfile'))}">
+        ${logoHtml}
+        <span class="gs-pill-name">${escHtml(S.user.displayName)}</span>
+        ${flagHtml}
+        ${S.user.isAdmin ? '<span class="gs-pill-admin">ADMIN</span>' : ''}
+      </div>
       <button id="btn-logout" class="btn-ghost">${t('logout')}</button>`;
     pill.classList.remove('hidden');
     $('btn-logout').addEventListener('click', doLogout);
+    const openProfile = () => showProfileModal();
+    $('btn-open-profile').addEventListener('click', openProfile);
+    $('btn-open-profile').addEventListener('keydown', e => {
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        openProfile();
+      }
+    });
   } else {
     pill.innerHTML = `<button id="btn-open-auth-hdr" class="btn-secondary">${t('login')} / ${t('register')}</button>`;
     pill.classList.remove('hidden');
     $('btn-open-auth-hdr').addEventListener('click', showAuthModal);
+  }
+}
+
+async function doProfileUpdate(e) {
+  e.preventDefault();
+  $('profile-error').classList.add('hidden');
+  try {
+    const currentPassword = $('profile-current-password').value;
+    const newPassword     = $('profile-new-password').value;
+    const supportedTeam   = $('profile-team')?.value || '';
+    const logoInput       = $('profile-logo');
+    let logoData = null;
+    if (logoInput && logoInput.files && logoInput.files[0]) {
+      const file = logoInput.files[0];
+      if (file.size > LOGO_MAX_BYTES) {
+        throw new Error(t('logoTooLarge'));
+      }
+      logoData = await readLogoFile(file);
+    }
+
+    const r = await POST('/api/auth/profile', {
+      token: S.token,
+      currentPassword,
+      newPassword,
+      supportedTeam,
+      logoData,
+    });
+
+    if (r.token && r.token !== S.token) {
+      S.token = r.token;
+      localStorage.setItem('gs_token', r.token);
+    }
+    S.user = {
+      username: r.username,
+      displayName: r.displayName,
+      isAdmin: r.isAdmin,
+      supportedTeam: r.supportedTeam || null,
+      logoData: r.logoData || null,
+    };
+    hideProfileModal();
+    renderUserPill();
+    renderLoginCTA();
+    showToast(t('profileSaved'));
+  } catch (err) {
+    const msg = err.message === 'Incorrect current password'
+      ? t('currentPasswordFail')
+      : (err.message || t('profileFail'));
+    $('profile-error').textContent = msg;
+    $('profile-error').classList.remove('hidden');
   }
 }
 
@@ -1171,6 +1308,7 @@ function switchMainTab(name) {
   $('tab-predictions').classList.toggle('hidden', name !== 'predictions');
   $('tab-guesses').classList.toggle('hidden', name !== 'guesses');
   $('tab-leaderboard').classList.toggle('hidden', name !== 'leaderboard');
+  $('predictions-filter-panel').classList.toggle('hidden', name !== 'predictions');
   if (name === 'leaderboard') {
     loadLeaderboard().then(renderLeaderboard);
   }
@@ -1188,6 +1326,7 @@ async function init() {
       localStorage.setItem('gs_lang', S.lang);
       applyLang();
       populateTeamSelect();
+      populateTeamSelect('profile-team', $('profile-team')?.value || (S.user?.supportedTeam || ''));
       renderGroupTabs();
       renderCurrentGroup();
       renderUserPill();
@@ -1215,6 +1354,13 @@ async function init() {
   $('login-form').addEventListener('submit', doLogin);
   $('register-form').addEventListener('submit', doRegister);
 
+  $('profile-modal').addEventListener('click', e => {
+    if (e.target === $('profile-modal')) hideProfileModal();
+  });
+  $('profile-modal-close').addEventListener('click', hideProfileModal);
+  $('profile-cancel').addEventListener('click', hideProfileModal);
+  $('profile-form').addEventListener('submit', doProfileUpdate);
+
   // Open auth from login-cta / btn-open-auth
   document.addEventListener('click', e => {
     if (e.target.id === 'btn-open-auth') showAuthModal();
@@ -1223,6 +1369,16 @@ async function init() {
   // Main tab switching
   document.querySelectorAll('.gs-main-tabs .gs-tab').forEach(btn => {
     btn.addEventListener('click', () => switchMainTab(btn.dataset.tab));
+  });
+
+  // Prediction status filters
+  document.querySelectorAll('.gs-status-filter-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.gs-status-filter-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      S.matchFilter = btn.dataset.matchFilter || 'all';
+      renderCurrentGroup();
+    });
   });
 
   // Admin modal
@@ -1237,12 +1393,14 @@ async function init() {
   _acSetup();
   await Promise.all([checkAuth(), loadMatches(), loadSquads(), loadVisitorContext()]);
   populateTeamSelect();
+  populateTeamSelect('profile-team', S.user?.supportedTeam || '');
   if (S.user) await loadUserData();
 
   // Show app
   $('app').classList.remove('hidden');
   renderUserPill();
   renderLoginCTA();
+  updateStickyOffsets();
 
   renderGroupTabs();
   renderCurrentGroup();
@@ -1262,6 +1420,16 @@ async function init() {
       }
     }
   }, 60_000);
+
+  window.addEventListener('resize', updateStickyOffsets, { passive: true });
+  window.addEventListener('orientationchange', updateStickyOffsets, { passive: true });
+  if (window.ResizeObserver) {
+    const ro = new ResizeObserver(() => updateStickyOffsets());
+    const header = document.querySelector('header');
+    const controls = document.querySelector('.gs-controls');
+    if (header) ro.observe(header);
+    if (controls) ro.observe(controls);
+  }
 }
 
 document.addEventListener('DOMContentLoaded', init);

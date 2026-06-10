@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>LaAlbiceleste2026</title>
-  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="style.css?v=20260610-1" />
 </head>
 <body>
   <main style="min-height:100vh;display:grid;place-items:center;padding:24px;text-align:center;">
@@ -17,7 +17,7 @@
 
   <script>
     (async function routeByStage() {
-      var fallback = '/groupstage.html';
+      var fallback = '/groupstage.html?v=20260610-1';
       var statusEl = document.getElementById('route-status');
       try {
         var res = await fetch('/api/stage/redirect-target');

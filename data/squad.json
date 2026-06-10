@@ -1748,6 +1748,17 @@
               "club": "Anderlecht",
               "captain": false,
               "jersey_number": 3
+            },
+            {
+              "name": "Jayden Nelson",
+              "position": "MF",
+              "date_of_birth": "February 7 2002",
+              "age": 24,
+              "caps": 14,
+              "goals": 3,
+              "club": "Austin FC",
+              "captain": false,
+              "jersey_number": 3
             }
           ]
         },

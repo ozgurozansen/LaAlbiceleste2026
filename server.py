@@ -4,6 +4,7 @@ LaAlbiceleste2026 API — pure Python stdlib server
 Usage: python3 server.py [port]   (default port 3000)
 """
 
+import base64
 import http.client
 import ipaddress
 import json
@@ -28,6 +29,8 @@ CACHE_TTL = 60  # seconds
 PUBLIC_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "public")
 DATA_DIR   = os.path.join(os.path.dirname(os.path.abspath(__file__)), "data")
 CONFIG_FILE = os.path.join(os.path.dirname(os.path.abspath(__file__)), "config.json")
+LOGO_MAX_BYTES = 2 * 1024 * 1024
+ASSET_VERSION = "20260610-1"
 
 
 def load_config():
@@ -289,6 +292,28 @@ def _validate_token(token):
             _tokens.pop(token, None)
         return None
     return t["username"]
+
+
+def _invalidate_user_tokens(username):
+    with _data_lock:
+        for token, info in list(_tokens.items()):
+            if info.get("username") == username:
+                _tokens.pop(token, None)
+
+
+def _validate_logo_data(logo_data):
+    if not logo_data:
+        return None
+    if not isinstance(logo_data, str) or not logo_data.startswith("data:image/"):
+        raise ValueError("Invalid logo data")
+    try:
+        _, encoded_logo = logo_data.split(",", 1)
+        decoded_logo = base64.b64decode(encoded_logo, validate=True)
+    except (ValueError, TypeError, base64.binascii.Error):
+        raise ValueError("Invalid logo data")
+    if len(decoded_logo) > LOGO_MAX_BYTES:
+        raise OverflowError("Logo is too large")
+    return logo_data
 
 
 # ── JSON file helpers ─────────────────────────────────────────────────────────
@@ -746,6 +771,14 @@ class Handler(BaseHTTPRequestHandler):
         self.send_response(200)
         self.send_header("Content-Type", mime)
         self.send_header("Content-Length", str(len(data)))
+        if mime.startswith("text/html"):
+            self.send_header("Cache-Control", "no-store, no-cache, must-revalidate, max-age=0")
+            self.send_header("Pragma", "no-cache")
+            self.send_header("Expires", "0")
+        elif mime in ("text/css", "application/javascript", "text/javascript"):
+            self.send_header("Cache-Control", "no-store, no-cache, must-revalidate, max-age=0")
+            self.send_header("Pragma", "no-cache")
+            self.send_header("Expires", "0")
         self.end_headers()
         self.wfile.write(data)
 
@@ -980,13 +1013,16 @@ class Handler(BaseHTTPRequestHandler):
                         g = user_guesses.get(idx_s)
                         if not g:
                             continue
-                        display = udata.get("users", {}).get(uname, {}).get("displayName", uname)
+                        user_info = udata.get("users", {}).get(uname, {})
+                        display = user_info.get("displayName", uname)
                         pts = None
                         if res_score:
                             pts = _calc_points(g, res_score, fh_ans, sh_ans)
                         guesses_list.append({
                             "username": uname,
                             "displayName": display,
+                            "supportedTeam": user_info.get("supportedTeam"),
+                            "logoData": user_info.get("logoData"),
                             "homeScore": g.get("homeScore"),
                             "awayScore": g.get("awayScore"),
                             "fhBonus": g.get("fhBonus"),
@@ -1082,13 +1118,14 @@ class Handler(BaseHTTPRequestHandler):
                 if supported_team and supported_team not in _SUPPORTED_TEAMS:
                     self.send_json(400, {"error": "Invalid supported team"})
                     return
-                if logo_data:
-                    if not isinstance(logo_data, str) or not logo_data.startswith("data:image/"):
-                        self.send_json(400, {"error": "Invalid logo data"})
-                        return
-                    if len(logo_data) > 200000:
-                        self.send_json(400, {"error": "Logo is too large"})
-                        return
+                try:
+                    logo_data = _validate_logo_data(logo_data)
+                except ValueError as exc:
+                    self.send_json(400, {"error": str(exc)})
+                    return
+                except OverflowError as exc:
+                    self.send_json(400, {"error": str(exc)})
+                    return
                 with _data_lock:
                     users = _jload(_USERS_FILE, {"users": {}})
                     if uname in users.get("users", {}):
@@ -1128,6 +1165,65 @@ class Handler(BaseHTTPRequestHandler):
                     "supportedTeam": user.get("supportedTeam"),
                     "logoData": user.get("logoData"),
                 })
+                return
+
+            # ── /api/auth/profile ─────────────────────────────────────────
+            if path == "/api/auth/profile":
+                token = data.get("token") or ""
+                username = _validate_token(token)
+                current_pw = data.get("currentPassword") or ""
+                new_pw = data.get("newPassword") or ""
+                supported_team = data.get("supportedTeam")
+                logo_data = data.get("logoData")
+                if not username:
+                    self.send_json(401, {"error": "Not authenticated"})
+                    return
+                if not current_pw:
+                    self.send_json(400, {"error": "Current password required"})
+                    return
+                if supported_team is not None:
+                    supported_team = (supported_team or "").strip()
+                    if supported_team and supported_team not in _SUPPORTED_TEAMS:
+                        self.send_json(400, {"error": "Invalid supported team"})
+                        return
+                try:
+                    logo_data = _validate_logo_data(logo_data)
+                except ValueError as exc:
+                    self.send_json(400, {"error": str(exc)})
+                    return
+                except OverflowError as exc:
+                    self.send_json(400, {"error": str(exc)})
+                    return
+
+                with _data_lock:
+                    users = _jload(_USERS_FILE, {"users": {}})
+                    user = users.get("users", {}).get(username)
+                    if not user or user.get("password") != _hash_pw(current_pw):
+                        self.send_json(401, {"error": "Incorrect current password"})
+                        return
+                    if supported_team is not None:
+                        user["supportedTeam"] = supported_team or None
+                    if logo_data is not None:
+                        user["logoData"] = logo_data or None
+                    if new_pw:
+                        user["password"] = _hash_pw(new_pw)
+                    _jsave(_USERS_FILE, users)
+
+                response_token = token
+                if new_pw:
+                    _invalidate_user_tokens(username)
+                    response_token = _create_token(username)
+
+                fresh = users.get("users", {}).get(username, {})
+                response = {
+                    "token": response_token,
+                    "username": username,
+                    "displayName": fresh.get("displayName", username),
+                    "isAdmin": fresh.get("isAdmin", False),
+                    "supportedTeam": fresh.get("supportedTeam"),
+                    "logoData": fresh.get("logoData"),
+                }
+                self.send_json(200, response)
                 return
 
             # ── /api/auth/logout ───────────────────────────────────────────

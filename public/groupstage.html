@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>LaAlbiceleste2026 – Grup Aşaması / Group Stage</title>
-  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="style.css?v=20260610-1" />
 </head>
 <body>
 
@@ -84,6 +84,50 @@
   </div>
 </div>
 
+<!-- ═══════════════════════════════════════ PROFILE MODAL ═══════════════════ -->
+<div id="profile-modal" class="gs-modal-backdrop hidden" role="dialog" aria-modal="true">
+  <div class="gs-modal-box">
+    <div class="gs-modal-header">
+      <h3 data-i18n="profileModalTitle">Profil Bilgilerini Düzenle</h3>
+      <button class="gs-modal-close" id="profile-modal-close">✕</button>
+    </div>
+
+    <form id="profile-form" class="gs-auth-form" autocomplete="on">
+      <div class="gs-form-hint" data-i18n="profileAuthHint">Değişiklikleri kaydetmek için mevcut şifrenizi girin</div>
+
+      <label>
+        <span data-i18n="currentPassword">Mevcut Şifre</span>
+        <input type="password" id="profile-current-password" autocomplete="current-password"
+               placeholder="••••••" required />
+      </label>
+
+      <label>
+        <span data-i18n="newPassword">Yeni Şifre</span>
+        <input type="password" id="profile-new-password" autocomplete="new-password"
+               placeholder="••••••" />
+        <span class="gs-form-hint" data-i18n="newPasswordHint">Boş bırakırsanız şifre değişmez</span>
+      </label>
+
+      <label>
+        <span data-i18n="supportedTeam">Taraf</span>
+        <select id="profile-team"></select>
+      </label>
+
+      <label>
+        <span data-i18n="logoLabel">Logo</span>
+        <input type="file" id="profile-logo" accept="image/*" />
+        <span class="gs-form-hint" data-i18n="logoHint">Varsa logo yükleyin (opsiyonel)</span>
+      </label>
+
+      <div id="profile-error" class="gs-form-error hidden"></div>
+      <div class="gs-admin-actions">
+        <button type="submit" class="btn-primary" data-i18n="save">Kaydet</button>
+        <button type="button" id="profile-cancel" class="btn-secondary" data-i18n="cancel">İptal</button>
+      </div>
+    </form>
+  </div>
+</div>
+
 <!-- ═══════════════════════════════════════ MAIN APP ═════════════════════════ -->
 <div id="app" class="hidden">
 
@@ -104,6 +148,13 @@
       <span data-i18n="notLoggedIn">Tahmin için giriş yapın</span>
       <button id="btn-open-auth" class="btn-secondary" data-i18n="login">Giriş Yap</button>
     </div>
+  </div>
+
+  <div id="predictions-filter-panel" class="gs-status-filters">
+    <button class="gs-status-filter-btn active" data-match-filter="all" data-i18n="filterAll">Tümü</button>
+    <button class="gs-status-filter-btn" data-match-filter="live" data-i18n="filterLive">Canlı</button>
+    <button class="gs-status-filter-btn" data-match-filter="finished" data-i18n="filterFinished">Bitti</button>
+    <button class="gs-status-filter-btn" data-match-filter="upcoming" data-i18n="filterUpcoming">Yaklaşan</button>
   </div>
 
   <!-- ── Predictions tab ──────────────────────────────────────────────────── -->
@@ -183,6 +234,6 @@
   </div>
 </div>
 
-<script src="groupstage.js"></script>
+<script src="groupstage.js?v=20260610-1"></script>
 </body>
 </html>

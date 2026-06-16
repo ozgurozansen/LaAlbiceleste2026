@@ -444,6 +444,15 @@ _cache = {"data": None, "fetched_at": 0}
 _tz_cache_lock = threading.Lock()
 _tz_cache = {}
 _TZ_CACHE_TTL = 3600
+_gs_guesses_all_cache_lock = threading.Lock()
+_gs_guesses_all_cache = {"payload": None, "expires_at": 0}
+_GS_GUESSES_ALL_CACHE_TTL = 15
+
+
+def _invalidate_guesses_all_cache():
+    with _gs_guesses_all_cache_lock:
+        _gs_guesses_all_cache["payload"] = None
+        _gs_guesses_all_cache["expires_at"] = 0
 
 
 # ── SSL context (handles corporate/self-signed CA chains) ────────────────────
@@ -989,6 +998,12 @@ class Handler(BaseHTTPRequestHandler):
 
             # ── /api/groupstage/guesses/all ────────────────────────────────
             if path == "/api/groupstage/guesses/all":
+                now_ts = time.time()
+                with _gs_guesses_all_cache_lock:
+                    if _gs_guesses_all_cache["payload"] is not None and now_ts < _gs_guesses_all_cache["expires_at"]:
+                        self.send_json(200, _gs_guesses_all_cache["payload"])
+                        return
+
                 gdata = _jload(_GUESS_FILE, {"guesses": {}})
                 udata = _jload(_USERS_FILE, {"users": {}})
                 rdata = _jload(_RES_FILE,   {"results": {}})
@@ -997,6 +1012,7 @@ class Handler(BaseHTTPRequestHandler):
                 for idx, m in enumerate(_ALL_MATCHES):
                     if "group" not in m:
                         continue
+                    
                     ko = _parse_kickoff_utc(m.get("date", ""), m.get("time", ""))
                     status = _match_status(ko)
                     if status == "upcoming":
@@ -1022,7 +1038,6 @@ class Handler(BaseHTTPRequestHandler):
                             "username": uname,
                             "displayName": display,
                             "supportedTeam": user_info.get("supportedTeam"),
-                            "logoData": user_info.get("logoData"),
                             "homeScore": g.get("homeScore"),
                             "awayScore": g.get("awayScore"),
                             "fhBonus": g.get("fhBonus"),
@@ -1038,7 +1053,12 @@ class Handler(BaseHTTPRequestHandler):
                         "guesses": guesses_list,
                     }
 
-                self.send_json(200, {"matches": matches_out})
+                payload = {"matches": matches_out}
+                with _gs_guesses_all_cache_lock:
+                    _gs_guesses_all_cache["payload"] = payload
+                    _gs_guesses_all_cache["expires_at"] = time.time() + _GS_GUESSES_ALL_CACHE_TTL
+
+                self.send_json(200, payload)
                 return
 
             # ── /api/groupstage/results ────────────────────────────────────
@@ -1271,6 +1291,7 @@ class Handler(BaseHTTPRequestHandler):
                     gdata = _jload(_GUESS_FILE, {"guesses": {}})
                     gdata.setdefault("guesses", {}).setdefault(username, {})[str(idx)] = guess
                     _jsave(_GUESS_FILE, gdata)
+                _invalidate_guesses_all_cache()
                 self.send_json(200, {"ok": True, "guess": guess})
                 return
 
@@ -1297,6 +1318,7 @@ class Handler(BaseHTTPRequestHandler):
                         "enteredAt":     datetime.now(timezone.utc).isoformat(),
                     }
                     _jsave(_RES_FILE, rdata)
+                _invalidate_guesses_all_cache()
                 self.send_json(200, {"ok": True, "leaderboard": _compute_leaderboard()})
                 return
 
@@ -1315,6 +1337,7 @@ class Handler(BaseHTTPRequestHandler):
                     rdata = _jload(_RES_FILE, {"results": {}})
                     rdata.setdefault("results", {}).pop(str(idx), None)
                     _jsave(_RES_FILE, rdata)
+                _invalidate_guesses_all_cache()
                 self.send_json(200, {"ok": True})
                 return
 
@@ -1344,6 +1367,7 @@ class Handler(BaseHTTPRequestHandler):
                                      "fetchedAt": datetime.now(timezone.utc).isoformat()})
                     rdata["results"][str(idx)] = existing
                     _jsave(_RES_FILE, rdata)
+                _invalidate_guesses_all_cache()
                 self.send_json(200, {"ok": True, "result": result,
                                      "leaderboard": _compute_leaderboard()})
                 return

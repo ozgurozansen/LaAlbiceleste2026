@@ -236,6 +236,7 @@ const S = {
   guesses: {},            // matchIndex(str) -> {homeScore,awayScore,fhBonus,shBonus}
   results: {},            // matchIndex(str) -> {score:{home,away}, scored}
   allGuesses: {},          // matchIndex(str) -> {status,result,guesses[]}
+  allGuessesFetchedAt: 0,
   leaderboard: [],
   activeGroup: 'A',
   matchFilter: 'all',
@@ -515,9 +516,13 @@ async function loadLeaderboard() {
   S.leaderboard = r.leaderboard || [];
 }
 
-async function loadAllGuesses() {
+async function loadAllGuesses(force = false) {
+  if (!force && S.allGuessesFetchedAt && (Date.now() - S.allGuessesFetchedAt) < 30_000) {
+    return;
+  }
   const r = await GET('/api/groupstage/guesses/all');
   S.allGuesses = r.matches || {};
+  S.allGuessesFetchedAt = Date.now();
 }
 
 async function loadVisitorContext() {

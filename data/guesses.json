@@ -112,6 +112,34 @@
         "fhBonus": "41",
         "shBonus": "62",
         "savedAt": "2026-06-15T21:25:01.309866+00:00"
+      },
+      "48": {
+        "homeScore": 3,
+        "awayScore": 1,
+        "fhBonus": "Kylian Mbappé ( captain )",
+        "shBonus": "6",
+        "savedAt": "2026-06-16T18:35:59.174211+00:00"
+      },
+      "49": {
+        "homeScore": 0,
+        "awayScore": 5,
+        "fhBonus": "Erling Haaland",
+        "shBonus": "Manaf Younis",
+        "savedAt": "2026-06-16T11:30:27.384376+00:00"
+      },
+      "54": {
+        "homeScore": 2,
+        "awayScore": 0,
+        "fhBonus": "Julián Alvarez",
+        "shBonus": "Julián Alvarez",
+        "savedAt": "2026-06-16T11:31:03.223866+00:00"
+      },
+      "55": {
+        "homeScore": 2,
+        "awayScore": 1,
+        "fhBonus": "Paul Wanner",
+        "shBonus": "62",
+        "savedAt": "2026-06-16T11:31:58.489302+00:00"
       }
     },
     "palyaco": {
@@ -219,6 +247,34 @@
         "fhBonus": "45",
         "shBonus": "46",
         "savedAt": "2026-06-15T21:31:39.466470+00:00"
+      },
+      "48": {
+        "homeScore": 2,
+        "awayScore": 1,
+        "fhBonus": "Kylian Mbappé ( captain )",
+        "shBonus": "6",
+        "savedAt": "2026-06-16T09:11:55.393328+00:00"
+      },
+      "49": {
+        "homeScore": 0,
+        "awayScore": 3,
+        "fhBonus": "Erling Haaland",
+        "shBonus": "Amir Al-Ammari",
+        "savedAt": "2026-06-16T20:59:44.303432+00:00"
+      },
+      "54": {
+        "homeScore": 2,
+        "awayScore": 1,
+        "fhBonus": "Lautaro Martínez",
+        "shBonus": "Lionel Messi ( captain )",
+        "savedAt": "2026-06-16T21:05:19.559136+00:00"
+      },
+      "55": {
+        "homeScore": 2,
+        "awayScore": 1,
+        "fhBonus": "Noor Al-Rawabdeh",
+        "shBonus": "46",
+        "savedAt": "2026-06-17T01:10:52.967828+00:00"
       }
     },
     "tudu_08": {
@@ -333,6 +389,62 @@
         "fhBonus": "43",
         "shBonus": "46",
         "savedAt": "2026-06-15T10:28:47.920042+00:00"
+      },
+      "48": {
+        "homeScore": 1,
+        "awayScore": 0,
+        "fhBonus": "Kylian Mbappé ( captain )",
+        "shBonus": "8",
+        "savedAt": "2026-06-16T06:50:34.568383+00:00"
+      },
+      "49": {
+        "homeScore": 1,
+        "awayScore": 2,
+        "fhBonus": "Ali Al-Hamadi",
+        "shBonus": "Aimar Sher",
+        "savedAt": "2026-06-16T06:50:35.592108+00:00"
+      },
+      "54": {
+        "homeScore": 3,
+        "awayScore": 0,
+        "fhBonus": "Lionel Messi ( captain )",
+        "shBonus": "Lionel Messi ( captain )",
+        "savedAt": "2026-06-16T21:06:15.976940+00:00"
+      },
+      "55": {
+        "homeScore": 4,
+        "awayScore": 1,
+        "fhBonus": "Carney Chukwuemeka",
+        "shBonus": "46",
+        "savedAt": "2026-06-16T06:50:37.799990+00:00"
+      },
+      "60": {
+        "homeScore": 6,
+        "awayScore": 1,
+        "fhBonus": "6",
+        "shBonus": "Pedro Neto",
+        "savedAt": "2026-06-17T07:44:49.855323+00:00"
+      },
+      "66": {
+        "homeScore": 2,
+        "awayScore": 1,
+        "fhBonus": "Jude Bellingham",
+        "shBonus": "46",
+        "savedAt": "2026-06-17T07:44:50.733604+00:00"
+      },
+      "67": {
+        "homeScore": 2,
+        "awayScore": 2,
+        "fhBonus": "Derrick Luckassen",
+        "shBonus": "Jordan Ayew ( captain )",
+        "savedAt": "2026-06-17T07:44:51.749877+00:00"
+      },
+      "61": {
+        "homeScore": 2,
+        "awayScore": 4,
+        "fhBonus": "Eldor Shomurodov ( captain )",
+        "shBonus": "8",
+        "savedAt": "2026-06-17T07:44:52.760904+00:00"
       }
     },
     "ozancayir": {
@@ -447,6 +559,34 @@
         "fhBonus": "32",
         "shBonus": "46",
         "savedAt": "2026-06-15T21:47:27.854509+00:00"
+      },
+      "48": {
+        "homeScore": 2,
+        "awayScore": 0,
+        "fhBonus": "Kylian Mbappé ( captain )",
+        "shBonus": "6",
+        "savedAt": "2026-06-16T17:17:14.079442+00:00"
+      },
+      "49": {
+        "homeScore": 0,
+        "awayScore": 4,
+        "fhBonus": "Erling Haaland",
+        "shBonus": "Amir Al-Ammari",
+        "savedAt": "2026-06-16T17:19:29.572529+00:00"
+      },
+      "54": {
+        "homeScore": 2,
+        "awayScore": 0,
+        "fhBonus": "Lionel Messi ( captain )",
+        "shBonus": "Julián Alvarez",
+        "savedAt": "2026-06-16T20:58:19.811308+00:00"
+      },
+      "55": {
+        "homeScore": 2,
+        "awayScore": 1,
+        "fhBonus": "Yazan Al-Arab",
+        "shBonus": "46",
+        "savedAt": "2026-06-16T21:00:42.359703+00:00"
       }
     },
     "boncuk": {
@@ -561,6 +701,34 @@
         "fhBonus": "26",
         "shBonus": "57",
         "savedAt": "2026-06-15T15:29:42.564741+00:00"
+      },
+      "48": {
+        "homeScore": 2,
+        "awayScore": 1,
+        "fhBonus": "Kylian Mbappé ( captain )",
+        "shBonus": "7",
+        "savedAt": "2026-06-16T15:11:21.219667+00:00"
+      },
+      "49": {
+        "homeScore": 0,
+        "awayScore": 3,
+        "fhBonus": "Erling Haaland",
+        "shBonus": "Amir Al-Ammari",
+        "savedAt": "2026-06-16T15:11:27.438962+00:00"
+      },
+      "54": {
+        "homeScore": 2,
+        "awayScore": 0,
+        "fhBonus": "Lionel Messi ( captain )",
+        "shBonus": "Lautaro Martínez",
+        "savedAt": "2026-06-16T15:00:43.559837+00:00"
+      },
+      "55": {
+        "homeScore": 2,
+        "awayScore": 0,
+        "fhBonus": "Nizar Al-Rashdan",
+        "shBonus": "59",
+        "savedAt": "2026-06-16T15:12:00.118599+00:00"
       }
     },
     "ceo": {
@@ -675,6 +843,62 @@
         "fhBonus": "43",
         "shBonus": "46",
         "savedAt": "2026-06-15T11:03:40.408047+00:00"
+      },
+      "48": {
+        "homeScore": 3,
+        "awayScore": 1,
+        "fhBonus": "Michael Olise",
+        "shBonus": "6",
+        "savedAt": "2026-06-16T09:04:41.837688+00:00"
+      },
+      "49": {
+        "homeScore": 0,
+        "awayScore": 3,
+        "fhBonus": "Erling Haaland",
+        "shBonus": "Zaid Tahseen",
+        "savedAt": "2026-06-16T09:05:34.977705+00:00"
+      },
+      "54": {
+        "homeScore": 2,
+        "awayScore": 1,
+        "fhBonus": "Nabil Bentaleb",
+        "shBonus": "Julián Alvarez",
+        "savedAt": "2026-06-16T09:09:25.078313+00:00"
+      },
+      "55": {
+        "homeScore": 3,
+        "awayScore": 0,
+        "fhBonus": "Odeh Al-Fakhouri",
+        "shBonus": "46",
+        "savedAt": "2026-06-16T09:12:51.006985+00:00"
+      },
+      "60": {
+        "homeScore": 2,
+        "awayScore": 1,
+        "fhBonus": "18",
+        "shBonus": "Cristiano Ronaldo ( captain )",
+        "savedAt": "2026-06-17T10:57:55.903382+00:00"
+      },
+      "66": {
+        "homeScore": 2,
+        "awayScore": 1,
+        "fhBonus": "Harry Kane ( captain )",
+        "shBonus": "46",
+        "savedAt": "2026-06-17T11:00:55.720016+00:00"
+      },
+      "67": {
+        "homeScore": 1,
+        "awayScore": 1,
+        "fhBonus": "Aníbal Godoy ( captain )",
+        "shBonus": "Antoine Semenyo",
+        "savedAt": "2026-06-17T11:13:17.479757+00:00"
+      },
+      "61": {
+        "homeScore": 1,
+        "awayScore": 2,
+        "fhBonus": "Eldor Shomurodov ( captain )",
+        "shBonus": "7",
+        "savedAt": "2026-06-17T11:28:53.965185+00:00"
       }
     },
     "facessi": {
@@ -789,6 +1013,55 @@
         "fhBonus": "44",
         "shBonus": "46",
         "savedAt": "2026-06-16T00:12:19.270071+00:00"
+      },
+      "49": {
+        "homeScore": 0,
+        "awayScore": 2,
+        "fhBonus": "Martin Ødegaard ( captain )",
+        "shBonus": "Ibrahim Bayesh",
+        "savedAt": "2026-06-16T11:35:20.778648+00:00"
+      },
+      "48": {
+        "homeScore": 2,
+        "awayScore": 2,
+        "fhBonus": "Sadio Mané",
+        "shBonus": "9",
+        "savedAt": "2026-06-16T11:40:30.724503+00:00"
+      },
+      "54": {
+        "homeScore": 1,
+        "awayScore": 0,
+        "fhBonus": "Lisandro Martínez",
+        "shBonus": "Nahuel Molina",
+        "savedAt": "2026-06-16T11:41:33.188659+00:00"
+      },
+      "55": {
+        "homeScore": 2,
+        "awayScore": 0,
+        "fhBonus": "Yazan Al-Arab",
+        "shBonus": "46",
+        "savedAt": "2026-06-17T03:50:01.099100+00:00"
+      },
+      "60": {
+        "homeScore": 2,
+        "awayScore": 2,
+        "fhBonus": "9",
+        "shBonus": "Pedro Neto",
+        "savedAt": "2026-06-17T13:13:45.152060+00:00"
+      },
+      "66": {
+        "homeScore": 1,
+        "awayScore": 0,
+        "fhBonus": "Harry Kane ( captain )",
+        "shBonus": "46",
+        "savedAt": "2026-06-17T13:13:45.868079+00:00"
+      },
+      "67": {
+        "homeScore": 1,
+        "awayScore": 0,
+        "fhBonus": null,
+        "shBonus": null,
+        "savedAt": "2026-06-17T13:14:01.127039+00:00"
       }
     },
     "lavlibolin": {
@@ -896,6 +1169,48 @@
         "fhBonus": "42",
         "shBonus": "46",
         "savedAt": "2026-06-15T19:55:00.892379+00:00"
+      },
+      "48": {
+        "homeScore": 2,
+        "awayScore": 1,
+        "fhBonus": "Michael Olise",
+        "shBonus": "5",
+        "savedAt": "2026-06-16T09:11:48.951964+00:00"
+      },
+      "49": {
+        "homeScore": 0,
+        "awayScore": 4,
+        "fhBonus": "Alexander Sørloth",
+        "shBonus": "Zaid Ismail",
+        "savedAt": "2026-06-16T12:12:45.083912+00:00"
+      },
+      "54": {
+        "homeScore": 1,
+        "awayScore": 1,
+        "fhBonus": "Amine Gouiri",
+        "shBonus": "Julián Alvarez",
+        "savedAt": "2026-06-16T20:00:43.175921+00:00"
+      },
+      "55": {
+        "homeScore": 4,
+        "awayScore": 0,
+        "fhBonus": "Nizar Al-Rashdan",
+        "shBonus": "46",
+        "savedAt": "2026-06-16T20:06:20.990444+00:00"
+      },
+      "60": {
+        "homeScore": 3,
+        "awayScore": 1,
+        "fhBonus": "34",
+        "shBonus": "Cristiano Ronaldo ( captain )",
+        "savedAt": "2026-06-17T13:46:01.778754+00:00"
+      },
+      "66": {
+        "homeScore": 1,
+        "awayScore": 1,
+        "fhBonus": "Andrej Kramarić",
+        "shBonus": "46",
+        "savedAt": "2026-06-17T13:50:36.434880+00:00"
       }
     },
     "dna": {
@@ -1031,6 +1346,76 @@
         "fhBonus": "Bukayo Saka",
         "shBonus": "46",
         "savedAt": "2026-06-16T04:34:19.302084+00:00"
+      },
+      "67": {
+        "homeScore": 2,
+        "awayScore": 0,
+        "fhBonus": "Aníbal Godoy ( captain )",
+        "shBonus": "Jordan Ayew ( captain )",
+        "savedAt": "2026-06-17T09:46:22.763065+00:00"
+      },
+      "61": {
+        "homeScore": 1,
+        "awayScore": 2,
+        "fhBonus": "Luis Díaz",
+        "shBonus": "8",
+        "savedAt": "2026-06-17T09:47:13.860773+00:00"
+      },
+      "2": {
+        "homeScore": 2,
+        "awayScore": 0,
+        "fhBonus": "David Jurásek",
+        "shBonus": "Patrik Schick",
+        "savedAt": "2026-06-17T09:48:17.240673+00:00"
+      },
+      "8": {
+        "homeScore": 2,
+        "awayScore": 2,
+        "fhBonus": "Edin Džeko ( captain )",
+        "shBonus": "Ricardo Rodriguez",
+        "savedAt": "2026-06-17T09:49:01.692385+00:00"
+      },
+      "3": {
+        "homeScore": 2,
+        "awayScore": 2,
+        "fhBonus": "Julián Quiñones",
+        "shBonus": "46",
+        "savedAt": "2026-06-17T09:50:30.775623+00:00"
+      },
+      "20": {
+        "homeScore": 2,
+        "awayScore": 1,
+        "fhBonus": "Tim Ream ( captain )",
+        "shBonus": "8",
+        "savedAt": "2026-06-17T09:51:46.648890+00:00"
+      },
+      "14": {
+        "homeScore": 1,
+        "awayScore": 3,
+        "fhBonus": "Andy Robertson ( captain )",
+        "shBonus": "Brahim Díaz",
+        "savedAt": "2026-06-17T09:52:25.361483+00:00"
+      },
+      "15": {
+        "homeScore": 3,
+        "awayScore": 0,
+        "fhBonus": "14",
+        "shBonus": "Bruno Guimarães",
+        "savedAt": "2026-06-17T09:52:47.576819+00:00"
+      },
+      "9": {
+        "homeScore": 3,
+        "awayScore": 0,
+        "fhBonus": "16",
+        "shBonus": "88",
+        "savedAt": "2026-06-17T09:54:43.578928+00:00"
+      },
+      "21": {
+        "homeScore": 2,
+        "awayScore": 0,
+        "fhBonus": "Orkun Kökçü",
+        "shBonus": "Kenan Yıldız",
+        "savedAt": "2026-06-17T09:55:29.659778+00:00"
       }
     },
     "cookie_monster": {
@@ -1145,6 +1530,34 @@
         "fhBonus": "33",
         "shBonus": "46",
         "savedAt": "2026-06-15T18:16:52.037970+00:00"
+      },
+      "48": {
+        "homeScore": 2,
+        "awayScore": 1,
+        "fhBonus": "Kylian Mbappé ( captain )",
+        "shBonus": "7",
+        "savedAt": "2026-06-16T18:27:17.953314+00:00"
+      },
+      "49": {
+        "homeScore": 0,
+        "awayScore": 3,
+        "fhBonus": "Erling Haaland",
+        "shBonus": "Aimar Sher",
+        "savedAt": "2026-06-16T20:07:43.935700+00:00"
+      },
+      "54": {
+        "homeScore": 2,
+        "awayScore": 1,
+        "fhBonus": "Lautaro Martínez",
+        "shBonus": "Lautaro Martínez",
+        "savedAt": "2026-06-16T20:09:47.819427+00:00"
+      },
+      "55": {
+        "homeScore": 1,
+        "awayScore": 0,
+        "fhBonus": "Konrad Laimer",
+        "shBonus": "46",
+        "savedAt": "2026-06-16T20:11:03.623703+00:00"
       }
     }
   }

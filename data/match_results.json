@@ -159,6 +159,46 @@
       "shBonusAnswer": "46",
       "scored": true,
       "enteredAt": "2026-06-16T04:56:29.801721+00:00"
+    },
+    "48": {
+      "score": {
+        "home": 3,
+        "away": 1
+      },
+      "fhBonusAnswer": null,
+      "shBonusAnswer": "8",
+      "scored": true,
+      "enteredAt": "2026-06-16T21:08:46.258934+00:00"
+    },
+    "49": {
+      "score": {
+        "home": 1,
+        "away": 4
+      },
+      "fhBonusAnswer": "Erling Haaland",
+      "shBonusAnswer": "Zaid Tahseen",
+      "scored": true,
+      "enteredAt": "2026-06-17T00:24:56.775830+00:00"
+    },
+    "54": {
+      "score": {
+        "home": 3,
+        "away": 0
+      },
+      "fhBonusAnswer": "Lionel Messi ( captain )",
+      "shBonusAnswer": "Lionel Messi ( captain )",
+      "scored": true,
+      "enteredAt": "2026-06-17T04:54:12.635970+00:00"
+    },
+    "55": {
+      "score": {
+        "home": 3,
+        "away": 1
+      },
+      "fhBonusAnswer": null,
+      "shBonusAnswer": "46",
+      "scored": true,
+      "enteredAt": "2026-06-17T06:25:35.868319+00:00"
     }
   }
 }

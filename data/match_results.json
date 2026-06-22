@@ -199,6 +199,206 @@
       "shBonusAnswer": "46",
       "scored": true,
       "enteredAt": "2026-06-17T06:25:35.868319+00:00"
+    },
+    "60": {
+      "score": {
+        "home": 1,
+        "away": 1
+      },
+      "fhBonusAnswer": "6",
+      "shBonusAnswer": null,
+      "scored": true,
+      "enteredAt": "2026-06-17T19:01:40.155607+00:00"
+    },
+    "66": {
+      "score": {
+        "home": 4,
+        "away": 2
+      },
+      "fhBonusAnswer": "Harry Kane ( captain )",
+      "shBonusAnswer": "58",
+      "scored": true,
+      "enteredAt": "2026-06-17T22:04:41.763922+00:00"
+    },
+    "67": {
+      "score": {
+        "home": 1,
+        "away": 0
+      },
+      "fhBonusAnswer": "Caleb Yirenkyi",
+      "shBonusAnswer": "Antoine Semenyo",
+      "scored": true,
+      "enteredAt": "2026-06-18T05:32:23.310264+00:00"
+    },
+    "61": {
+      "score": {
+        "home": 1,
+        "away": 3
+      },
+      "fhBonusAnswer": "Daniel Muñoz",
+      "shBonusAnswer": "8",
+      "scored": true,
+      "enteredAt": "2026-06-18T05:37:22.794236+00:00"
+    },
+    "2": {
+      "score": {
+        "home": 1,
+        "away": 1
+      },
+      "fhBonusAnswer": "Thalente Mbatha",
+      "shBonusAnswer": "Ladislav Krejčí ( captain )",
+      "scored": true,
+      "enteredAt": "2026-06-18T18:14:27.911580+00:00"
+    },
+    "8": {
+      "score": {
+        "home": 4,
+        "away": 1
+      },
+      "fhBonusAnswer": null,
+      "shBonusAnswer": "Nico Elvedi",
+      "scored": true,
+      "enteredAt": "2026-06-18T21:10:44.086907+00:00"
+    },
+    "9": {
+      "score": {
+        "home": 6,
+        "away": 0
+      },
+      "fhBonusAnswer": "16",
+      "shBonusAnswer": "87",
+      "scored": true,
+      "enteredAt": "2026-06-19T05:55:18.931528+00:00"
+    },
+    "3": {
+      "score": {
+        "home": 1,
+        "away": 0
+      },
+      "fhBonusAnswer": null,
+      "shBonusAnswer": "57",
+      "scored": true,
+      "enteredAt": "2026-06-19T05:56:52.538835+00:00"
+    },
+    "20": {
+      "score": {
+        "home": 2,
+        "away": 0
+      },
+      "fhBonusAnswer": "Jordan Bos",
+      "shBonusAnswer": "6",
+      "scored": true,
+      "enteredAt": "2026-06-19T21:15:59.216408+00:00"
+    },
+    "14": {
+      "score": {
+        "home": 0,
+        "away": 1
+      },
+      "fhBonusAnswer": "Ismael Saibari",
+      "shBonusAnswer": null,
+      "scored": true,
+      "enteredAt": "2026-06-20T03:16:44.984694+00:00"
+    },
+    "15": {
+      "score": {
+        "home": 3,
+        "away": 0
+      },
+      "fhBonusAnswer": "23",
+      "shBonusAnswer": "Danley Jean Jacques",
+      "scored": true,
+      "enteredAt": "2026-06-20T03:17:09.866529+00:00"
+    },
+    "21": {
+      "score": {
+        "home": 0,
+        "away": 1
+      },
+      "fhBonusAnswer": "Matías Galarza",
+      "shBonusAnswer": "Matías Galarza",
+      "scored": true,
+      "enteredAt": "2026-06-20T05:20:43.150417+00:00"
+    },
+    "32": {
+      "score": {
+        "home": 5,
+        "away": 1
+      },
+      "fhBonusAnswer": null,
+      "shBonusAnswer": "Crysencio Summerville",
+      "scored": true,
+      "enteredAt": "2026-06-20T20:29:02.969417+00:00"
+    },
+    "26": {
+      "score": {
+        "home": 2,
+        "away": 1
+      },
+      "fhBonusAnswer": "Franck Kessié ( captain )",
+      "shBonusAnswer": "Deniz Undav",
+      "scored": true,
+      "enteredAt": "2026-06-20T22:02:38.001535+00:00"
+    },
+    "27": {
+      "score": {
+        "home": 0,
+        "away": 0
+      },
+      "fhBonusAnswer": null,
+      "shBonusAnswer": "5",
+      "scored": true,
+      "enteredAt": "2026-06-21T04:19:33.733368+00:00"
+    },
+    "33": {
+      "score": {
+        "home": 0,
+        "away": 4
+      },
+      "fhBonusAnswer": "Daichi Kamada",
+      "shBonusAnswer": "46",
+      "scored": true,
+      "enteredAt": "2026-06-21T05:58:40.166830+00:00"
+    },
+    "44": {
+      "score": {
+        "home": 4,
+        "away": 0
+      },
+      "fhBonusAnswer": "10",
+      "shBonusAnswer": "6",
+      "scored": true,
+      "enteredAt": "2026-06-21T21:06:04.024367+00:00"
+    },
+    "38": {
+      "score": {
+        "home": 0,
+        "away": 0
+      },
+      "fhBonusAnswer": null,
+      "shBonusAnswer": "5",
+      "scored": true,
+      "enteredAt": "2026-06-21T21:07:32.908580+00:00"
+    },
+    "45": {
+      "score": {
+        "home": 2,
+        "away": 2
+      },
+      "fhBonusAnswer": "21",
+      "shBonusAnswer": "81",
+      "scored": true,
+      "enteredAt": "2026-06-22T07:39:59.707511+00:00"
+    },
+    "39": {
+      "score": {
+        "home": 1,
+        "away": 3
+      },
+      "fhBonusAnswer": "15",
+      "shBonusAnswer": "Trézéguet",
+      "scored": true,
+      "enteredAt": "2026-06-22T07:41:15.274542+00:00"
     }
   }
 }

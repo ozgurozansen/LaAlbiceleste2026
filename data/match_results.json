@@ -599,6 +599,26 @@
       "shBonusAnswer": "Diego Gómez",
       "scored": true,
       "enteredAt": "2026-06-26T06:16:29.948903+00:00"
+    },
+    "52": {
+      "score": {
+        "home": 1,
+        "away": 4
+      },
+      "fhBonusAnswer": "Patrick Berg",
+      "shBonusAnswer": "86",
+      "scored": true,
+      "enteredAt": "2026-06-26T21:02:36.888144+00:00"
+    },
+    "53": {
+      "score": {
+        "home": 5,
+        "away": 0
+      },
+      "fhBonusAnswer": "Habib Diarra",
+      "shBonusAnswer": "6",
+      "scored": true,
+      "enteredAt": "2026-06-26T21:05:15.246305+00:00"
     }
   }
 }

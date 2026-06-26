@@ -1,156 +1,824 @@
 {
+  "team_names_en": {
+    "Almanya": "Germany",
+    "Fransa": "France",
+    "İspanya": "Spain",
+    "İngiltere": "England",
+    "Portekiz": "Portugal",
+    "Hollanda": "Netherlands",
+    "Belçika": "Belgium",
+    "İtalya": "Italy",
+    "Hırvatistan": "Croatia",
+    "İsviçre": "Switzerland",
+    "Sırbistan": "Serbia",
+    "İskoçya": "Scotland",
+    "Türkiye": "Turkey",
+    "Avusturya": "Austria",
+    "Ukrayna": "Ukraine",
+    "Danimarka": "Denmark",
+    "Norveç": "Norway",
+    "Slovenya": "Slovenia",
+    "Slovakya": "Slovakia",
+    "Çekya": "Czech Republic",
+    "Polonya": "Poland",
+    "Macaristan": "Hungary",
+    "Arnavutluk": "Albania",
+    "Romanya": "Romania",
+    "Yunanistan": "Greece",
+    "Brezilya": "Brazil",
+    "Arjantin": "Argentina",
+    "Kolombiya": "Colombia",
+    "Uruguay": "Uruguay",
+    "Ekvador": "Ecuador",
+    "Bolivya": "Bolivia",
+    "Şili": "Chile",
+    "Peru": "Peru",
+    "Paraguay": "Paraguay",
+    "Venezuela": "Venezuela",
+    "ABD": "USA",
+    "Meksika": "Mexico",
+    "Kanada": "Canada",
+    "Panama": "Panama",
+    "Kosta Rika": "Costa Rica",
+    "Honduras": "Honduras",
+    "Jamaika": "Jamaica",
+    "Küba": "Cuba",
+    "El Salvador": "El Salvador",
+    "Curaçao": "Curaçao",
+    "Trinidad ve Tobago": "Trinidad & Tobago",
+    "Martinik": "Martinique",
+    "Fas": "Morocco",
+    "Senegal": "Senegal",
+    "Nijerya": "Nigeria",
+    "Kamerun": "Cameroon",
+    "Güney Afrika": "South Africa",
+    "Mali": "Mali",
+    "D. Kongo Cum.": "DR Congo",
+    "Mısır": "Egypt",
+    "Tunus": "Tunisia",
+    "Cezayir": "Algeria",
+    "Fildişi Sahili": "Ivory Coast",
+    "Gana": "Ghana",
+    "Japonya": "Japan",
+    "Güney Kore": "South Korea",
+    "Avustralya": "Australia",
+    "İran": "Iran",
+    "Suudi Arabistan": "Saudi Arabia",
+    "Katar": "Qatar",
+    "Irak": "Iraq",
+    "Özbekistan": "Uzbekistan",
+    "Ürdün": "Jordan",
+    "Çin": "China",
+    "Endonezya": "Indonesia",
+    "BAE": "UAE",
+    "Yeni Zelanda": "New Zealand",
+    "İsveç": "Sweden",
+    "Yeşil Burun Adaları": "Cape Verde",
+    "Bosna Hersek": "Bosnia & Herzegovina",
+    "Kuzey Makedonya": "North Macedonia",
+    "Karadağ": "Montenegro",
+    "Finlandiya": "Finland",
+    "Rusya": "Russia",
+    "Kazakistan": "Kazakhstan",
+    "Gürcistan": "Georgia",
+    "Kosova": "Kosovo",
+    "Azerbaycan": "Azerbaijan",
+    "Ermenistan": "Armenia",
+    "Kıbrıs": "Cyprus",
+    "Malta": "Malta",
+    "İzlanda": "Iceland",
+    "Faroe Adaları": "Faroe Islands",
+    "Lüksemburg": "Luxembourg",
+    "Andorra": "Andorra",
+    "San Marino": "San Marino",
+    "Liechtenstein": "Liechtenstein",
+    "Kongo Cum.": "Congo",
+    "Etyopya": "Ethiopia",
+    "Zimbabve": "Zimbabwe",
+    "Tanzanya": "Tanzania",
+    "Uganda": "Uganda",
+    "Mozambik": "Mozambique",
+    "Zambia": "Zambia",
+    "Madagaskar": "Madagascar",
+    "Angola": "Angola",
+    "Gabon": "Gabon",
+    "Burkina Faso": "Burkina Faso",
+    "Ruanda": "Rwanda",
+    "Nijer": "Niger",
+    "Gambiya": "Gambia",
+    "Gine": "Guinea",
+    "Gine-Bissau": "Guinea-Bissau",
+    "Ekvator Ginesi": "Equatorial Guinea",
+    "Liberya": "Liberia",
+    "Sierra Leone": "Sierra Leone",
+    "Togo": "Togo",
+    "Benin": "Benin",
+    "Orta Afrika Cum.": "Central African Republic",
+    "Çad": "Chad",
+    "Kongo": "Congo",
+    "Sudan": "Sudan",
+    "Kenya": "Kenya",
+    "Somali": "Somalia",
+    "Libya": "Libya",
+    "Moritanya": "Mauritania",
+    "Komor Adaları": "Comoros",
+    "Kap Verde": "Cape Verde",
+    "Sao Tome": "São Tomé",
+    "Suriye": "Syria",
+    "Lübnan": "Lebanon",
+    "Filistin": "Palestine",
+    "Vietnam": "Vietnam",
+    "Tayland": "Thailand",
+    "Malezya": "Malaysia",
+    "Filipinler": "Philippines",
+    "Myanmar": "Myanmar",
+    "Singapur": "Singapore",
+    "Kuzey Kore": "North Korea",
+    "Hong Kong": "Hong Kong",
+    "Tayvan": "Taiwan",
+    "Nepal": "Nepal",
+    "Hindistan": "India",
+    "Pakistan": "Pakistan",
+    "Bangladeş": "Bangladesh",
+    "Afganistan": "Afghanistan",
+    "Moğolistan": "Mongolia",
+    "Yeni Kaledonya": "New Caledonia",
+    "Fiji": "Fiji",
+    "Papua Yeni Gine": "Papua New Guinea",
+    "Barbados": "Barbados",
+    "Haiti": "Haiti",
+    "Dominik Cum.": "Dominican Republic",
+    "Belize": "Belize",
+    "Nikaragua": "Nicaragua",
+    "Guatemala": "Guatemala",
+    "Guyana": "Guyana",
+    "Surinam": "Suriname"
+  },
   "defaults": {
     "sport": 1,
-    "leagues": [10151]
+    "leagues": [
+      10151
+    ]
   },
   "sports": [
-    { "id": 1, "name": "Football" }
+    {
+      "id": 1,
+      "name": "Football"
+    }
   ],
   "leagues": [
-    { "code": 10151, "name": "Dünya Kupası", "sport": 1 }
+    {
+      "code": 10151,
+      "name": "Dünya Kupası",
+      "sport": 1
+    }
   ],
   "sport_types": {
-    "1": "Football", "2": "Basketball", "3": "Ice Hockey", "4": "Volleyball",
-    "5": "Tennis", "6": "Baseball", "7": "American Football", "8": "Handball",
-    "9": "Rugby", "10": "Futsal", "14": "Snooker",
-    "137": "Virtual Football", "153": "Virtual Basketball",
-    "19": "Seniors Snooker", "23": "Volleyball (W)"
+    "1": "Football",
+    "2": "Basketball",
+    "3": "Ice Hockey",
+    "4": "Volleyball",
+    "5": "Tennis",
+    "6": "Baseball",
+    "7": "American Football",
+    "8": "Handball",
+    "9": "Rugby",
+    "10": "Futsal",
+    "14": "Snooker",
+    "137": "Virtual Football",
+    "153": "Virtual Basketball",
+    "19": "Seniors Snooker",
+    "23": "Volleyball (W)"
   },
   "market_type_names": {
-    "1": "1X2 (Match Result)", "3": "Double Chance", "5": "HT/FT",
-    "7": "HT/FT", "8": "1st Half Double Chance", "9": "2nd Half Result",
-    "11": "Over/Under", "12": "Over/Under", "13": "Over/Under Goals",
-    "14": "1st Half O/U", "15": "Away Team O/U", "20": "1st Half O/U",
-    "29": "Home Team O/U", "38": "Both Teams to Score", "43": "Total Goals Range",
-    "48": "Most Goals Half", "49": "Odd/Even", "100": "Handicap Match Result",
-    "101": "Handicap Match Result", "155": "Over/Under", "182": "Who Advances",
-    "183": "1X2 (Set Odds)", "185": "Match Handicap", "187": "O/U Games",
-    "189": "Total Points O/U", "190": "Total Points O/U", "207": "Over/Under",
-    "209": "1st Half O/U", "212": "Over/Under", "216": "Total Corners O/U",
-    "218": "1st Half Corners O/U", "220": "Most Corners", "222": "1st Half Most Corners",
-    "224": "First Corner", "225": "Red Card",
-    "256": "Away Team O/U", "268": "Handicap Match Result", "272": "Result + Over/Under",
-    "291": "Which Team Scores First", "295": "Home Team Scores Both Halves", "296": "Away Team Scores Both Halves",
-    "299": "Corner Odd/Even", "301": "1st Half Corners O/U",
-    "326": "Home Team O/U", "328": "Away Team O/U", "338": "Total Corners Range",
-    "340": "1st Half Corners Range", "342": "Result + Over/Under", "343": "Result + O/U",
-    "414": "Total Corners Range", "416": "1st Half Result + 1st Half BTTS", "418": "Asian Handicap",
-    "422": "Correct Score Range", "424": "Total Corners O/U", "426": "Corner Handicap (Result)",
-    "432": "1st Half Odd/Even", "434": "1st Half Odd/Even", "438": "1X2 + Over/Under",
-    "442": "Win Margin", "444": "Win Margin", "446": "Over/Under & BTTS",
-    "450": "1st Half Odd/Even", "452": "1st Half BTTS", "455": "Home 1st Half O/U",
-    "457": "1st Half Away O/U", "459": "1st Half Result + 1st Half O/U",
-    "461": "Result (2-way)", "528": "Both Halves Under 1.5", "529": "Both Halves Over 1.5",
-    "571": "1st Half / Match Score", "583": "Total Corners O/U", "584": "Home Team Wins Either Half",
-    "585": "Away Wins Either Half", "586": "Which Half Home Team Scores More", "587": "Away - Most Goals Half",
-    "588": "Win Margin", "589": "Home Win to Nil", "590": "Away Win to Nil",
-    "591": "Home Team Wins Both Halves", "592": "Away Wins Both Halves", "593": "Penalty Awarded",
-    "599": "2nd Half BTTS", "601": "Home Team Corners O/U",
-    "602": "Away Team Corners O/U", "603": "Which Team Gets More Card Points?", "604": "Away Team O/U",
-    "327": "1st Half Card Points O/U",
-    "656": "Result (2-way)", "701": "Player Scores", "702": "Player Scores First",
-    "703": "Last Goalscorer", "704": "Hat-trick Scorer", "705": "Most Shots on Target",
-    "706": "Player Scores Header", "707": "Anytime Assist", "708": "Player Scores Free Kick",
-    "709": "Player to Receive a Card",
-    "710": "Yellow Card (Player)",
-    "711": "Player Scores and Gets Booked",
-    "712": "Player to Assist",
-    "713": "Player Scores and Assists",
-    "714": "Player Shots on Target", "716": "Match Specials",
-    "717": "Player Points O/U", "718": "Player Rebounds O/U", "719": "Player Assists O/U",
-    "720": "Player Assists O/U (Alt)", "721": "Player Blocks O/U",
-    "722": "Player to Receive a Card",
-    "723": "Player Points O/U (Alt)", "724": "Player Points O/U (High)", "725": "Player Points O/U (Alt 2)",
-    "730": "Team Points O/U (1H)", "731": "Team Points O/U (Q1)", "734": "Team Points O/U (Q2)",
-    "737": "Player Points O/U (Alt 3)",
-    "740": "Player to Have a Shot", "741": "Shot Count (Player)",
-    "742": "Foul Count (Player)", "743": "Goals + Assists O/U",
-    "764": "Shots O/U (Player) Alt",
-    "765": "Player Scores or Assists", "777": "Correct Score", "779": "1st Half Score",
-    "819": "Top Scorer",
-    "791": "Match Handicap", "798": "Corner Handicap", "799": "1st Half Corner Handicap",
-    "800": "1st Half Card Points O/U", "801": "1st Half / 2nd Half BTTS", "803": "Total Saves (Goalkeeper)",
-    "804": "Over/Under", "805": "Team Shots O/U", "806": "Team Corners O/U",
-    "807": "Team Offside", "808": "Team Offside",
-    "810": "Total Goals (Alt)", "812": "Alt Total O/U", "822": "Result + O/U",
-    "823": "Result + BTTS", "824": "Result + O/U + BTTS", "837": "Player to Receive a Card",
-    "862": "1st Half Corners O/U", "863": "1st Half Corners O/U",
-    "864": "Team Corners HCP", "866": "Next Goal", "867": "Corners 1X2",
-    "871": "Team Corners Stats", "872": "Team Shot Count", "874": "Team Interceptions",
-    "884": "Match Handicap", "887": "Alt Handicap"
+    "1": "1X2 (Match Result)",
+    "3": "Double Chance",
+    "5": "HT/FT",
+    "7": "HT/FT",
+    "8": "1st Half Double Chance",
+    "9": "2nd Half Result",
+    "11": "Over/Under",
+    "12": "Over/Under",
+    "13": "Over/Under Goals",
+    "14": "1st Half O/U",
+    "15": "Away Team O/U",
+    "20": "1st Half O/U",
+    "29": "Home Team O/U",
+    "38": "Both Teams to Score",
+    "43": "Total Goals Range",
+    "48": "Most Goals Half",
+    "49": "Odd/Even",
+    "100": "Handicap Match Result",
+    "101": "Handicap Match Result",
+    "155": "1st Half O/U",
+    "182": "Who Advances",
+    "183": "1X2 (Set Odds)",
+    "185": "Match Handicap",
+    "187": "O/U Games",
+    "189": "Total Points O/U",
+    "190": "Total Points O/U",
+    "207": "Away Team O/U",
+    "209": "1st Half O/U",
+    "212": "Home Team O/U",
+    "216": "Total Corners O/U",
+    "218": "Card Points Over/Under",
+    "220": "Most Corners",
+    "222": "1st Half Most Corners",
+    "224": "First Corner",
+    "225": "Red Card",
+    "256": "Away Team O/U",
+    "268": "Handicap Match Result",
+    "272": "Result + Over/Under",
+    "291": "Which Team Scores First",
+    "295": "Home Team Scores Both Halves",
+    "296": "Away Team Scores Both Halves",
+    "299": "Corner Odd/Even",
+    "301": "Card Points Over/Under",
+    "326": "Home Team O/U",
+    "327": "Deplasman Alt/Üst",
+    "328": "Deplasman Alt/Üst",
+    "338": "Match Result and BTTS",
+    "340": "1st Half Corners Range",
+    "342": "Result + Over/Under",
+    "343": "Result + O/U",
+    "414": "Match Result and BTTS",
+    "416": "1st Half Result + 1st Half BTTS",
+    "418": "Asian Handicap",
+    "422": "Correct Score Range",
+    "424": "Total Corners O/U",
+    "426": "Corner Handicap (Result)",
+    "432": "1st Half Odd/Even",
+    "434": "1st Half Odd/Even",
+    "438": "1X2 + Over/Under",
+    "442": "Win Margin",
+    "444": "Win Margin",
+    "446": "Over/Under & BTTS",
+    "450": "İlk yarı Tek/Çift",
+    "452": "1. Yarı Karşılıklı Gol",
+    "455": "Ev Sahibi İlk Yarı Alt/Üst",
+    "457": "Deplasman İlk Yarı Alt/Üst",
+    "459": "İlk yarı Sonuç + İlk yarı Alt/Üst",
+    "461": "Sonuç (2 Yollu)",
+    "528": "Her İki Yarıda 1.5 Alt",
+    "529": "Her İki Yarıda 1.5 Üst",
+    "571": "İlk Yarı / Maç Skoru",
+    "583": "Toplam Korner Alt/Üst",
+    "584": "Ev Sahibi Herhangi Bir Yarıyı Kazanır",
+    "585": "Deplasman Herhangi Bir Yarıyı Kazanır",
+    "586": "Ev Sahibi - En Fazla Gol Yarısı",
+    "587": "Deplasman - En Fazla Gol Yarısı",
+    "588": "Galibiyet Farkı",
+    "589": "Ev Sahibi Gol Yemeden Kazanır",
+    "590": "Deplasman Gol Yemeden Kazan",
+    "591": "Ev Sahibi Her İki Yarıyı Da Kazanır",
+    "592": "Deplasman Her İki Yarıyı Da Kazanır",
+    "593": "Penaltı Olur Mu",
+    "599": "İkinci yarı Karşılıklı Gol",
+    "601": "Ev Sahibi Korner",
+    "602": "Deplasman Korner",
+    "603": "Hangi Takım Daha Çok Kart Puanı Alır?",
+    "604": "Deplasman Alt/Üst",
+    "656": "Sonuç (2 Yollu)",
+    "701": "Oyuncu Gol Atar",
+    "702": "Oyuncu İlk Golü Atar",
+    "703": "Oyuncu Her İki Yarıda da Gol Atar",
+    "704": "Sarı Kart (Oyuncu)",
+    "705": "Oyuncu Gol Atar ve Takımı Kazanır",
+    "706": "Oyuncu Kafa ile Gol Atar",
+    "707": "Herhangi Bir Asist",
+    "708": "Oyuncu Frikikten Gol Atar",
+    "709": "Oyuncu Kart Görür",
+    "710": "Sarı Kart (Oyuncu)",
+    "711": "Oyuncu Gol Atar ve Kart Görür",
+    "712": "Oyuncu Asist Yapar",
+    "713": "Oyuncu Gol Atar ve Asist Yapar",
+    "714": "Oyuncu Kaleyi Bulan Şut Çeker",
+    "716": "Maç Özel",
+    "717": "Oyuncu Puan Alt/Üst",
+    "718": "Oyuncu Ribaunt Alt/Üst",
+    "719": "Oyuncu Asist Alt/Üst",
+    "720": "Oyuncu Asist Alt/Üst (Alt)",
+    "721": "Oyuncu Blok Alt/Üst",
+    "722": "Oyuncu Kart Görür",
+    "723": "Oyuncu Puan Alt/Üst (Alt)",
+    "724": "Oyuncu Puan Alt/Üst (Yüksek)",
+    "725": "Oyuncu Puan Alt/Üst (Alt 2)",
+    "730": "Takım Puan Alt/Üst (1Y)",
+    "731": "Takım Puan Alt/Üst (1Ç)",
+    "734": "Takım Puan Alt/Üst (2Ç)",
+    "737": "Oyuncu Puan Alt/Üst (Alt 3)",
+    "740": "Oyuncu Şut Çeker",
+    "741": "Oyuncu Faul Alır",
+    "742": "Oyuncu Faul Yapar",
+    "743": "Oyuncu Ofsayta Düşer",
+    "764": "Oyuncu Top Çalar",
+    "765": "Oyuncu Gol Atar veya Asist Yapar",
+    "777": "Maç Skoru",
+    "779": "İlk yarı Skoru",
+    "791": "Maç Handikabı",
+    "798": "Korner Handikap",
+    "799": "İlk yarı Korner Handikap",
+    "800": "İlk yarı Kart Puanı Alt/Üst",
+    "801": "İlk yarı / İkinci yarı Karşılıklı Gol",
+    "803": "Toplam Kurtarış (Kaleci)",
+    "804": "Hakem VAR Monitörüne Gider Alt/Üst",
+    "805": "Takım Şutu Alt/Üst",
+    "806": "Takım İsabetli Şut",
+    "807": "Takım Faul",
+    "808": "Takım Ofsayt",
+    "810": "Toplam Goller (Alt)",
+    "812": "Alt Toplam Alt/Üst",
+    "819": "Gol Krallığı",
+    "822": "Sonuç + Alt/Üst",
+    "823": "Sonuç + Karşılıklı Gol",
+    "824": "Sonuç + Alt/Üst + Karşılıklı Gol",
+    "837": "Oyuncu Kart Görür",
+    "862": "İlk Yarı Korner Alt/Üst",
+    "863": "Kart Puanı Alt/Üst",
+    "864": "Takım Korner HCP",
+    "866": "Sonraki Gol",
+    "867": "Korner 1X2",
+    "871": "Takım Kale Vuruşu",
+    "872": "Takım Taç Atışı",
+    "873": "Takım Top Çalma",
+    "874": "Takım Pas Arası",
+    "884": "Maç Handikabı",
+    "887": "Alt Handikap",
+    "161": "Ev Sahibi Alt/Üst",
+    "214": "Ev Sahibi Gol Yemez",
+    "215": "Deplasman Gol Yemez",
+    "329": "Deplasman Alt/Üst",
+    "715": "Oyuncu Özel",
+    "744": "Oyuncu Pas Yapar",
+    "763": "Oyuncu İsabetli Pas Yapar",
+    "809": "Takım Topa Sahip Olma Yüzdesi"
   },
-  "ou_mtids": [11, 12, 13, 14, 15, 20, 29, 155, 187, 189, 190, 207, 209, 212, 216, 218, 256, 301, 326, 327, 328, 424, 455, 457, 583, 601, 602, 604, 800, 804, 810, 812, 862, 863],
-  "ah_mtids": [418, 798, 799],
-  "eh_mtids": [268],
+  "ou_mtids": [
+    11,
+    12,
+    13,
+    14,
+    15,
+    20,
+    29,
+    155,
+    187,
+    189,
+    190,
+    207,
+    209,
+    212,
+    216,
+    218,
+    256,
+    301,
+    326,
+    327,
+    328,
+    424,
+    455,
+    457,
+    583,
+    601,
+    602,
+    604,
+    800,
+    804,
+    810,
+    812,
+    862,
+    863
+  ],
+  "ah_mtids": [
+    418,
+    798,
+    799
+  ],
+  "eh_mtids": [
+    268
+  ],
   "outcome_labels": {
-    "1":   {"1": "1 (Home)",       "2": "X (Draw)",       "3": "2 (Away)"},
-    "48":  {"1": "1.H",            "2": "Draw",           "3": "2.H"},
-    "100": {"1": "1 (Home)",       "2": "X (Draw)",       "3": "2 (Away)"},
-    "101": {"1": "1 (Home)",       "2": "X (Draw)",       "3": "2 (Away)"},
-    "183": {"1": "Home",           "2": "Draw",           "3": "Away"},
-    "185": {"1": "1 (Home)",       "2": "X (Draw)",       "3": "2 (Away)"},
-    "791": {"1": "1 (Home)",       "2": "X (Draw)",       "3": "2 (Away)"},
-    "867": {"1": "1 (Home)",       "2": "X (Draw)",       "3": "2 (Away)"},
-    "884": {"1": "1 (Home)",       "2": "X (Draw)",       "3": "2 (Away)"},
-    "887": {"1": "1 (Home)",       "2": "X (Draw)",       "3": "2 (Away)"},
-    "3":   {"1": "1X (Home/Draw)", "2": "12 (Home/Away)", "3": "X2 (Draw/Away)"},
-    "38":  {"1": "Yes",            "2": "No",              "3": "X2"},
-    "8":   {"1": "1X (Home/Draw)",  "2": "12 (Home/Away)",  "3": "X2 (Draw/Away)"},
-    "49":  {"1": "Odd",  "2": "Even"},
-    "182": {"1": "Home",  "2": "Away"},
-    "461": {"1": "Home",  "2": "Away"},
-    "656": {"1": "Home",  "2": "Away"},
-    "9":   {"1": "1",    "2": "X",   "3": "2"},
-    "295": {"1": "Yes",  "2": "No"},
-    "296": {"1": "Yes",  "2": "No"},
-    "528": {"1": "Yes",  "2": "No"},
-    "529": {"1": "Yes",  "2": "No"},
-    "590": {"1": "Yes",  "2": "No"},
-    "585": {"1": "No",   "2": "Yes"},
-    "591": {"1": "No",   "2": "Yes"},
-    "592": {"1": "No",   "2": "Yes"},
-    "599": {"1": "No",   "2": "Yes"},
-    "432": {"1": "Odd",  "2": "Even"},
-    "434": {"1": "Odd",  "2": "Even"},
-    "450": {"1": "Odd",  "2": "Even"},
-    "452": {"1": "Yes",  "2": "No"},
-    "414": {"1": "1+Yes", "2": "1+No",   "3": "X+Yes",    "4": "X+No",      "5": "2+Yes",      "6": "2+No"},
-    "801": {"1": "No/No",  "2": "1H Yes/2H No", "3": "Yes/Yes", "4": "1H No/2H Yes"},
-    "866": {"1": "Home",  "2": "No Goal", "3": "Away",    "4": "Other"},
-    "7":   {"1": "1/1", "2": "1/X", "3": "1/2", "4": "X/1", "5": "X/X", "6": "X/2", "7": "2/1", "8": "2/X", "9": "2/2"},
-    "291": {"1": "Home",    "2": "No Goal", "3": "Away"},
-    "338": {"1": "1+BTTS", "2": "X+BTTS", "3": "2+BTTS"},
-    "416": {"1": "1+Yes",  "2": "1+No",   "3": "X+Yes",  "4": "X+No",      "5": "2+Yes",     "6": "2+No"},
-    "586": {"1": "1st Half", "2": "Equal", "3": "2nd Half"},
-    "587": {"1": "1st Half", "2": "Equal", "3": "2nd Half"},
-    "823": {"1": "1+BTTS", "2": "X+BTTS", "3": "2+BTTS", "4": "1+No BTTS", "5": "X+No BTTS", "6": "2+No BTTS"},
-    "340": {"1": "0-4",     "2": "5-6",    "3": "7+"},
-    "438": {"1": "1+Under",  "2": "X+Under",  "3": "2+Under",  "4": "1+Over",   "5": "X+Over",   "6": "2+Over"},
-    "822": {"1": "1+Under",  "2": "X+Under",  "3": "2+Under",  "4": "1+Over",   "5": "X+Over",   "6": "2+Over"},
-    "824": {"1": "1+U+BTTS", "2": "X+U+BTTS", "3": "2+U+BTTS", "4": "1+O+BTTS", "5": "X+O+BTTS", "6": "2+O+BTTS"},
-    "603": {"1": "Home",  "2": "Away",  "3": "Draw"},
-    "225": {"1": "Yes",  "2": "No"},
-    "299": {"1": "Odd",  "2": "Even"},
-    "593": {"1": "Yes",  "2": "No"},
-    "272": {"1": "1+Under",  "2": "X+Under",  "3": "2+Under",  "4": "1+Over",   "5": "X+Over",   "6": "2+Over"},
-    "342": {"1": "1+Under",  "2": "X+Under",  "3": "2+Under",  "4": "1+Over",   "5": "X+Over",   "6": "2+Over"},
-    "459": {"1": "1+Under",  "2": "X+Under",  "3": "2+Under",  "4": "1+Over",   "5": "X+Over",   "6": "2+Over"},
-    "43":  {"1": "0-1", "2": "2-3", "3": "4-5", "4": "6+"},
-    "343": {"1": "1+Under", "2": "X+Under", "3": "2+Under", "4": "1+Over",  "5": "X+Over",  "6": "2+Over"},
-    "446": {"1": "0-1", "2": "2",   "3": "3",   "4": "4+"},
-    "588": {"1": "Home 3+", "2": "Home 2", "3": "Home 1", "4": "Away 1", "5": "Away 2", "6": "Away 3+", "7": "Draw"},
-    "589": {"1": "0-1", "2": "2+"},
-    "5":   {"1": "1/1", "2": "1/X", "3": "1/2", "4": "X/1", "5": "X/X", "6": "X/2", "7": "2/1", "8": "2/X", "9": "2/2"},
-    "220": {"1": "1", "2": "None", "3": "2"},
-    "222": {"1": "1", "2": "X", "3": "2"},
-    "224": {"1": "1", "2": "X", "3": "2"},
-    "187": {"1": "Over", "2": "Under", "3": "Over (Alt)", "4": "Under (Alt)"},
-    "426": {"1": "Home", "2": "Draw", "3": "Away", "4": "Other"},
-    "442": {"1": "Home", "2": "Away"},
-    "444": {"1": "Home", "2": "Away"},
-    "571": {"1": "Home 1", "2": "Home 2", "3": "Home 3", "4": "Home 4+", "5": "Away 1", "6": "Away 2", "7": "Away 3", "8": "Away 4+"},
-    "583": {"1": "Over", "2": "Under", "3": "Over (Line 2)", "4": "Under (Line 2)", "5": "Over (Line 3)", "6": "Under (Line 3)"},
-    "584": {"1": "Yes", "2": "No"}
+    "1": {
+      "1": "1 (Home)",
+      "2": "X (Draw)",
+      "3": "2 (Away)"
+    },
+    "48": {
+      "1": "1.H",
+      "2": "Draw",
+      "3": "2.H"
+    },
+    "100": {
+      "1": "1 (Home)",
+      "2": "X (Draw)",
+      "3": "2 (Away)"
+    },
+    "101": {
+      "1": "1 (Home)",
+      "2": "X (Draw)",
+      "3": "2 (Away)"
+    },
+    "183": {
+      "1": "Home",
+      "2": "Draw",
+      "3": "Away"
+    },
+    "185": {
+      "1": "1 (Home)",
+      "2": "X (Draw)",
+      "3": "2 (Away)"
+    },
+    "791": {
+      "1": "1 (Home)",
+      "2": "X (Draw)",
+      "3": "2 (Away)"
+    },
+    "867": {
+      "1": "1 (Home)",
+      "2": "X (Draw)",
+      "3": "2 (Away)"
+    },
+    "884": {
+      "1": "1 (Home)",
+      "2": "X (Draw)",
+      "3": "2 (Away)"
+    },
+    "887": {
+      "1": "1 (Home)",
+      "2": "X (Draw)",
+      "3": "2 (Away)"
+    },
+    "3": {
+      "1": "1X (Home/Draw)",
+      "2": "12 (Home/Away)",
+      "3": "X2 (Draw/Away)"
+    },
+    "38": {
+      "1": "Yes",
+      "2": "No",
+      "3": "X2"
+    },
+    "8": {
+      "1": "1X (Home/Draw)",
+      "2": "12 (Home/Away)",
+      "3": "X2 (Draw/Away)"
+    },
+    "49": {
+      "1": "Odd",
+      "2": "Even"
+    },
+    "182": {
+      "1": "Home",
+      "2": "Away"
+    },
+    "461": {
+      "1": "Home",
+      "2": "Away"
+    },
+    "656": {
+      "1": "Home",
+      "2": "Away"
+    },
+    "9": {
+      "1": "1",
+      "2": "X",
+      "3": "2"
+    },
+    "295": {
+      "1": "Yes",
+      "2": "No"
+    },
+    "296": {
+      "1": "Yes",
+      "2": "No"
+    },
+    "528": {
+      "1": "Yes",
+      "2": "No"
+    },
+    "529": {
+      "1": "Yes",
+      "2": "No"
+    },
+    "590": {
+      "1": "Yes",
+      "2": "No"
+    },
+    "585": {
+      "1": "No",
+      "2": "Yes"
+    },
+    "591": {
+      "1": "No",
+      "2": "Yes"
+    },
+    "592": {
+      "1": "No",
+      "2": "Yes"
+    },
+    "599": {
+      "1": "No",
+      "2": "Yes"
+    },
+    "432": {
+      "1": "Odd",
+      "2": "Even"
+    },
+    "434": {
+      "1": "Odd",
+      "2": "Even"
+    },
+    "450": {
+      "1": "Odd",
+      "2": "Even"
+    },
+    "452": {
+      "1": "Yes",
+      "2": "No"
+    },
+    "414": {
+      "1": "1+Yes",
+      "2": "1+No",
+      "3": "X+Yes",
+      "4": "X+No",
+      "5": "2+Yes",
+      "6": "2+No"
+    },
+    "801": {
+      "1": "No/No",
+      "2": "1H Yes/2H No",
+      "3": "Yes/Yes",
+      "4": "1H No/2H Yes"
+    },
+    "866": {
+      "1": "Home",
+      "2": "No Goal",
+      "3": "Away",
+      "4": "Other"
+    },
+    "7": {
+      "1": "1 (Home)",
+      "2": "X (Draw)",
+      "3": "2 (Away)"
+    },
+    "291": {
+      "1": "Home",
+      "2": "No Goal",
+      "3": "Away"
+    },
+    "338": {
+      "1": "0-8",
+      "2": "9-11",
+      "3": "12+"
+    },
+    "416": {
+      "1": "1+Yes",
+      "2": "1+No",
+      "3": "X+Yes",
+      "4": "X+No",
+      "5": "2+Yes",
+      "6": "2+No"
+    },
+    "586": {
+      "1": "1st Half",
+      "2": "Equal",
+      "3": "2nd Half"
+    },
+    "587": {
+      "1": "1st Half",
+      "2": "Equal",
+      "3": "2nd Half"
+    },
+    "823": {
+      "1": "1+KG Var",
+      "2": "X+KG Var",
+      "3": "2+KG Var",
+      "4": "1+KG Yok",
+      "5": "X+KG Yok",
+      "6": "2+KG Yok"
+    },
+    "340": {
+      "1": "0-4",
+      "2": "5-6",
+      "3": "7+"
+    },
+    "438": {
+      "1": "1+Alt",
+      "2": "X+Alt",
+      "3": "2+Alt",
+      "4": "1+Üst",
+      "5": "X+Üst",
+      "6": "2+Üst"
+    },
+    "822": {
+      "1": "1+Alt",
+      "2": "X+Alt",
+      "3": "2+Alt",
+      "4": "1+Üst",
+      "5": "X+Üst",
+      "6": "2+Üst"
+    },
+    "824": {
+      "1": "1+Alt+Var",
+      "2": "X+Alt+Var",
+      "3": "2+Alt+Var",
+      "4": "1+Üst+Var",
+      "5": "X+Üst+Var",
+      "6": "2+Üst+Var"
+    },
+    "603": {
+      "1": "Ev Sahibi",
+      "2": "Deplasman",
+      "3": "Beraberlik"
+    },
+    "225": {
+      "1": "Var",
+      "2": "Yok"
+    },
+    "299": {
+      "1": "Tek",
+      "2": "Çift"
+    },
+    "593": {
+      "1": "Evet",
+      "2": "Hayır"
+    },
+    "272": {
+      "1": "1+Alt",
+      "2": "X+Alt",
+      "3": "2+Alt",
+      "4": "1+Üst",
+      "5": "X+Üst",
+      "6": "2+Üst"
+    },
+    "342": {
+      "1": "1+Alt",
+      "2": "X+Alt",
+      "3": "2+Alt",
+      "4": "1+Üst",
+      "5": "X+Üst",
+      "6": "2+Üst"
+    },
+    "459": {
+      "1": "1+Alt",
+      "2": "X+Alt",
+      "3": "2+Alt",
+      "4": "1+Üst",
+      "5": "X+Üst",
+      "6": "2+Üst"
+    },
+    "43": {
+      "1": "0-1",
+      "2": "2-3",
+      "3": "4-5",
+      "4": "6+"
+    },
+    "343": {
+      "1": "1+Alt",
+      "2": "X+Alt",
+      "3": "2+Alt",
+      "4": "1+Üst",
+      "5": "X+Üst",
+      "6": "2+Üst"
+    },
+    "446": {
+      "1": "Alt & Var",
+      "2": "Üst & Var",
+      "3": "Alt & Yok",
+      "4": "Üst & Yok"
+    },
+    "588": {
+      "1": "Ev Sahibi 3+",
+      "2": "Ev Sahibi 2",
+      "3": "Ev Sahibi 1",
+      "4": "Deplasman 1",
+      "5": "Deplasman 2",
+      "6": "Deplasman 3+",
+      "7": "Beraberlik"
+    },
+    "589": {
+      "1": "0-1",
+      "2": "2+"
+    },
+    "5": {
+      "1": "1/1",
+      "2": "1/X",
+      "3": "1/2",
+      "4": "X/1",
+      "5": "X/X",
+      "6": "X/2",
+      "7": "2/1",
+      "8": "2/X",
+      "9": "2/2"
+    },
+    "220": {
+      "1": "Yok",
+      "2": "X"
+    },
+    "222": {
+      "1": "1",
+      "2": "X",
+      "3": "2"
+    },
+    "224": {
+      "1": "1",
+      "2": "X",
+      "3": "2"
+    },
+    "426": {
+      "1": "Ev Sahibi",
+      "2": "Beraberlik",
+      "3": "Deplasman",
+      "4": "Diğer"
+    },
+    "442": {
+      "1": "Ev Sahibi",
+      "2": "Deplasman"
+    },
+    "444": {
+      "1": "Ev Sahibi",
+      "2": "Deplasman"
+    },
+    "571": {
+      "1": "0:0 / 0:0",
+      "2": "0:0 / 0:1",
+      "3": "0:0 / 0:2",
+      "4": "0:0 / 0:3",
+      "5": "0:0 / 1:0",
+      "6": "0:0 / 1:1",
+      "7": "0:0 / 1:2",
+      "8": "0:0 / 2:0",
+      "9": "0:0 / 2:1",
+      "10": "0:0 / 3:0",
+      "11": "0:0 / 4+",
+      "12": "1:0 / 1:0",
+      "13": "1:0 / 1:1",
+      "14": "1:0 / 1:2",
+      "15": "1:0 / 2:0",
+      "16": "1:0 / 2:1",
+      "17": "1:0 / 3:0",
+      "18": "1:0 / 4+",
+      "19": "0:1 / 0:1",
+      "20": "0:1 / 0:2",
+      "21": "0:1 / 0:3",
+      "22": "0:1 / 1:1",
+      "23": "0:1 / 1:2",
+      "24": "0:1 / 2:1",
+      "25": "0:1 / 4+",
+      "26": "2:0 / 2:0",
+      "27": "2:0 / 2:1",
+      "28": "2:0 / 3:0",
+      "29": "2:0 / 4+",
+      "30": "1:1 / 1:1",
+      "31": "1:1 / 1:2",
+      "32": "1:1 / 2:1",
+      "33": "1:1 / 4+",
+      "34": "0:2 / 0:2",
+      "35": "0:2 / 0:3",
+      "36": "0:2 / 1:2",
+      "37": "0:2 / 4+",
+      "38": "3:0 / 3:0",
+      "39": "3:0 / 4+",
+      "40": "2:1 / 2:1",
+      "41": "2:1 / 4+",
+      "42": "1:2 / 1:2",
+      "43": "1:2 / 4+",
+      "44": "0:3 / 0:3",
+      "45": "0:3 / 4+",
+      "46": "4+ / 4+"
+    },
+    "583": {
+      "1": "Üst",
+      "2": "Alt",
+      "3": "Üst (Hat 2)",
+      "4": "Alt (Hat 2)",
+      "5": "Üst (Hat 3)",
+      "6": "Alt (Hat 3)"
+    },
+    "584": {
+      "1": "Evet",
+      "2": "Hayır"
+    },
+    "161": {
+      "1": "Alt",
+      "2": "Üst"
+    },
+    "164": {
+      "1": "Alt 4.5",
+      "2": "Üst 4.5"
+    },
+    "327": {
+      "1": "Alt",
+      "2": "Üst"
+    },
+    "329": {
+      "1": "Alt",
+      "2": "Üst"
+    },
+    "604": {
+      "1": "Alt 4.5",
+      "2": "Üst 4.5"
+    }
   },
   "tr_to_en": {
     "Alt": "Under",
@@ -162,248 +830,881 @@
     "İki Yarı da 1,5 Üst": "Both Halves Over 1.5"
   },
   "market_type_names_tr": {
-    "1": "Maç Sonucu", "3": "Çifte Şans", "5": "İlk Yarı/Maç Sonucu",
-    "7": "İlk Yarı Sonucu", "8": "İlk yarı Çifte Şans", "9": "2. Yarı Sonucu",
-    "11": "Alt/Üst", "12": "Alt/Üst", "13": "Toplam Gol Alt/Üst",
-    "14": "İlk Yarı Alt/Üst", "15": "İlk Yarı Alt/Üst", "20": "Ev Sahibi Alt/Üst",
-    "29": "Ev Sahibi Alt/Üst", "38": "Karşılıklı Gol", "43": "Toplam Gol Aralığı",
-    "48": "En Çok Gol Olacak Yarı", "49": "Tek/Çift",
-    "100": "Handikaplı Maç Sonucu", "101": "Handikaplı Maç Sonucu", "155": "Alt/Üst",
-    "182": "Kim Tur Atlar", "183": "1X2 (Set Oranları)", "185": "Maç Handikabı",
-    "187": "Oyun Alt/Üst", "189": "Toplam Puan Alt/Üst", "190": "Toplam Puan Alt/Üst",
-    "207": "Alt/Üst", "209": "İlk yarı Alt/Üst", "212": "Alt/Üst",
-    "216": "Toplam Korner Alt/Üst", "218": "İlk yarı Korner Alt/Üst",
-    "220": "En Çok Korner", "222": "1. Yarı En Çok Korner", "224": "İlk Korner",
+    "1": "Maç Sonucu",
+    "3": "Çifte Şans",
+    "5": "İlk Yarı/Maç Sonucu",
+    "7": "İlk Yarı Sonucu",
+    "8": "İlk yarı Çifte Şans",
+    "9": "2. Yarı Sonucu",
+    "11": "Alt/Üst",
+    "12": "Alt/Üst",
+    "13": "Toplam Gol Alt/Üst",
+    "14": "İlk Yarı Alt/Üst",
+    "15": "İlk Yarı Alt/Üst",
+    "20": "Ev Sahibi Alt/Üst",
+    "29": "Deplasman Alt/Üst",
+    "38": "Karşılıklı Gol",
+    "43": "Toplam Gol Aralığı",
+    "48": "En Çok Gol Olacak Yarı",
+    "49": "Tek/Çift",
+    "100": "Handikaplı Maç Sonucu",
+    "101": "Handikaplı Maç Sonucu",
+    "155": "Alt/Üst",
+    "164": "Deplasman Alt/Üst",
+    "182": "Kim Tur Atlar",
+    "183": "1X2 (Set Oranları)",
+    "185": "Maç Handikabı",
+    "187": "Oyun Alt/Üst",
+    "189": "Toplam Puan Alt/Üst",
+    "190": "Toplam Puan Alt/Üst",
+    "207": "Alt/Üst",
+    "209": "İlk yarı Alt/Üst",
+    "212": "Ev Sahibi Alt/Üst",
+    "216": "Toplam Korner Alt/Üst",
+    "218": "İlk Yarı Korner Alt/Üst",
+    "220": "En Çok Korner",
+    "222": "1. Yarı En Çok Korner",
+    "224": "İlk Korner",
     "225": "Kırmızı Kart",
-    "256": "Deplasman Alt/Üst", "268": "Handikaplı Maç Sonucu",
-    "272": "Sonuç + Alt/Üst", "291": "İlk Golü Hangi Takım Atar",
-    "295": "Ev Sahibi İki Yarıda Da Gol Atar", "296": "Deplasman İki Yarıda Da Gol Atar",
-    "299": "Korner Tek/Çift", "301": "İlk yarı Korner Alt/Üst",
-    "326": "Ev Sahibi Alt/Üst", "327": "İlk yarı Kart Puanı Alt/Üst",
+    "256": "Deplasman Alt/Üst",
+    "268": "Handikaplı Maç Sonucu",
+    "272": "Sonuç + Alt/Üst",
+    "291": "İlk Golü Hangi Takım Atar",
+    "295": "Ev Sahibi İki Yarıda Da Gol Atar",
+    "296": "Deplasman İki Yarıda Da Gol Atar",
+    "299": "Korner Tek/Çift",
+    "301": "Kart Puanı Alt/Üst",
+    "326": "Ev Sahibi Alt/Üst",
+    "327": "Deplasman Alt/Üst",
     "328": "Deplasman Alt/Üst",
-    "338": "Toplam Korner Aralığı", "340": "İlk yarı Korner Aralığı",
-    "342": "Sonuç + Alt/Üst", "343": "Sonuç + Alt/Üst",
-    "414": "Toplam Korner Aralığı", "416": "İlk yarı Sonuç + İlk yarı Karşılıklı Gol",
-    "418": "Asya Handikabı", "422": "Doğru Skor Aralığı",
-    "424": "Toplam Korner Alt/Üst", "426": "Handikaplı Korner",
-    "432": "İlk yarı Tek/Çift", "434": "İlk yarı Tek/Çift",
-    "438": "1X2 + Alt/Üst", "442": "Galibiyet Farkı", "444": "Galibiyet Farkı",
-    "446": "Alt/Üst Ve Karşılıklı Gol", "450": "İlk yarı Tek/Çift",
+    "338": "Toplam Korner Aralığı",
+    "340": "İlk yarı Korner Aralığı",
+    "342": "Sonuç + Alt/Üst",
+    "343": "Sonuç + Alt/Üst",
+    "414": "Maç Sonucu ve Karşılıklı Gol",
+    "416": "İlk yarı Sonuç + İlk yarı Karşılıklı Gol",
+    "418": "Asya Handikabı",
+    "422": "Doğru Skor Aralığı",
+    "424": "Toplam Korner Alt/Üst",
+    "426": "Handikaplı Korner",
+    "432": "İlk yarı Tek/Çift",
+    "434": "İlk yarı Tek/Çift",
+    "438": "1X2 + Alt/Üst",
+    "442": "Galibiyet Farkı",
+    "444": "Galibiyet Farkı",
+    "446": "Alt/Üst Ve Karşılıklı Gol",
+    "450": "İlk yarı Tek/Çift",
     "452": "1. Yarı Karşılıklı Gol",
-    "455": "Ev Sahibi 1.Yarı Alt/Üst", "457": "İlk yarı Deplasman Alt/Üst",
-    "459": "İlk yarı Sonuç + İlk yarı Alt/Üst", "461": "Sonuç (2 Yollu)",
-    "528": "Her İki Yarıda 1.5 Alt", "529": "Her İki Yarıda 1.5 Üst",
-    "571": "İlk Yarı / Maç Skoru", "583": "Toplam Korner Alt/Üst",
-    "584": "Ev Sahibi Herhangi Bir Yarıyı Kazanır", "585": "Deplasman Herhangi Bir Yarıyı Kazanır",
-    "586": "Ev Sahibi Hangi Yarıda Daha Çok Gol Atar", "587": "Deplasman - En Fazla Gol Yarısı",
-    "588": "Galibiyet Farkı", "589": "Ev Sahibi Gol Yemeden Kazanır",
-    "590": "Deplasman Gol Yemeden Kazan", "591": "Ev Sahibi Her İki Yarıyı Da Kazanır",
-    "592": "Deplasman Her İki Yarıyı Da Kazanır", "593": "Penaltı Olur Mu", "599": "İkinci yarı Karşılıklı Gol",
-    "601": "Ev Sahibi Korner Alt/Üst", "602": "Deplasman Korner Alt/Üst", "603": "Hangi Takım Daha Çok Kart Puanı Alır?",
-    "604": "Deplasman Alt/Üst", "656": "Sonuç (2 Yollu)",
-    "701": "Oyuncu Gol Atar", "702": "Oyuncu İlk Golü Atar",
-    "703": "Son Golü Atan", "704": "Hat-trick Yapan", "705": "İsabetli Şut Lideri",
-    "706": "Oyuncu Kafa ile Gol Atar", "707": "Herhangi Bir Asist", "708": "Oyuncu Frikikten Gol Atar",
-    "709": "Oyuncu Kart Görür", "710": "Sarı Kart (Oyuncu)",
+    "455": "Ev Sahibi İlk Yarı Alt/Üst",
+    "457": "Deplasman İlk Yarı Alt/Üst",
+    "459": "İlk yarı Sonuç + İlk yarı Alt/Üst",
+    "461": "Sonuç (2 Yollu)",
+    "528": "Her İki Yarıda 1.5 Alt",
+    "529": "Her İki Yarıda 1.5 Üst",
+    "571": "İlk Yarı / Maç Skoru",
+    "583": "Toplam Korner Alt/Üst",
+    "584": "Ev Sahibi Herhangi Bir Yarıyı Kazanır",
+    "585": "Deplasman Herhangi Bir Yarıyı Kazanır",
+    "586": "Ev Sahibi - En Fazla Gol Yarısı",
+    "587": "Deplasman - En Fazla Gol Yarısı",
+    "588": "Galibiyet Farkı",
+    "589": "Ev Sahibi Gol Yemeden Kazanır",
+    "590": "Deplasman Gol Yemeden Kazan",
+    "591": "Ev Sahibi Her İki Yarıyı Da Kazanır",
+    "592": "Deplasman Her İki Yarıyı Da Kazanır",
+    "593": "Penaltı Olur Mu",
+    "599": "İkinci yarı Karşılıklı Gol",
+    "601": "Ev Sahibi Korner",
+    "602": "Deplasman Korner",
+    "603": "Hangi Takım Daha Çok Kart Puanı Alır?",
+    "604": "Deplasman Alt/Üst",
+    "656": "Sonuç (2 Yollu)",
+    "701": "Oyuncu Gol Atar",
+    "702": "Oyuncu İlk Golü Atar",
+    "703": "Oyuncu Her İki Yarıda da Gol Atar",
+    "704": "Sarı Kart (Oyuncu)",
+    "705": "Oyuncu Gol Atar ve Takımı Kazanır",
+    "706": "Oyuncu Kafa ile Gol Atar",
+    "707": "Herhangi Bir Asist",
+    "708": "Oyuncu Frikikten Gol Atar",
+    "709": "Oyuncu Kart Görür",
+    "710": "Sarı Kart (Oyuncu)",
     "711": "Oyuncu Gol Atar ve Kart Görür",
     "712": "Oyuncu Asist Yapar",
-    "713": "Oyuncu Gol Atar ve Asist Yapar", "714": "Oyuncu Kaleyi Bulan Şut Çeker",
-    "716": "Maç Özel", "717": "Oyuncu Puan Alt/Üst", "718": "Oyuncu Ribaunt Alt/Üst",
-    "719": "Oyuncu Asist Alt/Üst", "720": "Oyuncu Asist Alt/Üst (Alt)",
-    "721": "Oyuncu Blok Alt/Üst", "722": "Oyuncu Kart Görür",
-    "723": "Oyuncu Puan Alt/Üst (Alt)", "724": "Oyuncu Puan Alt/Üst (Yüksek)",
-    "725": "Oyuncu Puan Alt/Üst (Alt 2)", "730": "Takım Puan Alt/Üst (1Y)",
-    "731": "Takım Puan Alt/Üst (1Ç)", "734": "Takım Puan Alt/Üst (2Ç)",
-    "737": "Oyuncu Puan Alt/Üst (Alt 3)", "740": "Oyuncu Şut Çeker",
-    "741": "Şut Sayısı (Oyuncu)", "742": "Faul Sayısı (Oyuncu)",
-    "743": "Gol + Asist Alt/Üst", "764": "Şut Alt/Üst (Oyuncu) Alt",
-    "765": "Oyuncu Gol Atar veya Asist Yapar", "777": "Doğru Skor", "779": "İlk yarı Skoru",
-    "791": "Maç Handikabı", "798": "Korner Handikap",
-    "799": "İlk yarı Korner Handikap", "800": "İlk yarı Kart Puanı Alt/Üst",
-    "801": "İlk yarı / İkinci yarı Karşılıklı Gol", "803": "Toplam Kurtarış (Kaleci)",
-    "804": "Alt/Üst", "805": "Takım Şutu Alt/Üst", "806": "Takım Korner Alt/Üst",
-    "807": "Takım Ofsayt", "808": "Takım Ofsayt",
-    "810": "Toplam Goller (Alt)", "812": "Alt Toplam Alt/Üst", "819": "Gol Krallığı",
-    "822": "Sonuç + Alt/Üst", "823": "Sonuç + Karşılıklı Gol",
-    "824": "Sonuç + Alt/Üst + Karşılıklı Gol", "837": "Oyuncu Kart Görür",
-    "862": "1. Yarı Korner Alt/Üst", "863": "İlk yarı Korner Alt/Üst",
-    "864": "Takım Korner HCP", "866": "Sonraki Gol", "867": "Korner 1X2",
-    "871": "Takım Korner İstatistik", "872": "Takım Şut Sayısı", "874": "Takım Pas Arası",
-    "884": "Maç Handikabı", "887": "Alt Handikap"
+    "713": "Oyuncu Gol Atar ve Asist Yapar",
+    "714": "Oyuncu Kaleyi Bulan Şut Çeker",
+    "716": "Maç Özel",
+    "717": "Oyuncu Puan Alt/Üst",
+    "718": "Oyuncu Ribaunt Alt/Üst",
+    "719": "Oyuncu Asist Alt/Üst",
+    "720": "Oyuncu Asist Alt/Üst (Alt)",
+    "721": "Oyuncu Blok Alt/Üst",
+    "722": "Oyuncu Kart Görür",
+    "723": "Oyuncu Puan Alt/Üst (Alt)",
+    "724": "Oyuncu Puan Alt/Üst (Yüksek)",
+    "725": "Oyuncu Puan Alt/Üst (Alt 2)",
+    "730": "Takım Puan Alt/Üst (1Y)",
+    "731": "Takım Puan Alt/Üst (1Ç)",
+    "734": "Takım Puan Alt/Üst (2Ç)",
+    "737": "Oyuncu Puan Alt/Üst (Alt 3)",
+    "740": "Oyuncu Şut Çeker",
+    "741": "Oyuncu Faul Alır",
+    "742": "Oyuncu Faul Yapar",
+    "743": "Oyuncu Ofsayta Düşer",
+    "764": "Oyuncu Top Çalar",
+    "765": "Oyuncu Gol Atar veya Asist Yapar",
+    "777": "Maç Skoru",
+    "779": "İlk yarı Skoru",
+    "791": "Maç Handikabı",
+    "798": "Korner Handikap",
+    "799": "İlk yarı Korner Handikap",
+    "800": "İlk yarı Kart Puanı Alt/Üst",
+    "801": "İlk yarı / İkinci yarı Karşılıklı Gol",
+    "803": "Toplam Kurtarış (Kaleci)",
+    "804": "Hakem VAR Monitörüne Gider Alt/Üst",
+    "805": "Takım Şutu Alt/Üst",
+    "806": "Takım İsabetli Şut",
+    "807": "Takım Faul",
+    "808": "Takım Ofsayt",
+    "810": "Toplam Goller (Alt)",
+    "812": "Alt Toplam Alt/Üst",
+    "819": "Gol Krallığı",
+    "822": "Sonuç + Alt/Üst",
+    "823": "Sonuç + Karşılıklı Gol",
+    "824": "Sonuç + Alt/Üst + Karşılıklı Gol",
+    "837": "Oyuncu Kart Görür",
+    "862": "İlk Yarı Korner Alt/Üst",
+    "863": "Kart Puanı Alt/Üst",
+    "864": "Takım Korner HCP",
+    "866": "Sonraki Gol",
+    "867": "Korner 1X2",
+    "871": "Takım Kale Vuruşu",
+    "872": "Takım Taç Atışı",
+    "873": "Takım Top Çalma",
+    "874": "Takım Pas Arası",
+    "884": "Maç Handikabı",
+    "887": "Alt Handikap",
+    "161": "Ev Sahibi Alt/Üst",
+    "214": "Ev Sahibi Gol Yemez",
+    "215": "Deplasman Gol Yemez",
+    "329": "Deplasman Alt/Üst",
+    "715": "Oyuncu Özel",
+    "744": "Oyuncu Pas Yapar",
+    "763": "Oyuncu İsabetli Pas Yapar",
+    "809": "Takım Topa Sahip Olma Yüzdesi"
   },
   "sport_types_tr": {
-    "1": "Futbol", "2": "Basketbol", "3": "Buz Hokeyi", "4": "Voleybol",
-    "5": "Tenis", "6": "Beyzbol", "7": "Amerikan Futbolu", "8": "Hentbol",
-    "9": "Rugby", "10": "Futsal", "14": "Snooker",
-    "137": "Sanal Futbol", "153": "Sanal Basketbol",
-    "19": "Kıdemliler Snooker", "23": "Voleybol (K)"
+    "1": "Futbol",
+    "2": "Basketbol",
+    "3": "Buz Hokeyi",
+    "4": "Voleybol",
+    "5": "Tenis",
+    "6": "Beyzbol",
+    "7": "Amerikan Futbolu",
+    "8": "Hentbol",
+    "9": "Rugby",
+    "10": "Futsal",
+    "14": "Snooker",
+    "137": "Sanal Futbol",
+    "153": "Sanal Basketbol",
+    "19": "Kıdemliler Snooker",
+    "23": "Voleybol (K)"
   },
   "outcome_labels_tr": {
-    "1":   {"1": "1 (Ev Sahibi)",    "2": "X (Beraberlik)",   "3": "2 (Deplasman)"},
-    "48":  {"1": "1.Y",              "2": "Eşit",             "3": "2.Y"},
-    "100": {"1": "1 (Ev Sahibi)",    "2": "X (Beraberlik)",   "3": "2 (Deplasman)"},
-    "101": {"1": "1 (Ev Sahibi)",    "2": "X (Beraberlik)",   "3": "2 (Deplasman)"},
-    "183": {"1": "Ev Sahibi",        "2": "Beraberlik",       "3": "Deplasman"},
-    "185": {"1": "1 (Ev Sahibi)",    "2": "X (Beraberlik)",   "3": "2 (Deplasman)"},
-    "791": {"1": "1 (Ev Sahibi)",    "2": "X (Beraberlik)",   "3": "2 (Deplasman)"},
-    "867": {"1": "1 (Ev Sahibi)",    "2": "X (Beraberlik)",   "3": "2 (Deplasman)"},
-    "884": {"1": "1 (Ev Sahibi)",    "2": "X (Beraberlik)",   "3": "2 (Deplasman)"},
-    "887": {"1": "1 (Ev Sahibi)",    "2": "X (Beraberlik)",   "3": "2 (Deplasman)"},
-    "3":   {"1": "1X (Ev S./Ber.)",  "2": "12 (Ev S./Dep.)",  "3": "X2 (Ber./Dep.)"},
-    "38":  {"1": "Var",              "2": "Yok",               "3": "X2"},
-    "8":   {"1": "1X (Ev S./Ber.)",  "2": "12 (Ev S./Dep.)",  "3": "X2 (Ber./Dep.)"},
-    "49":  {"1": "Tek",  "2": "Çift"},
-    "182": {"1": "Ev Sahibi",  "2": "Deplasman"},
-    "461": {"1": "Ev Sahibi",  "2": "Deplasman"},
-    "656": {"1": "Ev Sahibi",  "2": "Deplasman"},
-    "9":   {"1": "1",    "2": "X",   "3": "2"},
-    "295": {"1": "Var",  "2": "Yok"},
-    "296": {"1": "Var",  "2": "Yok"},
-    "528": {"1": "Var",  "2": "Yok"},
-    "529": {"1": "Var",  "2": "Yok"},
-    "590": {"1": "Evet",  "2": "Hayır"},
-    "585": {"1": "Yok",  "2": "Var"},
-    "591": {"1": "Yok",  "2": "Var"},
-    "592": {"1": "Yok",  "2": "Var"},
-    "599": {"1": "Yok",  "2": "Var"},
-    "432": {"1": "Tek",  "2": "Çift"},
-    "434": {"1": "Tek",  "2": "Çift"},
-    "450": {"1": "Tek",  "2": "Çift"},
-    "452": {"1": "Var",  "2": "Yok"},
-    "414": {"1": "1+Var", "2": "1+Yok",   "3": "X+Var",    "4": "X+Yok",    "5": "2+Var",    "6": "2+Yok"},
-    "801": {"1": "Yok/Yok", "2": "1Y Var/2Y Yok", "3": "Var/Var", "4": "1Y Yok/2Y Var"},
-    "866": {"1": "Ev Sahibi", "2": "Gol Yok", "3": "Deplasman", "4": "Diğer"},
-    "7":   {"1": "1", "2": "X", "3": "2"},
-    "291": {"1": "Ev Sahibi", "2": "Gol Yok",    "3": "Deplasman"},
-    "338": {"1": "1+KG Var", "2": "X+KG Var", "3": "2+KG Var"},
-    "416": {"1": "1+Var",  "2": "1+Yok",   "3": "X+Var",  "4": "X+Yok",  "5": "2+Var",  "6": "2+Yok"},
-    "586": {"1": "1. Yarı", "2": "Eşit", "3": "2. Yarı"},
-    "587": {"1": "1. Yarı", "2": "Eşit", "3": "2. Yarı"},
-    "823": {"1": "1+KG Var", "2": "X+KG Var", "3": "2+KG Var", "4": "1+KG Yok", "5": "X+KG Yok", "6": "2+KG Yok"},
-    "340": {"1": "0-4",  "2": "5-6",  "3": "7+"},
-    "438": {"1": "1+Alt",  "2": "X+Alt",  "3": "2+Alt",  "4": "1+Üst",  "5": "X+Üst",  "6": "2+Üst"},
-    "822": {"1": "1+Alt",  "2": "X+Alt",  "3": "2+Alt",  "4": "1+Üst",  "5": "X+Üst",  "6": "2+Üst"},
-    "824": {"1": "1+Alt+Var", "2": "X+Alt+Var", "3": "2+Alt+Var", "4": "1+Üst+Var", "5": "X+Üst+Var", "6": "2+Üst+Var"},
-    "603": {"1": "Ev Sahibi", "2": "Deplasman", "3": "Beraberlik"},
-    "225": {"1": "Var", "2": "Yok"},
-    "299": {"1": "Tek",  "2": "Çift"},
-    "593": {"1": "Evet", "2": "Hayır"},
-    "272": {"1": "1+Alt",  "2": "X+Alt",  "3": "2+Alt",  "4": "1+Üst",  "5": "X+Üst",  "6": "2+Üst"},
-    "342": {"1": "1+Alt",  "2": "X+Alt",  "3": "2+Alt",  "4": "1+Üst",  "5": "X+Üst",  "6": "2+Üst"},
-    "459": {"1": "1+Alt",  "2": "X+Alt",  "3": "2+Alt",  "4": "1+Üst",  "5": "X+Üst",  "6": "2+Üst"},
-    "43":  {"1": "0-1", "2": "2-3", "3": "4-5", "4": "6+"},
-    "343": {"1": "1+Alt", "2": "X+Alt", "3": "2+Alt", "4": "1+Üst", "5": "X+Üst", "6": "2+Üst"},
-    "446": {"1": "0-1", "2": "2",   "3": "3",   "4": "4+"},
-    "588": {"1": "Ev Sahibi 3+", "2": "Ev Sahibi 2", "3": "Ev Sahibi 1", "4": "Deplasman 1", "5": "Deplasman 2", "6": "Deplasman 3+", "7": "Beraberlik"},
-    "589": {"1": "0-1", "2": "2+"},
-    "5":   {"1": "1/1", "2": "1/X", "3": "1/2", "4": "X/1", "5": "X/X", "6": "X/2", "7": "2/1", "8": "2/X", "9": "2/2"},
-    "220": {"1": "1", "2": "Yok", "3": "2"},
-    "222": {"1": "1", "2": "X", "3": "2"},
-    "224": {"1": "1", "2": "X", "3": "2"},
-    "426": {"1": "Ev Sahibi", "2": "Beraberlik", "3": "Deplasman", "4": "Diğer"},
-    "442": {"1": "Ev Sahibi", "2": "Deplasman"},
-    "444": {"1": "Ev Sahibi", "2": "Deplasman"},
-    "571": {"1": "Ev S. 1", "2": "Ev S. 2", "3": "Ev S. 3", "4": "Ev S. 4+", "5": "Dep. 1", "6": "Dep. 2", "7": "Dep. 3", "8": "Dep. 4+"},
-    "583": {"1": "Üst", "2": "Alt", "3": "Üst (Hat 2)", "4": "Alt (Hat 2)", "5": "Üst (Hat 3)", "6": "Alt (Hat 3)"},
-    "584": {"1": "Evet", "2": "Hayır"}
+    "1": {
+      "1": "1 (Ev Sahibi)",
+      "2": "X (Beraberlik)",
+      "3": "2 (Deplasman)"
+    },
+    "48": {
+      "1": "1.Y",
+      "2": "Eşit",
+      "3": "2.Y"
+    },
+    "100": {
+      "1": "1 (Ev Sahibi)",
+      "2": "X (Beraberlik)",
+      "3": "2 (Deplasman)"
+    },
+    "101": {
+      "1": "1 (Ev Sahibi)",
+      "2": "X (Beraberlik)",
+      "3": "2 (Deplasman)"
+    },
+    "183": {
+      "1": "Ev Sahibi",
+      "2": "Beraberlik",
+      "3": "Deplasman"
+    },
+    "185": {
+      "1": "1 (Ev Sahibi)",
+      "2": "X (Beraberlik)",
+      "3": "2 (Deplasman)"
+    },
+    "791": {
+      "1": "1 (Ev Sahibi)",
+      "2": "X (Beraberlik)",
+      "3": "2 (Deplasman)"
+    },
+    "867": {
+      "1": "1 (Ev Sahibi)",
+      "2": "X (Beraberlik)",
+      "3": "2 (Deplasman)"
+    },
+    "884": {
+      "1": "1 (Ev Sahibi)",
+      "2": "X (Beraberlik)",
+      "3": "2 (Deplasman)"
+    },
+    "887": {
+      "1": "1 (Ev Sahibi)",
+      "2": "X (Beraberlik)",
+      "3": "2 (Deplasman)"
+    },
+    "3": {
+      "1": "1X (Ev S./Ber.)",
+      "2": "12 (Ev S./Dep.)",
+      "3": "X2 (Ber./Dep.)"
+    },
+    "38": {
+      "1": "Var",
+      "2": "Yok",
+      "3": "X2"
+    },
+    "8": {
+      "1": "1X (Ev S./Ber.)",
+      "2": "12 (Ev S./Dep.)",
+      "3": "X2 (Ber./Dep.)"
+    },
+    "49": {
+      "1": "Tek",
+      "2": "Çift"
+    },
+    "182": {
+      "1": "Ev Sahibi",
+      "2": "Deplasman"
+    },
+    "461": {
+      "1": "Ev Sahibi",
+      "2": "Deplasman"
+    },
+    "656": {
+      "1": "Ev Sahibi",
+      "2": "Deplasman"
+    },
+    "9": {
+      "1": "1",
+      "2": "X",
+      "3": "2"
+    },
+    "295": {
+      "1": "Var",
+      "2": "Yok"
+    },
+    "296": {
+      "1": "Var",
+      "2": "Yok"
+    },
+    "528": {
+      "1": "Var",
+      "2": "Yok"
+    },
+    "529": {
+      "1": "Var",
+      "2": "Yok"
+    },
+    "590": {
+      "1": "Evet",
+      "2": "Hayır"
+    },
+    "585": {
+      "1": "Evet",
+      "2": "Hayır"
+    },
+    "591": {
+      "1": "Evet",
+      "2": "Hayır"
+    },
+    "592": {
+      "1": "Hayır",
+      "2": "Evet"
+    },
+    "599": {
+      "1": "Var",
+      "2": "Yok"
+    },
+    "214": {
+      "1": "Evet",
+      "2": "Hayır"
+    },
+    "215": {
+      "1": "Evet",
+      "2": "Hayır"
+    },
+    "432": {
+      "1": "Tek",
+      "2": "Çift"
+    },
+    "434": {
+      "1": "Tek",
+      "2": "Çift"
+    },
+    "450": {
+      "1": "Tek",
+      "2": "Çift"
+    },
+    "452": {
+      "1": "Var",
+      "2": "Yok"
+    },
+    "414": {
+      "1": "1+Var",
+      "2": "1+Yok",
+      "3": "X+Var",
+      "4": "X+Yok",
+      "5": "2+Var",
+      "6": "2+Yok"
+    },
+    "801": {
+      "1": "Yok/Yok",
+      "2": "1Y Var/2Y Yok",
+      "3": "Var/Var",
+      "4": "1Y Yok/2Y Var"
+    },
+    "866": {
+      "1": "Ev Sahibi",
+      "2": "Gol Yok",
+      "3": "Deplasman",
+      "4": "Diğer"
+    },
+    "7": {
+      "1": "1",
+      "2": "X",
+      "3": "2"
+    },
+    "291": {
+      "1": "Ev Sahibi",
+      "2": "Gol Yok",
+      "3": "Deplasman"
+    },
+    "338": {
+      "1": "0-8",
+      "2": "9-11",
+      "3": "12+"
+    },
+    "416": {
+      "1": "1+Var",
+      "2": "1+Yok",
+      "3": "X+Var",
+      "4": "X+Yok",
+      "5": "2+Var",
+      "6": "2+Yok"
+    },
+    "586": {
+      "1": "1. Yarı",
+      "2": "Eşit",
+      "3": "2. Yarı"
+    },
+    "587": {
+      "1": "1. Yarı",
+      "2": "Eşit",
+      "3": "2. Yarı"
+    },
+    "823": {
+      "1": "1+KG Var",
+      "2": "X+KG Var",
+      "3": "2+KG Var",
+      "4": "1+KG Yok",
+      "5": "X+KG Yok",
+      "6": "2+KG Yok"
+    },
+    "340": {
+      "1": "0-4",
+      "2": "5-6",
+      "3": "7+"
+    },
+    "438": {
+      "1": "1+Alt",
+      "2": "X+Alt",
+      "3": "2+Alt",
+      "4": "1+Üst",
+      "5": "X+Üst",
+      "6": "2+Üst"
+    },
+    "822": {
+      "1": "1+Alt",
+      "2": "X+Alt",
+      "3": "2+Alt",
+      "4": "1+Üst",
+      "5": "X+Üst",
+      "6": "2+Üst"
+    },
+    "824": {
+      "1": "1+Alt+Var",
+      "2": "X+Alt+Var",
+      "3": "2+Alt+Var",
+      "4": "1+Üst+Var",
+      "5": "X+Üst+Var",
+      "6": "2+Üst+Var"
+    },
+    "603": {
+      "1": "Ev Sahibi",
+      "2": "Deplasman",
+      "3": "Beraberlik"
+    },
+    "225": {
+      "1": "Var",
+      "2": "Yok"
+    },
+    "299": {
+      "1": "Tek",
+      "2": "Çift"
+    },
+    "593": {
+      "1": "Evet",
+      "2": "Hayır"
+    },
+    "272": {
+      "1": "1+Alt",
+      "2": "X+Alt",
+      "3": "2+Alt",
+      "4": "1+Üst",
+      "5": "X+Üst",
+      "6": "2+Üst"
+    },
+    "342": {
+      "1": "1+Alt",
+      "2": "X+Alt",
+      "3": "2+Alt",
+      "4": "1+Üst",
+      "5": "X+Üst",
+      "6": "2+Üst"
+    },
+    "459": {
+      "1": "1+Alt",
+      "2": "X+Alt",
+      "3": "2+Alt",
+      "4": "1+Üst",
+      "5": "X+Üst",
+      "6": "2+Üst"
+    },
+    "43": {
+      "1": "0-1",
+      "2": "2-3",
+      "3": "4-5",
+      "4": "6+"
+    },
+    "343": {
+      "1": "1+Alt",
+      "2": "X+Alt",
+      "3": "2+Alt",
+      "4": "1+Üst",
+      "5": "X+Üst",
+      "6": "2+Üst"
+    },
+    "446": {
+      "1": "Alt & Var",
+      "2": "Üst & Var",
+      "3": "Alt & Yok",
+      "4": "Üst & Yok"
+    },
+    "588": {
+      "1": "Ev Sahibi 3+",
+      "2": "Ev Sahibi 2",
+      "3": "Ev Sahibi 1",
+      "4": "Deplasman 1",
+      "5": "Deplasman 2",
+      "6": "Deplasman 3+",
+      "7": "Beraberlik"
+    },
+    "589": {
+      "1": "0-1",
+      "2": "2+"
+    },
+    "5": {
+      "1": "1/1",
+      "2": "1/X",
+      "3": "1/2",
+      "4": "X/1",
+      "5": "X/X",
+      "6": "X/2",
+      "7": "2/1",
+      "8": "2/X",
+      "9": "2/2"
+    },
+    "220": {
+      "1": "1",
+      "2": "X",
+      "3": "2"
+    },
+    "222": {
+      "1": "1",
+      "2": "X",
+      "3": "2"
+    },
+    "224": {
+      "1": "1",
+      "2": "X",
+      "3": "2"
+    },
+    "426": {
+      "1": "Ev Sahibi",
+      "2": "Beraberlik",
+      "3": "Deplasman",
+      "4": "Diğer"
+    },
+    "442": {
+      "1": "Ev Sahibi",
+      "2": "Deplasman"
+    },
+    "444": {
+      "1": "Ev Sahibi",
+      "2": "Deplasman"
+    },
+    "571": {
+      "1": "0:0 / 0:0",
+      "2": "0:0 / 0:1",
+      "3": "0:0 / 0:2",
+      "4": "0:0 / 0:3",
+      "5": "0:0 / 1:0",
+      "6": "0:0 / 1:1",
+      "7": "0:0 / 1:2",
+      "8": "0:0 / 2:0",
+      "9": "0:0 / 2:1",
+      "10": "0:0 / 3:0",
+      "11": "0:0 / 4+",
+      "12": "1:0 / 1:0",
+      "13": "1:0 / 1:1",
+      "14": "1:0 / 1:2",
+      "15": "1:0 / 2:0",
+      "16": "1:0 / 2:1",
+      "17": "1:0 / 3:0",
+      "18": "1:0 / 4+",
+      "19": "0:1 / 0:1",
+      "20": "0:1 / 0:2",
+      "21": "0:1 / 0:3",
+      "22": "0:1 / 1:1",
+      "23": "0:1 / 1:2",
+      "24": "0:1 / 2:1",
+      "25": "0:1 / 4+",
+      "26": "2:0 / 2:0",
+      "27": "2:0 / 2:1",
+      "28": "2:0 / 3:0",
+      "29": "2:0 / 4+",
+      "30": "1:1 / 1:1",
+      "31": "1:1 / 1:2",
+      "32": "1:1 / 2:1",
+      "33": "1:1 / 4+",
+      "34": "0:2 / 0:2",
+      "35": "0:2 / 0:3",
+      "36": "0:2 / 1:2",
+      "37": "0:2 / 4+",
+      "38": "3:0 / 3:0",
+      "39": "3:0 / 4+",
+      "40": "2:1 / 2:1",
+      "41": "2:1 / 4+",
+      "42": "1:2 / 1:2",
+      "43": "1:2 / 4+",
+      "44": "0:3 / 0:3",
+      "45": "0:3 / 4+",
+      "46": "4+ / 4+"
+    },
+    "583": {
+      "1": "Üst",
+      "2": "Alt",
+      "3": "Üst (Hat 2)",
+      "4": "Alt (Hat 2)",
+      "5": "Üst (Hat 3)",
+      "6": "Alt (Hat 3)"
+    },
+    "584": {
+      "1": "Evet",
+      "2": "Hayır"
+    },
+    "161": {
+      "1": "Alt",
+      "2": "Üst"
+    },
+    "164": {
+      "1": "Alt 4.5",
+      "2": "Üst 4.5"
+    },
+    "327": {
+      "1": "Alt",
+      "2": "Üst"
+    },
+    "329": {
+      "1": "Alt",
+      "2": "Üst"
+    },
+    "604": {
+      "1": "Alt 4.5",
+      "2": "Üst 4.5"
+    }
   },
   "market_groups": [
     {
       "id": "mac_sonucu",
       "name_en": "Match Result",
       "name_tr": "Maç Sonucu",
-      "typeIds": [1, 3, 100, 101, 182, 183, 185, 268, 418, 461, 589, 590, 656, 791, 884, 887]
+      "typeIds": [
+        1,
+        3,
+        100,
+        101,
+        268,
+        5,
+        272,
+        342,
+        343,
+        438,
+        822,
+        414,
+        823,
+        824,
+        589,
+        590,
+        442,
+        444,
+        588,
+        182,
+        183,
+        185,
+        418,
+        461,
+        656,
+        791,
+        884,
+        887
+      ]
     },
     {
       "id": "yari_sonucu",
       "name_en": "Half Result",
       "name_tr": "Yarı Sonucu",
-      "typeIds": [8, 9, 48, 295, 296, 432, 434, 450, 452, 528, 529, 584, 585, 591, 592, 599, 801]
-    },
-    {
-      "id": "iy_mac_skoru",
-      "name_en": "HT/FT",
-      "name_tr": "İlk Yarı / Maç Skoru",
-      "typeIds": [5, 7, 416, 459, 571]
-    },
-    {
-      "id": "yari_altu",
-      "name_en": "Half Over/Under",
-      "name_tr": "Yarı Alt/Üst",
-      "typeIds": [14, 15, 155, 209]
-    },
-    {
-      "id": "gol",
-      "name_en": "Goals",
-      "name_tr": "Gol",
-      "typeIds": [38, 291, 586, 587, 866]
-    },
-    {
-      "id": "korner_kart",
-      "name_en": "Corners / Cards",
-      "name_tr": "Korner/Kart",
-      "typeIds": [216, 218, 220, 222, 224, 225, 299, 301, 327, 338, 340, 414, 424, 426, 583, 601, 602, 603, 798, 799, 800, 806, 862, 863, 864, 867, 871]
-    },
-    {
-      "id": "takim",
-      "name_en": "Team Stats",
-      "name_tr": "Takım",
-      "typeIds": [803, 805, 807, 808, 872, 874]
-    },
-    {
-      "id": "mac_skoru",
-      "name_en": "Match Score",
-      "name_tr": "Maç Skoru",
-      "typeIds": [422, 442, 444, 588, 777]
-    },
-    {
-      "id": "yari_skoru",
-      "name_en": "Half Score",
-      "name_tr": "Yarı Skoru",
-      "typeIds": [779]
-    },
-    {
-      "id": "mac_sonucu_altu",
-      "name_en": "Result + Over/Under",
-      "name_tr": "Maç Sonucu Alt/Üst",
-      "typeIds": [272, 342, 343, 438, 822, 823, 824]
-    },
-    {
-      "id": "taraf_altu",
-      "name_en": "Team Over/Under",
-      "name_tr": "Taraf Alt/Üst",
-      "typeIds": [20, 29, 207, 212, 256, 326, 328, 455, 457, 604]
+      "typeIds": [
+        7,
+        8,
+        459,
+        416,
+        9,
+        584,
+        585,
+        591,
+        592
+      ]
     },
     {
       "id": "toplam_gol",
       "name_en": "Total Goals",
       "name_tr": "Toplam Gol",
-      "typeIds": [11, 12, 13, 43, 49, 446, 804, 810, 812]
+      "typeIds": [
+        43,
+        48,
+        49,
+        432,
+        434,
+        450
+      ]
+    },
+    {
+      "id": "gol",
+      "name_en": "Goals",
+      "name_tr": "Gol",
+      "typeIds": [
+        38,
+        452,
+        599,
+        801,
+        291,
+        295,
+        296,
+        593,
+        586,
+        587,
+        214,
+        215,
+        866
+      ]
+    },
+    {
+      "id": "skor",
+      "name_en": "Score",
+      "name_tr": "Skor",
+      "typeIds": [
+        777,
+        779,
+        571,
+        422
+      ]
+    },
+    {
+      "id": "yari_altu",
+      "name_en": "Half Over/Under",
+      "name_tr": "Yarı Alt/Üst",
+      "typeIds": [
+        14,
+        15,
+        209,
+        528,
+        529
+      ]
+    },
+    {
+      "id": "mac_sonu_altu",
+      "name_en": "Match End Over/Under",
+      "name_tr": "Maç Sonu Alt/Üst",
+      "typeIds": [
+        207,
+        11,
+        12,
+        13,
+        155,
+        810,
+        812,
+        446
+      ]
+    },
+    {
+      "id": "taraf_altu",
+      "name_en": "Team Over/Under",
+      "name_tr": "Taraf Alt/Üst",
+      "typeIds": [
+        29,
+        161,
+        212,
+        326,
+        455,
+        457,
+        20,
+        164,
+        256,
+        327,
+        328,
+        329,
+        604
+      ]
+    },
+    {
+      "id": "korner_kart",
+      "name_en": "Corners / Cards",
+      "name_tr": "Korner/Kart",
+      "typeIds": [
+        338,
+        340,
+        216,
+        424,
+        583,
+        798,
+        426,
+        864,
+        799,
+        222,
+        224,
+        299,
+        800,
+        218,
+        301,
+        862,
+        863,
+        603,
+        225,
+        220,
+        867,
+        601,
+        602
+      ]
+    },
+    {
+      "id": "takim",
+      "name_en": "Team",
+      "name_tr": "Takım",
+      "typeIds": [
+        805,
+        806,
+        807,
+        808,
+        809,
+        871,
+        872,
+        873,
+        874
+      ]
     },
     {
       "id": "oyuncu",
       "name_en": "Players",
       "name_tr": "Oyuncu",
-      "typeIds": [701, 702, 703, 704, 705, 706, 707, 708, 709, 710, 711, 712, 713, 714, 717, 718, 719, 720, 721, 722, 723, 724, 725, 730, 731, 734, 737, 740, 741, 742, 743, 764, 765, 819, 837]
+      "typeIds": [
+        701,
+        702,
+        703,
+        704,
+        705,
+        706,
+        707,
+        708,
+        709,
+        722,
+        837,
+        710,
+        711,
+        712,
+        765,
+        713,
+        740,
+        714,
+        743,
+        803,
+        715,
+        744,
+        763,
+        717,
+        718,
+        719,
+        720,
+        721,
+        723,
+        724,
+        725,
+        730,
+        731,
+        734,
+        737,
+        741,
+        742,
+        764,
+        819
+      ]
     },
     {
       "id": "ozel",
-      "name_en": "Specials",
-      "name_tr": "Özel",
-      "typeIds": [187, 189, 190, 593, 716]
+      "name_en": "Match Specials",
+      "name_tr": "Maç Özel",
+      "typeIds": [
+        187,
+        189,
+        190,
+        716,
+        804
+      ]
     }
   ],
   "points": {
-    "correct_score":    2,
-    "correct_result":   3,
+    "correct_score": 2,
+    "correct_result": 3,
     "correct_fh_bonus": 2,
     "correct_sh_bonus": 2
   },
   "results_api": {
-    "provider":         "football-data",
-    "api_key":          "",
+    "provider": "football-data",
+    "api_key": "af3f06362507affd0dd0fa8f155b520f",
     "competition_code": "WC",
-    "base_url":         "https://api.football-data.org/v4"
+    "base_url": "https://api.football-data.org/v4"
+  },
+  "ko_results_api": {
+    "provider": "espn",
+    "competition_slug": "fifa.world"
   },
   "stage_redirect": {
     "group_stage_path": "/groupstage.html",

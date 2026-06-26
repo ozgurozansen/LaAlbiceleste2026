@@ -1,0 +1,64 @@
+{
+  "matches": {
+    "2960928": {
+      "name": "D. Kongo Cum. vs Özbekistan",
+      "nameEn": "DR Congo vs Uzbekistan",
+      "startTimestamp": 1782603000000,
+      "firstSeenAt": "2026-06-26T21:52:34.041970+00:00"
+    },
+    "2960935": {
+      "name": "Ürdün vs Arjantin",
+      "nameEn": "Jordan vs Argentina",
+      "startTimestamp": 1782612000000,
+      "firstSeenAt": "2026-06-26T21:52:34.041988+00:00"
+    },
+    "2960934": {
+      "name": "Yeşil Burun Adaları vs Suudi Arabistan",
+      "nameEn": "Cape Verde vs Saudi Arabia",
+      "startTimestamp": 1782518400000,
+      "firstSeenAt": "2026-06-26T21:52:34.041995+00:00"
+    },
+    "2960932": {
+      "name": "Cezayir vs Avusturya",
+      "nameEn": "Algeria vs Austria",
+      "startTimestamp": 1782612000000,
+      "firstSeenAt": "2026-06-26T21:52:34.041999+00:00"
+    },
+    "2960933": {
+      "name": "Uruguay vs İspanya",
+      "nameEn": "Uruguay vs Spain",
+      "startTimestamp": 1782518400000,
+      "firstSeenAt": "2026-06-26T21:52:34.042003+00:00"
+    },
+    "2960927": {
+      "name": "Yeni Zelanda vs Belçika",
+      "nameEn": "New Zealand vs Belgium",
+      "startTimestamp": 1782529200000,
+      "firstSeenAt": "2026-06-26T21:52:34.042007+00:00"
+    },
+    "2960931": {
+      "name": "Mısır vs İran",
+      "nameEn": "Egypt vs Iran",
+      "startTimestamp": 1782529200000,
+      "firstSeenAt": "2026-06-26T21:52:34.042011+00:00"
+    },
+    "2923135": {
+      "name": "Kolombiya vs Portekiz",
+      "nameEn": "Colombia vs Portugal",
+      "startTimestamp": 1782603000000,
+      "firstSeenAt": "2026-06-26T21:52:34.042015+00:00"
+    },
+    "2960929": {
+      "name": "Hırvatistan vs Gana",
+      "nameEn": "Croatia vs Ghana",
+      "startTimestamp": 1782594000000,
+      "firstSeenAt": "2026-06-26T21:52:34.042019+00:00"
+    },
+    "2960930": {
+      "name": "Panama vs İngiltere",
+      "nameEn": "Panama vs England",
+      "startTimestamp": 1782594000000,
+      "firstSeenAt": "2026-06-26T21:52:34.042023+00:00"
+    }
+  }
+}

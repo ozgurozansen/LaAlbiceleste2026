@@ -313,6 +313,13 @@ main { max-width: 1400px; margin: 0 auto; padding: 0 1rem 3rem; }
   color: var(--green);
   line-height: 1.3;
 }
+.prev-btn.is-bet {
+  border-color: var(--yellow);
+  background: rgba(245,158,11,.12);
+  box-shadow: 0 0 0 1px rgba(245,158,11,.3);
+}
+.prev-btn.is-bet .prev-odds { color: var(--yellow); }
+.prev-btn.is-bet .prev-lbl  { color: var(--yellow); opacity: .8; }
 
 .match-time {
   display: flex;
@@ -346,8 +353,10 @@ main { max-width: 1400px; margin: 0 auto; padding: 0 1rem 3rem; }
   border-radius: 4px;
   text-transform: uppercase;
 }
-.badge-live { background: #ef4444; color: #fff; }
-.badge-count { background: var(--surface2); color: var(--muted); border: 1px solid var(--border); }
+.badge-live     { background: #ef4444; color: #fff; }
+.badge-upcoming { background: var(--surface2); color: var(--muted); border: 1px solid var(--border); }
+.badge-finished { background: rgba(59,130,246,.15); color: #60a5fa; border: 1px solid rgba(59,130,246,.3); }
+.badge-count    { background: var(--surface2); color: var(--muted); border: 1px solid var(--border); }
 
 .match-chevron {
   color: var(--muted);
@@ -573,6 +582,361 @@ main { max-width: 1400px; margin: 0 auto; padding: 0 1rem 3rem; }
   .modal-outcomes { grid-template-columns: 1fr 1fr; }
 }
 
+/* ── Knockout Betting / Auth ─────────────────────────────────── */
+.auth-area {
+  display: flex;
+  align-items: center;
+  gap: .45rem;
+  font-size: .82rem;
+}
+.ko-action-area {
+  display: flex;
+  align-items: center;
+  gap: .4rem;
+  font-size: .82rem;
+}
+.ko-btn {
+  padding: .25rem .65rem;
+  border-radius: 4px;
+  border: 1px solid var(--yellow);
+  background: transparent;
+  color: var(--yellow);
+  cursor: pointer;
+  font-size: .78rem;
+  transition: background .15s;
+  white-space: nowrap;
+}
+.ko-btn:hover { background: rgba(245,158,11,.12); }
+.ko-credit { color: var(--yellow); font-weight: 700; }
+.ko-user {
+  display: inline-flex;
+  align-items: center;
+  gap: .3rem;
+  color: var(--text);
+  opacity: .75;
+  max-width: 120px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.ko-user-btn {
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  font-size: inherit;
+  font-family: inherit;
+}
+.ko-user-btn:hover { opacity: 1; }
+.ko-flag {
+  display: inline-block;
+  width: 18px;
+  height: auto;
+  vertical-align: middle;
+  flex-shrink: 0;
+}
+
+/* Bet badge on match cards */
+.badge-bet { background: rgba(34,197,94,.12); color: var(--green); border: 1px solid rgba(34,197,94,.3); }
+
+/* Highlighted selected outcome in market modal */
+.modal-outcome.is-bet {
+  border-color: var(--yellow) !important;
+  background: rgba(245,158,11,.1) !important;
+  box-shadow: 0 0 0 2px rgba(245,158,11,.25);
+}
+.modal-outcome.is-bet .modal-outcome-odds { color: var(--yellow); }
+
+/* Pending-bet (amount picker active) highlight */
+.modal-outcome.is-pending {
+  border-color: var(--accent) !important;
+  background: rgba(79,142,247,.08) !important;
+}
+
+/* Bet button in each outcome cell */
+.modal-bet-btn {
+  margin-top: .4rem;
+  padding: .3rem .6rem;
+  width: 100%;
+  border-radius: 4px;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--muted);
+  cursor: pointer;
+  font-size: .75rem;
+  transition: border-color .15s, color .15s, background .15s;
+  text-align: center;
+}
+.modal-bet-btn:hover { border-color: var(--yellow); color: var(--yellow); background: rgba(245,158,11,.07); }
+.modal-bet-btn.is-current { border-color: var(--yellow); color: var(--yellow); background: rgba(245,158,11,.12); }
+
+/* Amount picker (shown in modal footer when placing a bet) */
+.ko-bet-confirm {
+  margin-top: 1rem;
+  padding: .85rem;
+  background: rgba(79,142,247,.07);
+  border: 1px solid var(--accent);
+  border-radius: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: .6rem;
+}
+.ko-bet-confirm-label { font-size: .85rem; color: var(--text); }
+.ko-bet-confirm-label strong { color: var(--accent); }
+.ko-amount-row {
+  display: flex;
+  align-items: center;
+  gap: .6rem;
+}
+.ko-amount-label { font-size: .8rem; color: var(--muted); flex-shrink: 0; }
+.ko-amount-stepper {
+  display: flex;
+  align-items: center;
+  gap: .3rem;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: .2rem .35rem;
+}
+.ko-amount-btn {
+  width: 26px;
+  height: 26px;
+  border-radius: 4px;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--text);
+  cursor: pointer;
+  font-size: 1rem;
+  line-height: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background .12s;
+}
+.ko-amount-btn:hover:not(:disabled) { background: var(--surface2); border-color: var(--accent); color: var(--accent); }
+.ko-amount-btn:disabled { opacity: .35; cursor: not-allowed; }
+.ko-amount-val { font-size: 1rem; font-weight: 700; color: var(--text); min-width: 1.8rem; text-align: center; }
+.ko-payout-preview { font-size: .82rem; color: var(--green); }
+.ko-confirm-row {
+  display: flex;
+  gap: .5rem;
+}
+.ko-confirm-bet-btn {
+  flex: 1;
+  padding: .45rem;
+  border-radius: 6px;
+  border: 1px solid var(--yellow);
+  background: rgba(245,158,11,.15);
+  color: var(--yellow);
+  cursor: pointer;
+  font-size: .85rem;
+  font-weight: 600;
+  transition: background .15s;
+}
+.ko-confirm-bet-btn:hover { background: rgba(245,158,11,.25); }
+.ko-cancel-bet-btn {
+  padding: .45rem .9rem;
+  border-radius: 6px;
+  border: 1px solid var(--border);
+  background: transparent;
+  color: var(--muted);
+  cursor: pointer;
+  font-size: .85rem;
+  transition: background .15s;
+}
+.ko-cancel-bet-btn:hover { background: var(--surface2); color: var(--text); }
+
+/* Info bars at the bottom of the modal */
+.ko-login-hint {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: .75rem;
+  margin-top: 1rem;
+  padding: .6rem .85rem;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  font-size: .82rem;
+  color: var(--muted);
+}
+.ko-current-bet-info {
+  margin-top: 1rem;
+  padding: .6rem .85rem;
+  background: rgba(245,158,11,.07);
+  border: 1px solid rgba(245,158,11,.25);
+  border-radius: 6px;
+  font-size: .82rem;
+  color: var(--yellow);
+}
+
+/* Bet detail line on match cards */
+.ko-bet-preview {
+  font-size: .75rem;
+  color: var(--green);
+  padding: .25rem 1rem .3rem;
+  border-top: 1px solid rgba(34,197,94,.15);
+  background: rgba(34,197,94,.04);
+}
+
+/* ── Coupon panel ────────────────────────────────────────────── */
+.coupon-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,.45);
+  z-index: 1100;
+  cursor: pointer;
+}
+.coupon-backdrop.hidden { display: none; }
+.coupon-panel {
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  width: 320px;
+  max-width: 92vw;
+  background: var(--surface);
+  border-left: 1px solid var(--border);
+  z-index: 1101;
+  display: flex;
+  flex-direction: column;
+  transform: translateX(100%);
+  transition: transform .25s ease;
+}
+.coupon-panel:not(.hidden) { transform: translateX(0); }
+.coupon-panel.hidden { display: flex; } /* keep in DOM for transition */
+.coupon-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: .85rem 1rem;
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
+}
+.coupon-title { font-size: .95rem; font-weight: 700; }
+.coupon-close {
+  background: none;
+  border: none;
+  color: var(--muted);
+  cursor: pointer;
+  font-size: 1rem;
+  padding: .2rem .4rem;
+  border-radius: 4px;
+  transition: color .15s;
+}
+.coupon-close:hover { color: var(--text); }
+.coupon-content {
+  flex: 1;
+  overflow-y: auto;
+  padding: .5rem;
+  display: flex;
+  flex-direction: column;
+  gap: .4rem;
+}
+.coupon-empty {
+  padding: 2rem 1rem;
+  text-align: center;
+  color: var(--muted);
+  font-size: .88rem;
+}
+.coupon-bet-row {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: .65rem .8rem;
+  display: flex;
+  flex-direction: column;
+  gap: .25rem;
+}
+.coupon-bet-match { font-size: .78rem; color: var(--muted); }
+.coupon-bet-outcome { font-size: .9rem; font-weight: 600; color: var(--text); }
+.coupon-bet-meta {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: .78rem;
+}
+.coupon-bet-odds { color: var(--green); font-weight: 700; }
+.coupon-bet-amount { color: var(--yellow); }
+.coupon-bet-win { color: var(--muted); }
+.coupon-bet-delete {
+  align-self: flex-end;
+  margin-top: .2rem;
+  padding: .15rem .45rem;
+  border-radius: 4px;
+  border: 1px solid transparent;
+  background: transparent;
+  color: var(--muted);
+  cursor: pointer;
+  font-size: .75rem;
+  transition: color .15s, border-color .15s, background .15s;
+}
+.coupon-bet-delete:hover { color: var(--red); border-color: var(--red); background: rgba(239,68,68,.07); }
+.coupon-footer {
+  border-top: 1px solid var(--border);
+  padding: .85rem 1rem;
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  gap: .3rem;
+  font-size: .82rem;
+}
+.coupon-footer-row { display: flex; justify-content: space-between; }
+.coupon-footer-label { color: var(--muted); }
+.coupon-footer-val { font-weight: 700; }
+.coupon-footer-total { font-size: .9rem; }
+.coupon-footer-total .coupon-footer-val { color: var(--green); }
+
+/* Coupon button in header auth area */
+.ko-coupon-btn {
+  padding: .25rem .65rem;
+  border-radius: 4px;
+  border: 1px solid var(--green);
+  background: transparent;
+  color: var(--green);
+  cursor: pointer;
+  font-size: .78rem;
+  transition: background .15s;
+  white-space: nowrap;
+}
+.ko-coupon-btn:hover { background: rgba(34,197,94,.1); }
+
+/* Login modal form */
+.login-error-msg {
+  display: none;
+  margin-top: .5rem;
+  padding: .4rem .65rem;
+  background: rgba(239,68,68,.08);
+  border-radius: 4px;
+  color: var(--red);
+  font-size: .82rem;
+}
+.login-form {
+  display: flex;
+  flex-direction: column;
+  gap: .75rem;
+  margin-top: .9rem;
+}
+.login-field {
+  width: 100%;
+  padding: .55rem .75rem;
+  border-radius: 6px;
+  border: 1px solid var(--border);
+  background: var(--surface2);
+  color: var(--text);
+  font-size: .9rem;
+  outline: none;
+  transition: border-color .15s;
+}
+.login-field:focus { border-color: var(--accent); }
+.login-submit-btn {
+  width: 100%;
+  padding: .55rem;
+  font-size: .9rem;
+  border-radius: 6px;
+  justify-content: center;
+}
+
 /* ═══════════════════════════════════════════════════════════════════════════
    GROUP STAGE PREDICTIONS  –  groupstage.html / groupstage.js
    ═══════════════════════════════════════════════════════════════════════════ */
@@ -759,6 +1123,66 @@ main { max-width: 1400px; margin: 0 auto; padding: 0 1rem 3rem; }
   font-size: .85rem;
   color: var(--muted);
 }
+
+/* ── KO Scoreboard ───────────────────────────────────────────── */
+.ko-scoreboard {
+  max-width: 900px;
+  margin: .75rem auto .25rem;
+  padding: 0 .75rem;
+}
+.ko-sb-title {
+  font-size: .72rem;
+  font-weight: 700;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-bottom: .35rem;
+  padding-left: .1rem;
+}
+.ko-sb-rows {
+  display: flex;
+  flex-wrap: wrap;
+  gap: .35rem;
+}
+.ko-sb-row {
+  display: flex;
+  align-items: center;
+  gap: .5rem;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: .3rem .6rem;
+  font-size: .78rem;
+  min-width: 160px;
+}
+.ko-sb-row.ko-sb-me {
+  border-color: var(--green);
+  background: rgba(34,197,94,.06);
+}
+.ko-sb-rank  { color: var(--muted); font-size: .7rem; min-width: 22px; }
+.ko-sb-name  { flex: 1; font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.ko-sb-stats { font-size: .68rem; color: var(--muted); white-space: nowrap; }
+.ko-sb-credit {
+  font-weight: 700;
+  color: var(--green);
+  white-space: nowrap;
+  margin-left: .25rem;
+}
+
+/* ── Coupon bet row states ────────────────────────────────────── */
+.coupon-bet-row.is-won  { border-left: 3px solid var(--green); background: rgba(34,197,94,.06); }
+.coupon-bet-row.is-lost { border-left: 3px solid #ef4444;      background: rgba(239,68,68,.06); }
+.coupon-bet-tag {
+  display: inline-block;
+  font-size: .66rem;
+  font-weight: 700;
+  border-radius: 3px;
+  padding: .05rem .3rem;
+  margin-left: .35rem;
+  vertical-align: middle;
+}
+.coupon-bet-tag-won  { background: rgba(34,197,94,.18); color: var(--green); }
+.coupon-bet-tag-lost { background: rgba(239,68,68,.18); color: #ef4444; }
 
 /* ── Group tabs ──────────────────────────────────────────────── */
 .gs-group-tabs {
@@ -1562,4 +1986,151 @@ main { max-width: 1400px; margin: 0 auto; padding: 0 1rem 3rem; }
   .gs-locked-key   { min-width: 70px; }
   .gs-admin-actions { flex-direction: column; }
   .gs-lb-wrap      { padding: 0 .5rem; }
+}
+
+/* ── KO Tab navigation ───────────────────────────────────────────────────── */
+.ko-tab-bar {
+  top: var(--gs-header-offset);
+  z-index: 99;
+  max-width: unset;
+  padding: .45rem 1.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.ko-main-tabs {
+  gap: .35rem;
+}
+
+/* ── KO Submitted bets tab ───────────────────────────────────────────────── */
+.ko-submitted-card {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  margin-bottom: 1rem;
+  overflow: hidden;
+}
+.ko-submitted-card-header {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: .75rem;
+  padding: .6rem .85rem;
+  background: var(--surface3, var(--surface2));
+  border-bottom: 1px solid var(--border);
+}
+.ko-submitted-card-title {
+  font-weight: 700;
+  font-size: .92rem;
+}
+.ko-submitted-card-date {
+  font-size: .75rem;
+  color: var(--muted);
+  white-space: nowrap;
+}
+.ko-submitted-bets-list { padding: .35rem 0; }
+.ko-bet-row {
+  display: flex;
+  align-items: center;
+  gap: .75rem;
+  padding: .45rem .85rem;
+  border-bottom: 1px solid var(--border);
+}
+.ko-bet-row:last-child { border-bottom: none; }
+.ko-bet-user {
+  display: flex;
+  align-items: center;
+  gap: .4rem;
+  min-width: 130px;
+  flex-shrink: 0;
+}
+.ko-user-logo {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 1px solid var(--border);
+}
+.ko-user-logo-default {
+  font-size: .9rem;
+  line-height: 1;
+}
+.ko-bet-username {
+  font-weight: 600;
+  font-size: .82rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.ko-bet-detail {
+  flex: 1;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: .25rem;
+  font-size: .8rem;
+  color: var(--muted);
+  min-width: 0;
+}
+.ko-bet-market  { color: var(--text); font-weight: 500; }
+.ko-bet-outcome { color: var(--accent); font-weight: 600; }
+.ko-bet-odds    { color: var(--yellow); font-weight: 700; }
+.ko-bet-amount  { color: var(--muted); }
+.ko-bet-sep     { color: var(--border); }
+.ko-bet-status {
+  display: flex;
+  align-items: center;
+  gap: .3rem;
+  flex-shrink: 0;
+}
+.ko-bet-result  { font-size: 1rem; font-weight: 700; }
+.ko-bet-won     { color: var(--green); }
+.ko-bet-lost    { color: var(--red, #ef4444); }
+.ko-bet-pending { color: var(--muted); }
+.ko-bet-payout  { font-size: .78rem; font-weight: 700; color: var(--green); }
+.ko-bet-correct { font-size: .72rem; color: var(--muted); margin-left: .3rem; }
+.ko-result-score { font-size: .78rem; font-weight: 600; color: var(--green); margin-left: .5rem; }
+.ko-empty-msg {
+  padding: .85rem;
+  color: var(--muted);
+  font-size: .85rem;
+  text-align: center;
+}
+
+/* ── KO Full leaderboard tab ─────────────────────────────────────────────── */
+.ko-lb-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: .88rem;
+}
+.ko-lb-table thead tr {
+  background: var(--surface3, var(--surface2));
+  border-bottom: 2px solid var(--border);
+}
+.ko-lb-table th {
+  padding: .5rem .65rem;
+  text-align: left;
+  font-size: .75rem;
+  font-weight: 700;
+  letter-spacing: .05em;
+  color: var(--muted);
+  text-transform: uppercase;
+}
+.ko-lb-table td { padding: .55rem .65rem; border-bottom: 1px solid var(--border); }
+.ko-lb-table tbody tr:last-child td { border-bottom: none; }
+.ko-lb-table tbody tr:hover { background: var(--surface3, rgba(255,255,255,.03)); }
+.ko-lb-me td { background: rgba(34,197,94,.06) !important; }
+.ko-lb-rank { font-size: .85rem; width: 36px; text-align: center; }
+.ko-lb-user {
+  display: flex;
+  align-items: center;
+  gap: .45rem;
+}
+.ko-lb-credit { font-weight: 700; color: var(--green); white-space: nowrap; }
+.ko-lb-wl     { color: var(--muted); font-size: .8rem; white-space: nowrap; }
+
+@media (max-width: 480px) {
+  .ko-bet-row { flex-wrap: wrap; gap: .4rem; }
+  .ko-bet-user { min-width: 100%; }
+  .ko-submitted-card-header { flex-direction: column; gap: .2rem; }
 }

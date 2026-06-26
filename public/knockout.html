@@ -4,16 +4,19 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>LaAlbiceleste2026</title>
-  <link rel="stylesheet" href="style.css?v=20260610-1" />
+  <link rel="stylesheet" href="style.css?v=20260625-4" />
 </head>
 <body>
   <header>
     <div class="header-inner">
       <div class="logo">
         <a href="/"><img src="img/logo-la2026.png" alt="LaAlbiceleste 2026" class="header-logo" /></a>
+        <span class="gs-header-sep">›</span>
+        <span class="gs-page-title" data-tr="Eleme Aşaması Bahisleri" data-en="Knockout Stage Bets">Eleme Aşaması Bahisleri</span>
       </div>
       <div class="header-right">
         <div class="header-meta" id="cache-info"></div>
+        <div id="auth-area" class="auth-area"></div>
         <div class="lang-toggle">
           <button class="lang-btn active" data-lang="tr">TR</button>
           <button class="lang-btn" data-lang="en">EN</button>
@@ -22,27 +25,41 @@
     </div>
   </header>
 
-  <div class="controls">
-    <div class="search-row">
-      <input type="text" id="search" placeholder="Search team..." />
-      <select id="date-filter">
-        <option value="">All dates</option>
-      </select>
-      <button id="btn-refresh">↻ Refresh</button>
-      <button id="btn-toggle-filters" title="Toggle filters">▾ Filters</button>
-    </div>
-    <div id="filters-panel" class="filters-panel">
-      <div id="sport-tabs" class="sport-tabs"></div>
-      <div id="league-filter" class="league-filter hidden"></div>
+  <div class="gs-controls ko-tab-bar">
+    <nav class="ko-main-tabs gs-main-tabs">
+      <button class="gs-tab active" data-tab="bets" data-tr="Bahis" data-en="Place Bets">Bahis</button>
+      <button class="gs-tab" data-tab="submitted" data-tr="Girilen Bahisler" data-en="Submitted Bets">Girilen Bahisler</button>
+      <button class="gs-tab" data-tab="leaderboard" data-tr="Sıralama" data-en="Leaderboard">Sıralama</button>
+    </nav>
+    <div id="ko-action-area" class="ko-action-area"></div>
+  </div>
+
+  <!-- ── Tab 1: Place Bets ───────────────────────────────────────────────── -->
+  <div id="ko-tab-bets" class="gs-tab-content">
+    <main>
+      <div id="summary-bar" class="summary-bar"></div>
+      <div id="matches-list" class="matches-list"></div>
+      <div id="loading" class="loading hidden" data-tr="Yükleniyor..." data-en="Loading...">Yükleniyor...</div>
+      <div id="error-msg" class="error-msg hidden"></div>
+    </main>
+  </div>
+
+  <!-- ── Tab 2: Submitted Bets ──────────────────────────────────────────── -->
+  <div id="ko-tab-submitted" class="gs-tab-content hidden">
+    <div class="gs-lb-wrap">
+      <h2 class="gs-section-title" id="ko-submitted-title" data-tr="Girilen Bahisler" data-en="Submitted Bets">Girilen Bahisler</h2>
+      <div id="ko-submitted-loading" class="loading hidden" data-tr="Yükleniyor..." data-en="Loading...">Yükleniyor...</div>
+      <div id="ko-submitted-bets"></div>
     </div>
   </div>
 
-  <main>
-    <div id="summary-bar" class="summary-bar"></div>
-    <div id="matches-list" class="matches-list"></div>
-    <div id="loading" class="loading hidden">Loading...</div>
-    <div id="error-msg" class="error-msg hidden"></div>
-  </main>
+  <!-- ── Tab 3: Leaderboard ─────────────────────────────────────────────── -->
+  <div id="ko-tab-leaderboard" class="gs-tab-content hidden">
+    <div class="gs-lb-wrap">
+      <h2 class="gs-section-title" id="ko-leaderboard-title" data-tr="Sıralama" data-en="Leaderboard">Sıralama</h2>
+      <div id="ko-leaderboard-full"></div>
+    </div>
+  </div>
 
   <!-- Market detail modal -->
   <div id="modal" class="modal hidden" role="dialog" aria-modal="true">
@@ -53,6 +70,54 @@
     </div>
   </div>
 
-  <script src="app.js?v=20260610-1"></script>
+  <!-- Coupon panel backdrop -->
+  <div id="coupon-backdrop" class="coupon-backdrop hidden"></div>
+
+  <!-- Coupon panel (slide-in from right) -->
+  <div id="coupon-panel" class="coupon-panel hidden" aria-label="Betting coupon">
+    <div class="coupon-header">
+      <span class="coupon-title" data-tr="Kuponum" data-en="My Bets">Kuponum</span>
+      <button class="coupon-close" id="coupon-close" aria-label="Close coupon">✕</button>
+    </div>
+    <div id="coupon-content" class="coupon-content"></div>
+  </div>
+
+  <!-- Login modal -->
+  <div id="login-modal" class="modal hidden" role="dialog" aria-modal="true">
+    <div class="modal-backdrop" id="login-backdrop"></div>
+    <div class="modal-box" style="max-width:360px">
+      <button class="modal-close" id="login-modal-close" aria-label="Close">✕</button>
+      <div class="modal-match-title" data-tr="Giriş Yap" data-en="Login to Bet">Giriş Yap</div>
+      <div id="login-error" class="login-error-msg"></div>
+      <div class="login-form">
+        <input type="text"     id="login-username" class="login-field" data-tr-ph="Kullanıcı adı" data-en-ph="Username" placeholder="Kullanıcı adı" autocomplete="username" />
+        <input type="password" id="login-password" class="login-field" data-tr-ph="Şifre" data-en-ph="Password" placeholder="Şifre" autocomplete="current-password" />
+        <button id="login-submit" class="ko-btn login-submit-btn" data-tr="Giriş Yap" data-en="Login">Giriş Yap</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Profile modal -->
+  <div id="ko-profile-modal" class="modal hidden" role="dialog" aria-modal="true">
+    <div class="modal-backdrop" id="ko-profile-backdrop"></div>
+    <div class="modal-box" style="max-width:380px">
+      <button class="modal-close" id="ko-profile-modal-close" aria-label="Close">✕</button>
+      <div class="modal-match-title" data-tr="Profil Ayarları" data-en="Profile Settings">Profil Ayarları</div>
+      <form id="ko-profile-form" class="login-form" style="gap:.75rem">
+        <div style="font-size:.78rem;color:var(--muted)" data-tr="Değişiklikleri kaydetmek için mevcut şifrenizi girin" data-en="Enter your current password to save changes">Değişiklikleri kaydetmek için mevcut şifrenizi girin</div>
+        <input type="password" id="ko-profile-current-pw" class="login-field" data-tr-ph="Mevcut Şifre" data-en-ph="Current Password" placeholder="Mevcut Şifre" autocomplete="current-password" required />
+        <input type="password" id="ko-profile-new-pw" class="login-field" data-tr-ph="Yeni Şifre (opsiyonel)" data-en-ph="New Password (optional)" placeholder="Yeni Şifre (opsiyonel)" autocomplete="new-password" />
+        <select id="ko-profile-team" class="login-field"></select>
+        <label style="font-size:.82rem;color:var(--muted);cursor:pointer">
+          <span data-tr="Logo" data-en="Logo">Logo</span>
+          <input type="file" id="ko-profile-logo" accept="image/*" style="display:block;margin-top:.3rem" />
+        </label>
+        <div id="ko-profile-error" class="login-error-msg hidden"></div>
+        <button type="submit" class="ko-btn login-submit-btn" data-tr="Kaydet" data-en="Save">Kaydet</button>
+      </form>
+    </div>
+  </div>
+
+  <script src="app.js?v=20260625-4"></script>
 </body>
 </html>

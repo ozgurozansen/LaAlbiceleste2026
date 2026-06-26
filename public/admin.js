@@ -439,12 +439,74 @@ document.querySelectorAll('.adm-filter-btn').forEach(btn => {
   });
 });
 
+// ── Knockout ESPN fetch ───────────────────────────────────────────────────────
+async function koFetchResults() {
+  const btn = $('adm-ko-fetch-btn');
+  const msg = $('adm-ko-fetch-msg');
+  btn.disabled = true;
+  btn.textContent = '⏳ Çekiliyor...';
+  msg.textContent = '';
+  msg.style.color = '#aaa';
+  try {
+    const d = await api('POST', '/api/knockout/admin/fetch-results', { token: S.token });
+    if (d.ok) {
+      const nf = d.fetched.length;
+      const ns = d.settled.length;
+      if (nf === 0) {
+        msg.textContent = 'Yeni sonuç bulunamadı.';
+        msg.style.color = '#888';
+      } else {
+        msg.textContent = `✓ ${nf} maç çekildi, ${ns} maç yerleşti.`;
+        msg.style.color = '#2ecc71';
+        loadData();
+      }
+    } else {
+      msg.textContent = d.error || 'Hata oluştu.';
+      msg.style.color = '#e74c3c';
+    }
+  } catch (e) {
+    msg.textContent = 'Bağlantı hatası.';
+    msg.style.color = '#e74c3c';
+  }
+  btn.disabled = false;
+  btn.textContent = '⬇ KO Sonuçlarını Çek';
+}
+
+// ── Export group stage points as KO starting credits ─────────────────────────
+async function gsExportCredits() {
+  const btn = $('adm-gs-export-btn');
+  const msg = $('adm-gs-export-msg');
+  if (!confirm('Grup aşaması puanları KO başlangıç kredisi olarak aktarılacak. Onaylıyor musunuz?')) return;
+  btn.disabled = true;
+  btn.textContent = '⏳ Aktarılıyor...';
+  msg.textContent = '';
+  msg.style.color = '#aaa';
+  try {
+    const d = await api('POST', '/api/knockout/admin/export-gs-credits', { token: S.token });
+    if (d.ok) {
+      const n = Object.keys(d.exported).length;
+      msg.textContent = `✓ ${n} kullanıcı güncellendi.`;
+      msg.style.color = '#f59e0b';
+    } else {
+      msg.textContent = d.error || 'Hata oluştu.';
+      msg.style.color = '#e74c3c';
+    }
+  } catch (e) {
+    msg.textContent = 'Bağlantı hatası.';
+    msg.style.color = '#e74c3c';
+  }
+  btn.disabled = false;
+  btn.textContent = '🏆 GS → KO Kredi';
+}
+
 // ── Show panel ────────────────────────────────────────────────────────────────
 function showPanel() {
   $('adm-login-screen').classList.add('hidden');
   $('adm-panel').classList.remove('hidden');
   $('adm-user-badge').textContent = `👤 ${S.user.displayName || S.user.username}`;
   $('adm-logout-btn').addEventListener('click', doLogout);
+  $('adm-ko-fetch-btn').addEventListener('click', koFetchResults);
+  $('adm-gs-export-btn').addEventListener('click', gsExportCredits);
   _acSetup();
   loadData();
 }

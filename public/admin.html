@@ -89,6 +89,13 @@
     .adm-clear-btn  { padding:.45rem 1rem; background:transparent; border:1px solid #7f1d1d;
                       border-radius:6px; color:#f87171; font-size:.85rem; cursor:pointer; }
     .adm-clear-btn:hover { background:#7f1d1d; color:#fff; }
+
+    .adm-ko-fetch-btn { padding:.35rem .9rem; background:#1a3a2a; border:1px solid #27ae60;
+                        border-radius:6px; color:#2ecc71; font-size:.82rem; cursor:pointer;
+                        white-space:nowrap; }
+    .adm-ko-fetch-btn:hover:not(:disabled) { background:#27ae60; color:#fff; }
+    .adm-ko-fetch-btn:disabled { opacity:.45; cursor:not-allowed; }
+    .adm-ko-fetch-msg { font-size:.78rem; white-space:nowrap; }
   </style>
 </head>
 <body>
@@ -129,6 +136,10 @@
     </div>
     <div class="adm-header-right">
       <span id="adm-user-badge" class="adm-user-badge"></span>
+      <button id="adm-ko-fetch-btn" class="adm-ko-fetch-btn" title="Fetch knockout results from ESPN and settle bets">⬇ KO Sonuçlarını Çek</button>
+      <span id="adm-ko-fetch-msg" class="adm-ko-fetch-msg"></span>
+      <button id="adm-gs-export-btn" class="adm-ko-fetch-btn" style="border-color:#f59e0b;color:#f59e0b" title="Export group stage points as knockout starting credits">🏆 GS → KO Kredi</button>
+      <span id="adm-gs-export-msg" class="adm-ko-fetch-msg"></span>
       <button id="adm-logout-btn" class="adm-logout-btn">Çıkış</button>
     </div>
   </div>

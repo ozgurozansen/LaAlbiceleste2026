@@ -399,6 +399,206 @@
       "shBonusAnswer": "Trézéguet",
       "scored": true,
       "enteredAt": "2026-06-22T07:41:15.274542+00:00"
+    },
+    "56": {
+      "score": {
+        "home": 2,
+        "away": 0
+      },
+      "fhBonusAnswer": "Stefan Posch",
+      "shBonusAnswer": "Leandro Paredes",
+      "scored": true,
+      "enteredAt": "2026-06-22T20:59:35.802784+00:00"
+    },
+    "50": {
+      "score": {
+        "home": 3,
+        "away": 0
+      },
+      "fhBonusAnswer": "14",
+      "shBonusAnswer": null,
+      "scored": true,
+      "enteredAt": "2026-06-23T06:44:30.830844+00:00"
+    },
+    "51": {
+      "score": {
+        "home": 3,
+        "away": 2
+      },
+      "fhBonusAnswer": null,
+      "shBonusAnswer": "Erling Haaland",
+      "scored": true,
+      "enteredAt": "2026-06-23T06:46:19.068772+00:00"
+    },
+    "57": {
+      "score": {
+        "home": 1,
+        "away": 2
+      },
+      "fhBonusAnswer": "36",
+      "shBonusAnswer": "Husam Abu Dahab",
+      "scored": true,
+      "enteredAt": "2026-06-23T06:48:07.371592+00:00"
+    },
+    "62": {
+      "score": {
+        "home": 5,
+        "away": 0
+      },
+      "fhBonusAnswer": "39",
+      "shBonusAnswer": "46",
+      "scored": true,
+      "enteredAt": "2026-06-23T19:01:46.580841+00:00"
+    },
+    "68": {
+      "score": {
+        "home": 0,
+        "away": 0
+      },
+      "fhBonusAnswer": null,
+      "shBonusAnswer": "95",
+      "scored": true,
+      "enteredAt": "2026-06-23T22:09:52.455576+00:00"
+    },
+    "69": {
+      "score": {
+        "home": 0,
+        "away": 1
+      },
+      "fhBonusAnswer": null,
+      "shBonusAnswer": "Ante Budimir",
+      "scored": true,
+      "enteredAt": "2026-06-24T06:22:18.763448+00:00"
+    },
+    "63": {
+      "score": {
+        "home": 1,
+        "away": 0
+      },
+      "fhBonusAnswer": null,
+      "shBonusAnswer": "82",
+      "scored": true,
+      "enteredAt": "2026-06-24T06:23:23.605507+00:00"
+    },
+    "10": {
+      "score": {
+        "home": 2,
+        "away": 1
+      },
+      "fhBonusAnswer": "Granit Xhaka ( captain )",
+      "shBonusAnswer": "85",
+      "scored": true,
+      "enteredAt": "2026-06-24T20:58:54.131449+00:00"
+    },
+    "11": {
+      "score": {
+        "home": 3,
+        "away": 1
+      },
+      "fhBonusAnswer": null,
+      "shBonusAnswer": "6",
+      "scored": true,
+      "enteredAt": "2026-06-24T21:00:12.324468+00:00"
+    },
+    "16": {
+      "score": {
+        "home": 0,
+        "away": 3
+      },
+      "fhBonusAnswer": null,
+      "shBonusAnswer": "91",
+      "scored": true,
+      "enteredAt": "2026-06-25T08:12:19.025577+00:00"
+    },
+    "17": {
+      "score": {
+        "home": 4,
+        "away": 2
+      },
+      "fhBonusAnswer": null,
+      "shBonusAnswer": "Achraf Hakimi ( captain )",
+      "scored": true,
+      "enteredAt": "2026-06-25T08:14:10.543610+00:00"
+    },
+    "4": {
+      "score": {
+        "home": 0,
+        "away": 3
+      },
+      "fhBonusAnswer": null,
+      "shBonusAnswer": "Álvaro Fidalgo",
+      "scored": true,
+      "enteredAt": "2026-06-25T08:16:34.183842+00:00"
+    },
+    "5": {
+      "score": {
+        "home": 1,
+        "away": 0
+      },
+      "fhBonusAnswer": null,
+      "shBonusAnswer": "46",
+      "scored": true,
+      "enteredAt": "2026-06-25T08:17:24.573599+00:00"
+    },
+    "29": {
+      "score": {
+        "home": 2,
+        "away": 1
+      },
+      "fhBonusAnswer": "Aleksandar Pavlović",
+      "shBonusAnswer": "46",
+      "scored": true,
+      "enteredAt": "2026-06-25T22:54:38.268900+00:00"
+    },
+    "28": {
+      "score": {
+        "home": 0,
+        "away": 2
+      },
+      "fhBonusAnswer": "7",
+      "shBonusAnswer": "6",
+      "scored": true,
+      "enteredAt": "2026-06-25T22:55:44.549017+00:00"
+    },
+    "34": {
+      "score": {
+        "home": 1,
+        "away": 1
+      },
+      "fhBonusAnswer": null,
+      "shBonusAnswer": "Anthony Elanga",
+      "scored": true,
+      "enteredAt": "2026-06-26T06:13:06.954315+00:00"
+    },
+    "35": {
+      "score": {
+        "home": 1,
+        "away": 3
+      },
+      "fhBonusAnswer": "Brian Brobbey",
+      "shBonusAnswer": "67",
+      "scored": true,
+      "enteredAt": "2026-06-26T06:14:33.007754+00:00"
+    },
+    "22": {
+      "score": {
+        "home": 3,
+        "away": 2
+      },
+      "fhBonusAnswer": "Auston Trusty",
+      "shBonusAnswer": null,
+      "scored": true,
+      "enteredAt": "2026-06-26T06:15:21.860480+00:00"
+    },
+    "23": {
+      "score": {
+        "home": 0,
+        "away": 0
+      },
+      "fhBonusAnswer": null,
+      "shBonusAnswer": "Diego Gómez",
+      "scored": true,
+      "enteredAt": "2026-06-26T06:16:29.948903+00:00"
     }
   }
 }

@@ -64,6 +64,10 @@
         "/^python -c \"\nimport urllib\\.request, json\nurl = 'https://bulten\\.nesine\\.com/api/bulten/getprebultenfull'\nreq = urllib\\.request\\.Request\\(url, headers=\\{'User-Agent': 'Mozilla/5\\.0'\\}\\)\nwith urllib\\.request\\.urlopen\\(req, timeout=15\\) as r:\n    data = json\\.loads\\(r\\.read\\(\\)\\)\nleagues = data\\.get\\('sg', \\{\\}\\)\\.get\\('LA', \\[\\]\\)\nfor l in leagues:\n    name = l\\.get\\('N', ''\\)\n    if 'dunya' in name\\.lower\\(\\) or 'world' in name\\.lower\\(\\) or 'copa' in name\\.lower\\(\\) or 'dünya' in name\\.lower\\(\\):\n        print\\(l\\.get\\('LID'\\), name\\)\n\"\n$/": {
             "approve": true,
             "matchCommandLine": true
+        },
+        "/^python server\\.py 8000$/": {
+            "approve": true,
+            "matchCommandLine": true
         }
     },
     "python.defaultInterpreterPath": "${workspaceFolder}/.venv/Scripts/python.exe"

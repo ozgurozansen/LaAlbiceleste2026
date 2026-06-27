@@ -47,6 +47,7 @@ let koMaxBet     = 8;
 let koOpenModal   = null;    // { matchId, marketId } currently-open market modal
 let koPendingBet  = null;    // { match, market, outcome, amount } – amount picker in progress
 let koLeaderboard = [];      // [{username, displayName, credit, bets, won, lost}]
+let liveScores    = {};      // { matchId: {homeScore, awayScore, clock, period} }
 
 /* ── DOM refs ───────────────────────────────────────────────── */
 const searchEl     = document.getElementById('search');
@@ -67,6 +68,13 @@ const modalClose   = document.getElementById('modal-close');
 const modalBdrop   = document.getElementById('modal-backdrop');
 
 /* ── Fetch helpers ───────────────────────────────────────────── */
+async function loadLiveScores() {
+  try {
+    const res = await fetch('/api/knockout/live-scores');
+    if (res.ok) liveScores = (await res.json()).scores || {};
+  } catch (_) {}
+}
+
 async function loadMatches({ silent = false } = {}) {
   if (!silent) { showLoading(true); hideError(); }
 
@@ -384,16 +392,23 @@ function buildMatchCard(match) {
         </div>
         <div class="match-teams">
           <div class="team-name">${esc(lang === 'en' ? (match.homeTeamEn || match.homeTeam) : match.homeTeam)}</div>
-          <div class="vs-sep">vs</div>
+          ${(() => {
+            const ls = liveScores[String(match.id)];
+            return ls
+              ? `<div class="vs-sep live-score">${ls.homeScore} – ${ls.awayScore}</div>`
+              : `<div class="vs-sep">vs</div>`;
+          })()}
           <div class="team-name">${esc(lang === 'en' ? (match.awayTeamEn || match.awayTeam) : match.awayTeam)}</div>
         </div>
         <div class="match-badges">
           ${(() => {
-            const st = match.status || (match.isLive ? 'live' : 'upcoming');
+            const st  = match.status || (match.isLive ? 'live' : 'upcoming');
+            const ls  = liveScores[String(match.id)];
             const cls = st === 'live' ? 'badge-live' : st === 'finished' ? 'badge-finished' : 'badge-upcoming';
-            const lbl = st === 'live' ? (lang === 'tr' ? 'Canlı' : 'Live')
-                      : st === 'finished' ? (lang === 'tr' ? 'Bitti' : 'Finished')
-                      : (lang === 'tr' ? 'Yaklaşan' : 'Upcoming');
+            const lbl = st === 'live'
+              ? `${lang === 'tr' ? 'Canlı' : 'Live'}${ls && ls.clock ? ' ' + ls.clock : ''}`
+              : st === 'finished' ? (lang === 'tr' ? 'Bitti' : 'Finished')
+              : (lang === 'tr' ? 'Yaklaşan' : 'Upcoming');
             return `<span class="badge ${cls}">${lbl}</span>`;
           })()}
           ${(koUser && koBets[String(match.id)]) ? '<span class="badge badge-bet">✓ Bet</span>' : ''}
@@ -662,6 +677,7 @@ async function boot() {
   } catch (_) { /* config load failure is non-fatal */ }
   await koCheckAuth();
   loadKoLeaderboard();
+  loadLiveScores();
   loadMatches();
 }
 boot();
@@ -670,7 +686,7 @@ boot();
 let _pollTimer = null;
 function _startPoll() {
   if (_pollTimer) return;
-  _pollTimer = setInterval(() => loadMatches({ silent: true }), 60_000);
+  _pollTimer = setInterval(() => { loadLiveScores(); loadMatches({ silent: true }); }, 60_000);
 }
 function _stopPoll() {
   clearInterval(_pollTimer);
@@ -1223,7 +1239,11 @@ async function loadKoLeaderboard() {
   } catch (_) {}
 }
 
-function _koUserLogo(logoData) {
+function _koUserLogo(logoData, username) {
+  if (username) {
+    // Use avatar endpoint — browser caches per user, avoids repeating base64
+    return `<img src="/api/user/avatar/${esc(username)}" alt="" class="ko-user-logo" loading="lazy" onerror="this.replaceWith(Object.assign(document.createElement('span'),{className:'ko-user-logo-default',textContent:'👤'}))">`;
+  }
   if (!logoData) return '<span class="ko-user-logo-default">👤</span>';
   return `<img src="${esc(logoData)}" alt="" class="ko-user-logo" loading="lazy">`;
 }
@@ -1241,7 +1261,7 @@ function renderKoLeaderboardFull() {
       <td class="ko-lb-rank">${medals[i] || `${i + 1}.`}</td>
       <td class="ko-lb-name">
         <span class="ko-lb-user">
-          ${_koUserLogo(u.logoData)}
+          ${u.hasLogo ? _koUserLogo(null, u.username) : '<span class="ko-user-logo-default">👤</span>'}
           <span>${esc(u.displayName || u.username)}</span>
           ${_koFlag(u.supportedTeam)}
         </span>
@@ -1527,7 +1547,7 @@ function renderAllKoBets() {
           return `
             <div class="ko-bet-row">
               <div class="ko-bet-user">
-                ${_koUserLogo(b.logoData)}
+                ${b.hasLogo ? _koUserLogo(null, b.username) : '<span class="ko-user-logo-default">👤</span>'}
                 <span class="ko-bet-username">${esc(b.displayName || b.username)}</span>
                 ${_koFlag(b.supportedTeam)}
               </div>
@@ -1548,7 +1568,12 @@ function renderAllKoBets() {
     return `
       <div class="ko-submitted-card">
         <div class="ko-submitted-card-header">
-          <div class="ko-submitted-card-title">${esc((lang === 'en' && m.nameEn) ? m.nameEn : (m.name || mId))}${resultScore ? `<span class="ko-result-score">${esc(resultScore)}</span>` : ''}</div>
+          <div class="ko-submitted-card-title">
+            ${esc((lang === 'en' && m.nameEn) ? m.nameEn : (m.name || mId))}
+            ${resultScore ? `<span class="ko-result-score">${esc(resultScore)}</span>`
+              : liveScores[mId] ? `<span class="ko-result-score live-score">🔴 ${liveScores[mId].homeScore} – ${liveScores[mId].awayScore}${liveScores[mId].clock ? ' · ' + liveScores[mId].clock : ''}</span>`
+              : ''}
+          </div>
           <div class="ko-submitted-card-date">${esc(dateLabel)}</div>
         </div>
         <div class="ko-submitted-bets-list">${betRows}</div>

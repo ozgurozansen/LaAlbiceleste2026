@@ -1252,34 +1252,41 @@ def _ko_fetch_match_result_for_log_entry(minfo):
     t2 = parts[1].strip().lower()
 
     # ── Step 1: scoreboard → find event_id by date + fuzzy team name ─────────
-    try:
-        sb = _ko_espn_get(f"{base}/scoreboard?dates={date_str}&limit=50")
-    except Exception as exc:
-        print(f"[ko-espn] scoreboard {date_str}: {exc}")
-        return None
+    # ESPN uses US Eastern time so a match at 00:xx UTC may appear under the previous date.
+    prev_date_str = (dt - timedelta(days=1)).strftime("%Y%m%d")
+    dates_to_try  = [date_str, prev_date_str]
 
     event_id       = None
     finished_lower = {"full time", "after extra time", "after penalties", "final"}
 
-    for ev in sb.get("events", []):
-        comps  = ev.get("competitions") or [{}]
-        status = (comps[0].get("status") or {}).get("type", {}).get("description", "").lower()
-        if not any(s in status for s in finished_lower):
+    def _norm(s):
+        return unicodedata.normalize("NFKD", s).encode("ascii", "ignore").decode().lower()
+
+    for try_date in dates_to_try:
+        try:
+            sb = _ko_espn_get(f"{base}/scoreboard?dates={try_date}&limit=50")
+        except Exception as exc:
+            print(f"[ko-espn] scoreboard {try_date}: {exc}")
             continue
-        teams = comps[0].get("competitors") or []
-        def _norm(s):
-            return unicodedata.normalize("NFKD", s).encode("ascii", "ignore").decode().lower()
-        names = {t.get("homeAway"): _norm((t.get("team") or {}).get("displayName", ""))
-                 for t in teams}
-        hn = names.get("home", "")
-        an = names.get("away", "")
-        t1n, t2n = _norm(t1), _norm(t2)
-        if (t1n in hn or hn in t1n) and (t2n in an or an in t2n):
-            event_id = ev.get("id")
+        for ev in sb.get("events", []):
+            comps  = ev.get("competitions") or [{}]
+            status = (comps[0].get("status") or {}).get("type", {}).get("description", "").lower()
+            if not any(s in status for s in finished_lower):
+                continue
+            teams = comps[0].get("competitors") or []
+            names = {t.get("homeAway"): _norm((t.get("team") or {}).get("displayName", ""))
+                     for t in teams}
+            hn = names.get("home", "")
+            an = names.get("away", "")
+            t1n, t2n = _norm(t1), _norm(t2)
+            if (t1n in hn or hn in t1n) and (t2n in an or an in t2n):
+                event_id = ev.get("id")
+                break
+        if event_id:
             break
 
     if not event_id:
-        print(f"[ko-espn] match not found: '{t1}' vs '{t2}' on {date_str}")
+        print(f"[ko-espn] match not found: '{t1}' vs '{t2}' on {date_str}/{prev_date_str}")
         return None
 
     # ── Step 2: full summary — one call for all data ──────────────────────────
@@ -1384,7 +1391,7 @@ def _ko_settle_match_bets(match_id, result):
 
 
 def _ko_check_and_settle_finished_matches():
-    """Fetch results and settle bets for each match that ended >3.5h ago."""
+    """Fetch results and settle bets for each match that started >105 minutes ago."""
     now_ts = time.time()
     log    = _jload(_KO_MATCH_LOG_FILE, {"matches": {}})
 
@@ -1401,7 +1408,7 @@ def _ko_check_and_settle_finished_matches():
             ts_sec = ts_f / 1000.0 if ts_f > 1e10 else ts_f
         except (ValueError, TypeError):
             continue
-        if now_ts < ts_sec + 3.5 * 3600:
+        if now_ts < ts_sec + 105 * 60:
             continue
 
         result = _ko_fetch_match_result_for_log_entry(minfo)
@@ -1425,12 +1432,82 @@ def _ko_check_and_settle_finished_matches():
 
 _ko_last_settle_ts   = 0.0
 _ko_settle_ts_lock   = threading.Lock()
+_live_scores_cache   = {"data": None, "fetched_at": 0}
+_live_scores_lock    = threading.Lock()
+
+
+def _get_live_scores():
+    """Return current live scores from ESPN keyed by Nesine match ID. Cached 60s."""
+    with _live_scores_lock:
+        now = time.time()
+        if _live_scores_cache["data"] is not None and now - _live_scores_cache["fetched_at"] < 60:
+            return _live_scores_cache["data"]
+
+    cfg  = CONFIG.get("ko_results_api", {})
+    slug = cfg.get("competition_slug", "fifa.world")
+    base = f"https://site.api.espn.com/apis/site/v2/sports/soccer/{slug}"
+
+    log    = _jload(_KO_MATCH_LOG_FILE, {"matches": {}})
+    now_ts = time.time()
+
+    candidates = {
+        mid: minfo for mid, minfo in log["matches"].items()
+        if (ts := minfo.get("startTimestamp")) and
+           (float(ts) / 1000.0 if float(ts) > 1e10 else float(ts)) <= now_ts
+    }
+
+    scores = {}
+    if candidates:
+        today  = datetime.now(timezone.utc)
+        espn_events = []
+        for d in [today.strftime("%Y%m%d"), (today - timedelta(days=1)).strftime("%Y%m%d")]:
+            try:
+                espn_events.extend(_ko_espn_get(f"{base}/scoreboard?dates={d}&limit=50").get("events", []))
+            except Exception:
+                pass
+
+        def _norm(s):
+            return unicodedata.normalize("NFKD", s).encode("ascii", "ignore").decode().lower()
+
+        live_statuses = {"in progress", "halftime"}
+
+        for mid, minfo in candidates.items():
+            parts = _match_name_en(minfo).split(" vs ", 1)
+            if len(parts) != 2:
+                continue
+            t1n, t2n = _norm(parts[0].strip()), _norm(parts[1].strip())
+            for ev in espn_events:
+                comp   = (ev.get("competitions") or [{}])[0]
+                st     = (comp.get("status") or {})
+                st_desc = st.get("type", {}).get("description", "").lower()
+                if not any(s in st_desc for s in live_statuses):
+                    continue
+                teams  = comp.get("competitors") or []
+                tnames = {t.get("homeAway"): _norm((t.get("team") or {}).get("displayName", "")) for t in teams}
+                if not ((t1n in tnames.get("home","") or tnames.get("home","") in t1n) and
+                        (t2n in tnames.get("away","") or tnames.get("away","") in t2n)):
+                    continue
+                ht = next((t for t in teams if t.get("homeAway") == "home"), {})
+                at = next((t for t in teams if t.get("homeAway") == "away"), {})
+                scores[mid] = {
+                    "homeScore": int(ht.get("score") or 0),
+                    "awayScore": int(at.get("score") or 0),
+                    "clock":     st.get("displayClock", ""),
+                    "period":    st.get("type", {}).get("shortDetail", st_desc),
+                }
+                break
+
+    with _live_scores_lock:
+        _live_scores_cache["data"]       = scores
+        _live_scores_cache["fetched_at"] = time.time()
+    return scores
+
 
 def _ko_maybe_settle():
-    """Throttled wrapper — runs at most once every 2 minutes."""
+    """Throttled wrapper — runs at most once every 5 minutes."""
     global _ko_last_settle_ts
     with _ko_settle_ts_lock:
-        if time.time() - _ko_last_settle_ts < 120:
+        if time.time() - _ko_last_settle_ts < 300:
             return
         _ko_last_settle_ts = time.time()
     _ko_check_and_settle_finished_matches()
@@ -1446,7 +1523,7 @@ def _ko_compute_leaderboard():
             "username":      uname,
             "displayName":   uinfo.get("displayName", uname),
             "supportedTeam": uinfo.get("supportedTeam"),
-            "logoData":      uinfo.get("logoData"),
+            "hasLogo":       bool(uinfo.get("logoData")),
             "credit":        round(credit, 2),
             "bets":          len(bets_all),
             "won":           sum(1 for b in bets_all.values() if b.get("won") is True),
@@ -2051,6 +2128,27 @@ class Handler(BaseHTTPRequestHandler):
                 self.send_json(200, load_config())
                 return
 
+            # ── /api/user/avatar/<username> ───────────────────────────────
+            if path.startswith("/api/user/avatar/"):
+                uname = path[len("/api/user/avatar/"):]
+                users_data = _jload(_USERS_FILE, {"users": {}})
+                logo = users_data.get("users", {}).get(uname, {}).get("logoData")
+                if logo and isinstance(logo, str) and logo.startswith("data:image/") and "," in logo:
+                    header, b64 = logo.split(",", 1)
+                    mime = header.split(";")[0].replace("data:", "") or "image/png"
+                    import base64 as _b64
+                    img_bytes = _b64.b64decode(b64)
+                    self.send_response(200)
+                    self.send_header("Content-Type", mime)
+                    self.send_header("Content-Length", str(len(img_bytes)))
+                    self.send_header("Cache-Control", "public, max-age=86400")
+                    self.end_headers()
+                    self.wfile.write(img_bytes)
+                else:
+                    self.send_response(404)
+                    self.end_headers()
+                return
+
             # ── /api/client-context ───────────────────────────────────────
             if path == "/api/client-context":
                 client_ip = _extract_client_ip(self)
@@ -2111,6 +2209,11 @@ class Handler(BaseHTTPRequestHandler):
                 })
                 return
 
+            # ── /api/knockout/live-scores ─────────────────────────────────
+            if path == "/api/knockout/live-scores":
+                self.send_json(200, {"scores": _get_live_scores()})
+                return
+
             # ── /api/knockout/leaderboard ─────────────────────────────────
             if path == "/api/knockout/leaderboard":
                 self.send_json(200, {"leaderboard": _ko_compute_leaderboard()})
@@ -2146,7 +2249,7 @@ class Handler(BaseHTTPRequestHandler):
                             "username":        uname,
                             "displayName":     uinfo.get("displayName", uname),
                             "supportedTeam":   uinfo.get("supportedTeam"),
-                            "logoData":        uinfo.get("logoData"),
+                            "hasLogo":         bool(uinfo.get("logoData")),
                             "marketName":      bet.get("marketName"),
                             "marketNameTr":    _market_type_name(_tid, _sov, _mn, "tr"),
                             "marketNameEn":    _market_type_name(_tid, _sov, _mn, "en"),

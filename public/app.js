@@ -1547,7 +1547,6 @@ function renderAllKoBets() {
           return `
             <div class="ko-bet-row">
               <div class="ko-bet-user">
-                ${b.hasLogo ? _koUserLogo(null, b.username) : '<span class="ko-user-logo-default">👤</span>'}
                 <span class="ko-bet-username">${esc(b.displayName || b.username)}</span>
                 ${_koFlag(b.supportedTeam)}
               </div>

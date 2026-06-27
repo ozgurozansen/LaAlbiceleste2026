@@ -430,11 +430,18 @@ function buildMarketCard(matchId, market) {
     ? `<span class="market-spread">${formatSpread(market.spreadValue)}</span>`
     : '';
 
-  const outcomesHtml = displayOutcomes.map(o => `
-    <div class="outcome-btn">
+  const placedBet = koBets[String(matchId)];
+  const betOnThisMarket = placedBet && String(placedBet.marketId) === String(market.id);
+
+  const outcomesHtml = displayOutcomes.map(o => {
+    const suspended = o.odds <= 1;
+    const isBet = betOnThisMarket && placedBet.outcomeLabel === o.label;
+    return `
+    <div class="outcome-btn${suspended ? ' outcome-suspended' : ''}${isBet ? ' outcome-btn-bet' : ''}">
       <span class="outcome-label" title="${esc(o.label)}">${esc(truncate(o.label, 10))}</span>
-      <span class="outcome-odds">${o.odds}</span>
-    </div>`).join('');
+      <span class="outcome-odds">${suspended ? '-' : o.odds}</span>
+    </div>`;
+  }).join('');
 
   const extra = market.outcomes.length > 4
     ? `<div class="outcome-btn" style="cursor:pointer;justify-content:center">
@@ -464,17 +471,18 @@ function openMarketModal(matchId, marketId) {
   const currentBet = koBets[String(matchId)];
 
   const outcomesHtml = market.outcomes.map(o => {
-    const isCurrBet = currentBet
+    const suspended = o.odds <= 1;
+    const isCurrBet = !suspended && currentBet
       && String(currentBet.marketId) === String(market.id)
       && currentBet.outcomeLabel === o.label;
-    const betLabel = isCurrBet ? '✓ Your Bet' : (currentBet ? 'Replace' : 'Bet');
-    const betBtn = koUser
+    const betLabel = isCurrBet ? `✓ ${lang === 'tr' ? 'Bahsiniz' : 'Your Bet'}` : (currentBet ? (lang === 'tr' ? 'Değiştir' : 'Replace') : (lang === 'tr' ? 'Oyna' : 'Bet'));
+    const betBtn = (!suspended && koUser)
       ? `<button class="modal-bet-btn${isCurrBet ? ' is-current' : ''}" data-outcome-n="${o.n}">${betLabel}</button>`
       : '';
     return `
-    <div class="modal-outcome${isCurrBet ? ' is-bet' : ''}" data-outcome-n="${o.n}">
+    <div class="modal-outcome${isCurrBet ? ' is-bet' : ''}${suspended ? ' outcome-suspended' : ''}" data-outcome-n="${o.n}">
       <span class="modal-outcome-label">${esc(o.label)}</span>
-      <span class="modal-outcome-odds">${o.odds}</span>
+      <span class="modal-outcome-odds">${suspended ? '-' : o.odds}</span>
       ${betBtn}
     </div>`;
   }).join('');
@@ -993,11 +1001,11 @@ function _renderModalFooter(matchId, market) {
     footerEl.innerHTML = `
       <div class="ko-bet-confirm">
         <div class="ko-bet-confirm-label">
-          Bet on <strong>${esc(outcome.label)}</strong> @ <strong>${outcome.odds}</strong>
+          ${lang === 'tr' ? 'Bahis' : 'Bet on'}: <strong>${esc(outcome.label)}</strong> @ <strong>${outcome.odds}</strong>
           <span style="opacity:.65;font-size:.78rem"> — ${esc(market.typeName)}</span>
         </div>
         <div class="ko-amount-row">
-          <span class="ko-amount-label">Amount:</span>
+          <span class="ko-amount-label">${lang === 'tr' ? 'Miktar:' : 'Amount:'}</span>
           <div class="ko-amount-stepper">
             <button class="ko-amount-btn" id="ko-amt-dec" ${amount <= koMinBet ? 'disabled' : ''}>−</button>
             <span class="ko-amount-val" id="ko-amt-val">${amount}</span>
@@ -1005,10 +1013,10 @@ function _renderModalFooter(matchId, market) {
           </div>
           <span style="font-size:.78rem;color:var(--muted)">la (${koMinBet}–${koMaxBet})</span>
         </div>
-        <div class="ko-payout-preview">Potential win: ${payout} la</div>
+        <div class="ko-payout-preview">${lang === 'tr' ? 'Tahmini kazanç' : 'Potential win'}: ${payout} la</div>
         <div class="ko-confirm-row">
-          <button class="ko-confirm-bet-btn" id="ko-confirm-bet-btn">✓ Place Bet</button>
-          <button class="ko-cancel-bet-btn" id="ko-cancel-bet-btn">Cancel</button>
+          <button class="ko-confirm-bet-btn" id="ko-confirm-bet-btn">✓ ${lang === 'tr' ? 'Bahsi Oyna' : 'Place Bet'}</button>
+          <button class="ko-cancel-bet-btn" id="ko-cancel-bet-btn">${lang === 'tr' ? 'İptal' : 'Cancel'}</button>
         </div>
       </div>`;
     footerEl.querySelector('#ko-amt-dec').addEventListener('click', () => {
@@ -1038,13 +1046,13 @@ function _renderModalFooter(matchId, market) {
 
   if (!koUser) {
     footerEl.innerHTML = `<div class="ko-login-hint">
-      <span>Login to place bets</span>
-      <button class="ko-btn" id="modal-login-btn">Login</button>
+      <span>${lang === 'tr' ? 'Bahis yapmak için giriş yapın' : 'Login to place bets'}</span>
+      <button class="ko-btn" id="modal-login-btn">${lang === 'tr' ? 'Giriş Yap' : 'Login'}</button>
     </div>`;
     footerEl.querySelector('#modal-login-btn').addEventListener('click', () => showLoginModal());
   } else if (currentBet && market && String(currentBet.marketId) !== String(market.id)) {
     footerEl.innerHTML = `<div class="ko-current-bet-info">
-      Your bet for this game: <strong>${esc(currentBet.outcomeLabel)}</strong> @ ${currentBet.odds}
+      ${lang === 'tr' ? 'Bu maç için bahsiniz' : 'Your bet for this game'}: <strong>${esc(currentBet.outcomeLabel)}</strong> @ ${currentBet.odds}
       <span style="opacity:.7;font-size:.78rem"> · ${esc(currentBet.marketName)} · ${currentBet.amount} la</span>
     </div>`;
   } else {
@@ -1083,6 +1091,23 @@ function _updateMatchBetBadge(matchId, bet) {
     const previewStripEl = card.querySelector('.match-preview');
     if (previewStripEl) previewStripEl.outerHTML = buildMatchPreview(match);
   }
+
+  // Highlight the placed outcome in all market cards for this match
+  card.querySelectorAll('.market-card').forEach(mc => {
+    mc.querySelectorAll('.outcome-btn').forEach(btn => {
+      btn.classList.remove('outcome-btn-bet');
+    });
+    if (bet && String(mc.dataset.marketId) === String(bet.marketId)) {
+      mc.querySelectorAll('.outcome-btn').forEach(btn => {
+        const labelEl = btn.querySelector('.outcome-label');
+        if (labelEl && labelEl.title === bet.outcomeLabel) {
+          btn.classList.add('outcome-btn-bet');
+          const oddsEl = btn.querySelector('.outcome-odds');
+          if (oddsEl) oddsEl.style.color = '';
+        }
+      });
+    }
+  });
 }
 
 // ── Coupon panel ─────────────────────────────────────────────────────────────
@@ -1127,7 +1152,7 @@ function renderCouponPanel() {
       : '';
     const deleteBtn = isSettled
       ? ''
-      : `<button class="coupon-bet-delete" data-match-id="${esc(matchId)}" title="Remove bet">✕ Remove</button>`;
+      : `<button class="coupon-bet-delete" data-match-id="${esc(matchId)}" title="Remove bet">✕ ${lang === 'tr' ? 'Kaldır' : 'Remove'}</button>`;
     return `
     <div class="coupon-bet-row${rowClass}">
       <div class="coupon-bet-match">${esc((lang === 'en' && bet.matchNameEn) ? bet.matchNameEn : (bet.matchName || matchId))}</div>
@@ -1225,6 +1250,9 @@ function _clearMatchBetDisplay(matchId) {
     const previewStripEl = card.querySelector('.match-preview');
     if (previewStripEl) previewStripEl.outerHTML = buildMatchPreview(match);
   }
+
+  // Remove outcome highlight from all market cards for this match
+  card.querySelectorAll('.outcome-btn').forEach(btn => btn.classList.remove('outcome-btn-bet'));
 }
 
 // ── Knockout leaderboard ──────────────────────────────────────────────────────

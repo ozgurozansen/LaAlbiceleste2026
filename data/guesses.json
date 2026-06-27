@@ -446,8 +446,22 @@
         "homeScore": 1,
         "awayScore": 1,
         "fhBonus": "Salem Al-Dawsari ( captain )",
-        "shBonus": "Ryan Mendes ( captain )",
-        "savedAt": "2026-06-26T07:22:45.728379+00:00"
+        "shBonus": "Salem Al-Dawsari ( captain )",
+        "savedAt": "2026-06-26T23:08:11.082024+00:00"
+      },
+      "40": {
+        "homeScore": 1,
+        "awayScore": 1,
+        "fhBonus": "Saman Ghoddos",
+        "shBonus": "Omar Marmoush",
+        "savedAt": "2026-06-26T22:55:52.843775+00:00"
+      },
+      "41": {
+        "homeScore": 0,
+        "awayScore": 2,
+        "fhBonus": "Maxim De Cuyper",
+        "shBonus": "Tim Payne",
+        "savedAt": "2026-06-26T22:57:37.312030+00:00"
       }
     },
     "palyaco": {
@@ -877,6 +891,48 @@
         "fhBonus": "Nicolas Jackson",
         "shBonus": "7",
         "savedAt": "2026-06-26T01:31:59.417232+00:00"
+      },
+      "58": {
+        "homeScore": 0,
+        "awayScore": 1,
+        "fhBonus": "45",
+        "shBonus": "Nabil Bentaleb",
+        "savedAt": "2026-06-27T02:20:38.185077+00:00"
+      },
+      "59": {
+        "homeScore": 0,
+        "awayScore": 2,
+        "fhBonus": "Musa Al-Taamari",
+        "shBonus": "87",
+        "savedAt": "2026-06-27T02:20:45.616763+00:00"
+      },
+      "64": {
+        "homeScore": 1,
+        "awayScore": 2,
+        "fhBonus": "45",
+        "shBonus": "46",
+        "savedAt": "2026-06-27T02:17:46.412098+00:00"
+      },
+      "65": {
+        "homeScore": 2,
+        "awayScore": 1,
+        "fhBonus": "Abdukodir Khusanov",
+        "shBonus": "Cédric Bakambu",
+        "savedAt": "2026-06-27T02:20:35.008528+00:00"
+      },
+      "70": {
+        "homeScore": 0,
+        "awayScore": 2,
+        "fhBonus": "Fidel Escobar",
+        "shBonus": "Harry Kane ( captain )",
+        "savedAt": "2026-06-27T02:20:26.468114+00:00"
+      },
+      "71": {
+        "homeScore": 1,
+        "awayScore": 0,
+        "fhBonus": "45",
+        "shBonus": "6",
+        "savedAt": "2026-06-27T02:17:47.342295+00:00"
       }
     },
     "tudu_08": {
@@ -2719,6 +2775,34 @@
         "fhBonus": "43",
         "shBonus": "8",
         "savedAt": "2026-06-26T08:16:24.426019+00:00"
+      },
+      "64": {
+        "homeScore": 2,
+        "awayScore": 4,
+        "fhBonus": "43",
+        "shBonus": "46",
+        "savedAt": "2026-06-26T23:03:48.582290+00:00"
+      },
+      "59": {
+        "homeScore": 0,
+        "awayScore": 5,
+        "fhBonus": "Ihsan Haddad ( captain )",
+        "shBonus": "87",
+        "savedAt": "2026-06-26T23:04:18.668227+00:00"
+      },
+      "65": {
+        "homeScore": 2,
+        "awayScore": 0,
+        "fhBonus": "Rustam Ashurmatov",
+        "shBonus": "Yoane Wissa",
+        "savedAt": "2026-06-26T23:07:28.118700+00:00"
+      },
+      "58": {
+        "homeScore": 1,
+        "awayScore": 2,
+        "fhBonus": "43",
+        "shBonus": "Rafik Belghali",
+        "savedAt": "2026-06-26T23:08:43.066824+00:00"
       }
     },
     "facessi": {

@@ -619,6 +619,46 @@
       "shBonusAnswer": "6",
       "scored": true,
       "enteredAt": "2026-06-26T21:05:15.246305+00:00"
+    },
+    "46": {
+      "score": {
+        "home": 0,
+        "away": 0
+      },
+      "fhBonusAnswer": null,
+      "shBonusAnswer": "Deroy Duarte",
+      "scored": true,
+      "enteredAt": "2026-06-27T04:05:50.129288+00:00"
+    },
+    "47": {
+      "score": {
+        "home": 0,
+        "away": 1
+      },
+      "fhBonusAnswer": null,
+      "shBonusAnswer": "76",
+      "scored": true,
+      "enteredAt": "2026-06-27T04:07:43.173299+00:00"
+    },
+    "40": {
+      "score": {
+        "home": 1,
+        "away": 1
+      },
+      "fhBonusAnswer": "Ramin Rezaeian",
+      "shBonusAnswer": null,
+      "scored": true,
+      "enteredAt": "2026-06-27T05:14:51.377401+00:00"
+    },
+    "41": {
+      "score": {
+        "home": 1,
+        "away": 5
+      },
+      "fhBonusAnswer": null,
+      "shBonusAnswer": "Elijah Just",
+      "scored": true,
+      "enteredAt": "2026-06-27T05:15:58.000749+00:00"
     }
   }
 }

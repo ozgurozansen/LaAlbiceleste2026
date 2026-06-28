@@ -2851,12 +2851,14 @@ class Handler(BaseHTTPRequestHandler):
                 except (ValueError, TypeError):
                     self.send_json(400, {"error": "odds must be a positive number"})
                     return
+                credit_now = _ko_compute_credit(username)
+                dynamic_max = max(KNOCKOUT_MIN_BET, int(credit_now * 0.20))
                 try:
                     amount = int(amount_raw) if amount_raw is not None else KNOCKOUT_MIN_BET
-                    if not (KNOCKOUT_MIN_BET <= amount <= KNOCKOUT_MAX_BET):
+                    if not (KNOCKOUT_MIN_BET <= amount <= dynamic_max):
                         raise ValueError
                 except (ValueError, TypeError):
-                    self.send_json(400, {"error": f"Bet amount must be between {KNOCKOUT_MIN_BET} and {KNOCKOUT_MAX_BET}"})
+                    self.send_json(400, {"error": f"Bet amount must be between {KNOCKOUT_MIN_BET} and {dynamic_max}"})
                     return
                 if start_ts is not None:
                     try:

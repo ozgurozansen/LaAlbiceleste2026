@@ -28,7 +28,7 @@ let activeLeagues = [];   // [] = all leagues; set from config on boot
 let searchTerm = '';
 let dateFilter = '';
 let expandedIds = new Set();
-let collapsedGroups = new Set();
+let expandedGroups = new Set(); // market groups expanded by user (default: collapsed)
 let appConfig = {};
 let lang = 'tr';
 let visitorContext = {
@@ -42,12 +42,16 @@ let koToken      = localStorage.getItem('ko_token') || null;
 let koUser       = null;
 let koBets       = {};   // { matchId: { outcomeLabel, odds, amount, marketId, marketName, ... } }
 let koCredit     = null;
-let koMinBet     = 4;
-let koMaxBet     = 8;
+let koMinBet     = 1;
+let koMaxBet     = 1;
+function _updateBetLimits() {
+  koMaxBet = Math.max(koMinBet, Math.floor((koCredit || 0) * 0.20));
+}
 let koOpenModal   = null;    // { matchId, marketId } currently-open market modal
 let koPendingBet  = null;    // { match, market, outcome, amount } – amount picker in progress
 let koLeaderboard = [];      // [{username, displayName, credit, bets, won, lost}]
-let liveScores    = {};      // { matchId: {homeScore, awayScore, clock, period} }
+
+
 
 /* ── DOM refs ───────────────────────────────────────────────── */
 const searchEl     = document.getElementById('search');
@@ -68,12 +72,7 @@ const modalClose   = document.getElementById('modal-close');
 const modalBdrop   = document.getElementById('modal-backdrop');
 
 /* ── Fetch helpers ───────────────────────────────────────────── */
-async function loadLiveScores() {
-  try {
-    const res = await fetch('/api/knockout/live-scores');
-    if (res.ok) liveScores = (await res.json()).scores || {};
-  } catch (_) {}
-}
+
 
 async function loadMatches({ silent = false } = {}) {
   if (!silent) { showLoading(true); hideError(); }
@@ -137,7 +136,7 @@ function buildSportTabs() {
   sportTabsEl.querySelectorAll('.sport-tab').forEach(btn => {
     btn.addEventListener('click', () => {
       activeSport = Number(btn.dataset.sport);
-      expandedIds.clear();
+      expandedIds.clear(); expandedGroups.clear();
       loadMatches();
     });
   });
@@ -181,7 +180,7 @@ function buildLeagueFilter() {
         if (idx === -1) activeLeagues.push(code);
         else activeLeagues.splice(idx, 1);
       }
-      expandedIds.clear();
+      expandedIds.clear(); expandedGroups.clear();
       loadMatches();
     });
   });
@@ -230,18 +229,18 @@ function renderMatches() {
     if (card) card.classList.add('open');
   });
 
-  // Market group header click → collapse/expand
+  // Market group header click → expand/collapse
   matchesList.querySelectorAll('.market-group-header').forEach(header => {
     header.addEventListener('click', e => {
       e.stopPropagation();
       const group = header.closest('.market-group');
       const key = `${group.dataset.matchId}:${group.dataset.groupId}`;
-      if (collapsedGroups.has(key)) {
-        collapsedGroups.delete(key);
-        group.classList.remove('collapsed');
-      } else {
-        collapsedGroups.add(key);
+      if (expandedGroups.has(key)) {
+        expandedGroups.delete(key);
         group.classList.add('collapsed');
+      } else {
+        expandedGroups.add(key);
+        group.classList.remove('collapsed');
       }
     });
   });
@@ -344,14 +343,12 @@ function groupMarkets(markets) {
     });
   });
   
-  const result = buckets.filter(b => b.markets.length > 0);
-  if (other.markets.length > 0) result.push(other);
-  return result;
+  return buckets.filter(b => b.markets.length > 0);
 }
 
 function buildMarketGroup(matchId, group) {
   const key = `${matchId}:${group.id}`;
-  const isCollapsed = collapsedGroups.has(key);
+  const isCollapsed = !expandedGroups.has(key);
   const groupName = lang === 'tr' ? group.name_tr : group.name_en;
   const cardsHtml = group.markets.map(m => buildMarketCard(matchId, m)).join('');
   return `
@@ -392,21 +389,14 @@ function buildMatchCard(match) {
         </div>
         <div class="match-teams">
           <div class="team-name">${esc(lang === 'en' ? (match.homeTeamEn || match.homeTeam) : match.homeTeam)}</div>
-          ${(() => {
-            const ls = liveScores[String(match.id)];
-            return ls
-              ? `<div class="vs-sep live-score">${ls.homeScore} – ${ls.awayScore}</div>`
-              : `<div class="vs-sep">vs</div>`;
-          })()}
+          <div class="vs-sep">vs</div>
           <div class="team-name">${esc(lang === 'en' ? (match.awayTeamEn || match.awayTeam) : match.awayTeam)}</div>
         </div>
         <div class="match-badges">
           ${(() => {
             const st  = match.status || (match.isLive ? 'live' : 'upcoming');
-            const ls  = liveScores[String(match.id)];
             const cls = st === 'live' ? 'badge-live' : st === 'finished' ? 'badge-finished' : 'badge-upcoming';
-            const lbl = st === 'live'
-              ? `${lang === 'tr' ? 'Canlı' : 'Live'}${ls && ls.clock ? ' ' + ls.clock : ''}`
+            const lbl = st === 'live' ? (lang === 'tr' ? 'Canlı' : 'Live')
               : st === 'finished' ? (lang === 'tr' ? 'Bitti' : 'Finished')
               : (lang === 'tr' ? 'Yaklaşan' : 'Upcoming');
             return `<span class="badge ${cls}">${lbl}</span>`;
@@ -519,6 +509,8 @@ function closeModal() {
   koPendingBet = null;
   modal.classList.add('hidden');
   document.body.style.overflow = '';
+  const _sheet = document.getElementById('ko-bet-sheet');
+  if (_sheet) { _sheet.classList.remove('active'); _sheet.innerHTML = ''; }
 }
 
 /* ── Utilities ───────────────────────────────────────────────── */
@@ -601,19 +593,19 @@ searchEl?.addEventListener('input', () => {
   clearTimeout(searchTimer);
   searchTimer = setTimeout(() => {
     searchTerm = searchEl.value.trim();
-    expandedIds.clear();
+    expandedIds.clear(); expandedGroups.clear();
     loadMatches();
   }, 350);
 });
 
 dateEl?.addEventListener('change', () => {
   dateFilter = dateEl.value;
-  expandedIds.clear();
+  expandedIds.clear(); expandedGroups.clear();
   loadMatches();
 });
 
 refreshBtn?.addEventListener('click', () => {
-  expandedIds.clear();
+  expandedIds.clear(); expandedGroups.clear();
   loadMatches();
 });
 
@@ -650,7 +642,7 @@ document.querySelectorAll('.lang-btn').forEach(btn => {
   btn.addEventListener('click', () => {
     lang = btn.dataset.lang;
     document.querySelectorAll('.lang-btn').forEach(b => b.classList.toggle('active', b === btn));
-    expandedIds.clear();
+    expandedIds.clear(); expandedGroups.clear();
     loadMatches();
     renderAuthUI();
     renderKoLeaderboardFull();
@@ -685,7 +677,6 @@ async function boot() {
   } catch (_) { /* config load failure is non-fatal */ }
   await koCheckAuth();
   loadKoLeaderboard();
-  loadLiveScores();
   loadMatches();
 }
 boot();
@@ -694,7 +685,7 @@ boot();
 let _pollTimer = null;
 function _startPoll() {
   if (_pollTimer) return;
-  _pollTimer = setInterval(() => { loadLiveScores(); loadMatches({ silent: true }); }, 60_000);
+  _pollTimer = setInterval(() => { loadMatches({ silent: true }); }, 60_000);
 }
 function _stopPoll() {
   clearInterval(_pollTimer);
@@ -718,8 +709,7 @@ async function koCheckAuth() {
       const bJson = await bRes.json();
       koBets   = bJson.bets   || {};
       koCredit = bJson.credit;
-      if (bJson.minBet != null) koMinBet = bJson.minBet;
-      if (bJson.maxBet != null) koMaxBet = bJson.maxBet;
+      _updateBetLimits();
     }
   } catch (_) {}
   renderAuthUI();
@@ -733,8 +723,7 @@ async function koRefreshBets() {
     const json = await res.json();
     koBets   = json.bets   || {};
     koCredit = json.credit;
-    if (json.minBet != null) koMinBet = json.minBet;
-    if (json.maxBet != null) koMaxBet = json.maxBet;
+    _updateBetLimits();
   } catch (_) {}
   renderAuthUI();
   renderCouponPanel();
@@ -766,6 +755,7 @@ function renderAuthUI() {
     const actionEl = document.getElementById('ko-action-area');
     if (actionEl) actionEl.innerHTML = '';
   }
+  _syncHeaderOffset();
 }
 
 function openKoProfileModal() {
@@ -969,6 +959,7 @@ async function _confirmBet() {
     }
     koBets[matchId] = json.bet;
     koCredit        = json.credit;
+    _updateBetLimits();
     koPendingBet    = null;
     renderAuthUI();
     renderCouponPanel();
@@ -988,9 +979,10 @@ function _cancelBet() {
       ?.markets.find(mk => String(mk.id) === koOpenModal.marketId));
 }
 
-/* Rebuild only the modal-footer div (avoids full modal rebuild on each stepper click) */
+/* Rebuild the modal-footer and the floating bet sheet as needed */
 function _renderModalFooter(matchId, market) {
   const footerEl = document.getElementById('modal-footer');
+  const sheet    = document.getElementById('ko-bet-sheet');
   if (!footerEl) return;
 
   const currentBet = koBets[String(matchId)];
@@ -998,11 +990,15 @@ function _renderModalFooter(matchId, market) {
   if (koPendingBet && market && String(koPendingBet.market.id) === String(market.id)) {
     const { outcome, amount } = koPendingBet;
     const payout = (outcome.odds * amount).toFixed(2);
-    footerEl.innerHTML = `
-      <div class="ko-bet-confirm">
-        <div class="ko-bet-confirm-label">
-          ${lang === 'tr' ? 'Bahis' : 'Bet on'}: <strong>${esc(outcome.label)}</strong> @ <strong>${outcome.odds}</strong>
-          <span style="opacity:.65;font-size:.78rem"> — ${esc(market.typeName)}</span>
+
+    // Render confirmation in the floating bottom sheet instead of inline footer
+    if (sheet) {
+      sheet.innerHTML = `
+        <div class="ko-sheet-handle"></div>
+        <div class="ko-sheet-sel">
+          ${lang === 'tr' ? 'Bahis' : 'Bet on'}: <strong>${esc(outcome.label)}</strong>
+          <span style="opacity:.7"> @ ${outcome.odds}</span>
+          <span class="ko-sheet-mkt"> · ${esc(market.typeName)}</span>
         </div>
         <div class="ko-amount-row">
           <span class="ko-amount-label">${lang === 'tr' ? 'Miktar:' : 'Amount:'}</span>
@@ -1017,22 +1013,25 @@ function _renderModalFooter(matchId, market) {
         <div class="ko-confirm-row">
           <button class="ko-confirm-bet-btn" id="ko-confirm-bet-btn">✓ ${lang === 'tr' ? 'Bahsi Oyna' : 'Place Bet'}</button>
           <button class="ko-cancel-bet-btn" id="ko-cancel-bet-btn">${lang === 'tr' ? 'İptal' : 'Cancel'}</button>
-        </div>
-      </div>`;
-    footerEl.querySelector('#ko-amt-dec').addEventListener('click', () => {
-      if (koPendingBet && koPendingBet.amount > koMinBet) {
-        koPendingBet.amount--;
-        _renderModalFooter(matchId, market);
-      }
-    });
-    footerEl.querySelector('#ko-amt-inc').addEventListener('click', () => {
-      if (koPendingBet && koPendingBet.amount < koMaxBet) {
-        koPendingBet.amount++;
-        _renderModalFooter(matchId, market);
-      }
-    });
-    footerEl.querySelector('#ko-confirm-bet-btn').addEventListener('click', _confirmBet);
-    footerEl.querySelector('#ko-cancel-bet-btn').addEventListener('click', _cancelBet);
+        </div>`;
+      sheet.classList.add('active');
+      sheet.querySelector('#ko-amt-dec').addEventListener('click', () => {
+        if (koPendingBet && koPendingBet.amount > koMinBet) {
+          koPendingBet.amount--;
+          _renderModalFooter(matchId, market);
+        }
+      });
+      sheet.querySelector('#ko-amt-inc').addEventListener('click', () => {
+        if (koPendingBet && koPendingBet.amount < koMaxBet) {
+          koPendingBet.amount++;
+          _renderModalFooter(matchId, market);
+        }
+      });
+      sheet.querySelector('#ko-confirm-bet-btn').addEventListener('click', _confirmBet);
+      sheet.querySelector('#ko-cancel-bet-btn').addEventListener('click', _cancelBet);
+    }
+
+    footerEl.innerHTML = ''; // clear modal footer while sheet is visible
 
     // Highlight the pending outcome
     document.querySelectorAll('.modal-outcome').forEach(el => el.classList.remove('is-pending'));
@@ -1040,6 +1039,9 @@ function _renderModalFooter(matchId, market) {
     if (pendingEl) pendingEl.classList.add('is-pending');
     return;
   }
+
+  // No pending bet — dismiss the sheet
+  if (sheet) { sheet.classList.remove('active'); sheet.innerHTML = ''; }
 
   // Remove any pending highlights
   document.querySelectorAll('.modal-outcome').forEach(el => el.classList.remove('is-pending'));
@@ -1225,6 +1227,7 @@ async function deleteKoBet(matchId) {
     if (!res.ok) { alert(json.error || 'Could not remove bet'); return; }
     delete koBets[matchId];
     koCredit = json.credit;
+    _updateBetLimits();
     renderAuthUI();
     renderCouponPanel();
     loadKoLeaderboard();
@@ -1323,134 +1326,126 @@ function _koCorrectOutcome(bet, r) {
   if (h == null) return null;
   const tot = h + a;
   const fr  = h > a ? 1 : h < a ? 2 : 0;
-  const frLabel = fr === 1 ? 'Home Win' : fr === 2 ? 'Away Win' : 'Draw';
+  const tr  = lang === 'tr';
+
+  const T = (tr_s, en_s) => tr ? tr_s : en_s;
+  const frLabel  = fr === 1 ? T('Ev Sahibi', 'Home Win') : fr === 2 ? T('Deplasman', 'Away Win') : T('Beraberlik', 'Draw');
+  const yn       = v => v ? T('Evet', 'Yes') : T('Hayır', 'No');
+  const home_s   = T('Ev Sahibi', 'Home');
+  const away_s   = T('Deplasman', 'Away');
   const htH = r.htHome, htA = r.htAway;
   const h2 = htH != null ? h - htH : null;
   const a2 = htA != null ? a - htA : null;
 
+  const _frOf = (gh, ga) => gh > ga ? T('Ev Sahibi', 'Home Win') : gh < ga ? T('Deplasman', 'Away Win') : T('Beraberlik', 'Draw');
+
   // ── 1X2 variants ─────────────────────────────────────────────
   if (tid === 1 || tid === 183) return `${frLabel} (${h}–${a})`;
-  if (tid === 3) return `${frLabel} (${h}–${a})`;
-  if (tid === 7 && htH != null) {
-    const htFr = htH > htA ? 'Home Win' : htH < htA ? 'Away Win' : 'Draw';
-    return `HT: ${htH}–${htA} (${htFr})`;
-  }
-  if (tid === 8 && htH != null) {
-    const htFr = htH > htA ? 'Home Win' : htH < htA ? 'Away Win' : 'Draw';
-    return `HT: ${htH}–${htA} (${htFr})`;
-  }
-  if (tid === 9 && h2 != null) {
-    const h2Fr = h2 > a2 ? 'Home Win' : h2 < a2 ? 'Away Win' : 'Draw';
-    return `2H: ${h2}–${a2} (${h2Fr})`;
-  }
-  // HT/FT double result
-  if (tid === 5 && htH != null) return `HT ${htH}–${htA} → FT ${h}–${a}`;
-  // HT/FT exact score
-  if (tid === 571 && htH != null) return `HT: ${htH}–${htA}, FT: ${h}–${a}`;
+  if (tid === 3)  return `${frLabel} (${h}–${a})`;
+  if ((tid === 7 || tid === 8) && htH != null) return `${T('İY','HT')}: ${htH}–${htA} (${_frOf(htH,htA)})`;
+  if (tid === 9 && h2 != null) return `${T('2Y','2H')}: ${h2}–${a2} (${_frOf(h2,a2)})`;
+  if (tid === 5 && htH != null) return `${T('İY','HT')} ${htH}–${htA} → ${T('MS','FT')} ${h}–${a}`;
+  if (tid === 571 && htH != null) return `${T('İY','HT')}: ${htH}–${htA}, ${T('MS','FT')}: ${h}–${a}`;
 
   // ── BTTS variants ─────────────────────────────────────────────
-  if (tid === 38) return `${h>0 && a>0 ? 'Yes' : 'No'} (${h}–${a})`;
-  if (tid === 452 && htH != null) return `HT: ${htH}–${htA} (BTTS: ${htH>0 && htA>0 ? 'Yes' : 'No'})`;
-  if (tid === 416 && htH != null) {
-    const htFr = htH > htA ? 'Home' : htH < htA ? 'Away' : 'Draw';
-    return `HT: ${htH}–${htA} (${htFr}, BTTS: ${htH>0 && htA>0 ? 'Yes' : 'No'})`;
-  }
-  if (tid === 599 && h2 != null) return `2H: ${h2}–${a2} (BTTS: ${h2>0 && a2>0 ? 'Yes' : 'No'})`;
-  if (tid === 801 && htH != null) return `1H: ${htH}–${htA}, 2H: ${h2}–${a2}`;
+  if (tid === 38)  return `${yn(h>0 && a>0)} (${h}–${a})`;
+  if (tid === 452 && htH != null) return `${T('İY','HT')}: ${htH}–${htA} (${T('KG','BTTS')}: ${yn(htH>0 && htA>0)})`;
+  if (tid === 416 && htH != null) return `${T('İY','HT')}: ${htH}–${htA} (${_frOf(htH,htA)}, ${T('KG','BTTS')}: ${yn(htH>0 && htA>0)})`;
+  if (tid === 599 && h2 != null)  return `${T('2Y','2H')}: ${h2}–${a2} (${T('KG','BTTS')}: ${yn(h2>0 && a2>0)})`;
+  if (tid === 801 && htH != null) return `${T('1Y','1H')}: ${htH}–${htA}, ${T('2Y','2H')}: ${h2}–${a2}`;
 
   // ── Combination markets ───────────────────────────────────────
-  if (tid === 272) return `${frLabel}, ${tot} goals total`;
-  if (tid === 414) return `${frLabel}, BTTS: ${h>0 && a>0 ? 'Yes' : 'No'}`;
-  if (tid === 446 && sov) return `${tot} goals (line: ${sov}), BTTS: ${h>0 && a>0 ? 'Yes' : 'No'}`;
+  if (tid === 272) return `${frLabel}, ${tot} ${T('gol','goals')}`;
+  if (tid === 414) return `${frLabel}, ${T('KG','BTTS')}: ${yn(h>0 && a>0)}`;
+  if (tid === 446 && sov) return `${tot} ${T('gol','goals')} (${T('çizgi','line')}: ${sov}), ${T('KG','BTTS')}: ${yn(h>0 && a>0)}`;
 
   // ── Over/Under ────────────────────────────────────────────────
-  if ([11,12,13,810,812].includes(tid) && sov) return `${tot} goals (line: ${sov})`;
-  if (tid === 14 && htH != null) return `1H: ${htH+htA} goals`;
-  if ([20,29,212,326,455,161].includes(tid) && sov) return `Home scored ${h} (line: ${sov})`;
-  if ([15,164,207,256,327,328,329,604].includes(tid) && sov) return `Away scored ${a} (line: ${sov})`;
-  if ((tid === 528 || tid === 529) && h2 != null) return `1H: ${htH+htA} goals, 2H: ${h2+a2} goals`;
+  if ([11,12,13,810,812].includes(tid) && sov) return `${tot} ${T('gol','goals')} (${T('çizgi','line')}: ${sov})`;
+  if (tid === 14 && htH != null) return `${T('1Y','1H')}: ${htH+htA} ${T('gol','goals')}`;
+  if ([20,29,212,326,455,161].includes(tid) && sov) return `${home_s}: ${h} ${T('gol','goals')} (${T('çizgi','line')}: ${sov})`;
+  if ([15,164,207,256,327,328,329,604].includes(tid) && sov) return `${away_s}: ${a} ${T('gol','goals')} (${T('çizgi','line')}: ${sov})`;
+  if ((tid === 528 || tid === 529) && h2 != null) return `${T('1Y','1H')}: ${htH+htA} ${T('gol','goals')}, ${T('2Y','2H')}: ${h2+a2} ${T('gol','goals')}`;
 
   // ── Odd/Even ──────────────────────────────────────────────────
-  if (tid === 49) return `${tot % 2 === 1 ? 'Odd' : 'Even'} (${tot} goals)`;
+  if (tid === 49) return `${tot % 2 === 1 ? T('Tek','Odd') : T('Çift','Even')} (${tot} ${T('gol','goals')})`;
   if ([432,434,450].includes(tid) && htH != null) {
     const htTot = htH + htA;
-    return `1H: ${htTot % 2 === 1 ? 'Odd' : 'Even'} (${htTot} goals)`;
+    return `${T('1Y','1H')}: ${htTot % 2 === 1 ? T('Tek','Odd') : T('Çift','Even')} (${htTot} ${T('gol','goals')})`;
   }
 
   // ── Goals range / Most goals half ────────────────────────────
-  if (tid === 43) return `${tot} goals total`;
-  if (tid === 48 && htH != null) return `1H: ${htH+htA} goals, 2H: ${h2+a2} goals`;
+  if (tid === 43) return `${tot} ${T('gol','goals')}`;
+  if (tid === 48 && htH != null) return `${T('1Y','1H')}: ${htH+htA} ${T('gol','goals')}, ${T('2Y','2H')}: ${h2+a2} ${T('gol','goals')}`;
 
   // ── Handicaps ────────────────────────────────────────────────
-  if (tid === 418 && sov) return `Home ${h} Away ${a} (line: ${sov})`;
-  if (tid === 268 && sov) return `Home ${h} Away ${a} (line: ${sov > 0 ? '+'+sov : sov})`;
+  if (tid === 418 && sov) return `${home_s} ${h} ${away_s} ${a} (${T('çizgi','line')}: ${sov})`;
+  if (tid === 268 && sov) return `${home_s} ${h} ${away_s} ${a} (${T('çizgi','line')}: ${sov > 0 ? '+'+sov : sov})`;
 
   // ── Win margin ────────────────────────────────────────────────
-  if (tid === 588) return `${frLabel} by ${Math.abs(h-a)} (${h}–${a})`;
+  if (tid === 588) return `${frLabel} ${Math.abs(h-a)} ${T('fark','by')} (${h}–${a})`;
 
   // ── Exact scores ──────────────────────────────────────────────
   if (tid === 777) return `${h}:${a}`;
-  if ((tid === 778 || tid === 779) && htH != null) return `HT: ${htH}:${htA}`;
+  if ((tid === 778 || tid === 779) && htH != null) return `${T('İY','HT')}: ${htH}:${htA}`;
 
   // ── Both halves ───────────────────────────────────────────────
-  if ((tid === 295) && htH != null) return `Home: 1H ${htH}, 2H ${h2} → ${htH>0 && h2>0 ? 'Yes' : 'No'}`;
-  if ((tid === 296) && htH != null) return `Away: 1H ${htA}, 2H ${a2} → ${htA>0 && a2>0 ? 'Yes' : 'No'}`;
-  if ((tid === 591) && htH != null) return `1H: ${htH}–${htA}, 2H: ${h2}–${a2}`;
-  if ((tid === 592) && htH != null) return `1H: ${htH}–${htA}, 2H: ${h2}–${a2}`;
-  if ([584,585,586,587].includes(tid) && htH != null) return `1H: ${htH}–${htA}, 2H: ${h2}–${a2}`;
+  if (tid === 295 && htH != null) return `${home_s}: ${T('1Y','1H')} ${htH}, ${T('2Y','2H')} ${h2} → ${yn(htH>0 && h2>0)}`;
+  if (tid === 296 && htH != null) return `${away_s}: ${T('1Y','1H')} ${htA}, ${T('2Y','2H')} ${a2} → ${yn(htA>0 && a2>0)}`;
+  if ((tid === 591 || tid === 592) && htH != null) return `${T('1Y','1H')}: ${htH}–${htA}, ${T('2Y','2H')}: ${h2}–${a2}`;
+  if ([584,585,586,587].includes(tid) && htH != null) return `${T('1Y','1H')}: ${htH}–${htA}, ${T('2Y','2H')}: ${h2}–${a2}`;
 
   // ── Clean sheets / wins to nil ────────────────────────────────
-  if (tid === 214) return `${a === 0 ? 'Yes' : 'No'} (Away scored ${a})`;
-  if (tid === 215) return `${h === 0 ? 'Yes' : 'No'} (Home scored ${h})`;
-  if (tid === 589) return `${fr === 1 && a === 0 ? 'Yes' : 'No'} (${h}–${a})`;
-  if (tid === 590) return `${fr === 2 && h === 0 ? 'Yes' : 'No'} (${h}–${a})`;
+  if (tid === 214) return `${yn(a === 0)} (${away_s}: ${a} ${T('gol','goals')})`;
+  if (tid === 215) return `${yn(h === 0)} (${home_s}: ${h} ${T('gol','goals')})`;
+  if (tid === 589) return `${yn(fr === 1 && a === 0)} (${h}–${a})`;
+  if (tid === 590) return `${yn(fr === 2 && h === 0)} (${h}–${a})`;
 
   // ── Who advances / shootout ───────────────────────────────────
   if (tid === 182) return `${frLabel} (${h}–${a})`;
-  if (tid === 593) return `FT: ${h}–${a}`;
+  if (tid === 593) return `${T('MS','FT')}: ${h}–${a}`;
 
   // ── First to score ────────────────────────────────────────────
-  if (tid === 291) return r.firstScorer ? `First scorer: ${r.firstScorer}` : 'No goals';
+  if (tid === 291) return r.firstScorer ? `${T('İlk gol','First scorer')}: ${r.firstScorer}` : T('Gol yok','No goals');
 
   // ── Red card in match ─────────────────────────────────────────
   if (tid === 225) {
     const s = (r.redCards || []).join(', ');
-    return s ? `Red card: ${s}` : 'No red cards';
+    return s ? `${T('Kırmızı kart','Red card')}: ${s}` : T('Kırmızı kart yok','No red cards');
   }
 
   // ── Player markets ────────────────────────────────────────────
   if (tid === 701) {
     const s = (r.scorers || []).join(', ');
-    return s ? `Scored: ${s}` : 'No goals';
+    return s ? `${T('Goller','Scored')}: ${s}` : T('Gol yok','No goals');
   }
-  if (tid === 702) return r.firstScorer ? `First: ${r.firstScorer}` : 'No goals';
+  if (tid === 702) return r.firstScorer ? `${T('İlk','First')}: ${r.firstScorer}` : T('Gol yok','No goals');
   if (tid === 706) {
     const s = (r.headerScorers || []).join(', ');
-    return s ? `Header: ${s}` : 'No header goals';
+    return s ? `${T('Kafa','Header')}: ${s}` : T('Kafa golü yok','No header goals');
   }
   if (tid === 708) {
     const s = (r.fkScorers || []).join(', ');
-    return s ? `Freekick: ${s}` : 'No freekick goals';
+    return s ? `${T('Friki','Freekick')}: ${s}` : T('Frikik golü yok','No freekick goals');
   }
   if (tid === 707) {
     const s = (r.assisters || []).join(', ');
-    return s ? `Assisted: ${s}` : 'No assists';
+    return s ? `${T('Asistler','Assisted')}: ${s}` : T('Asist yok','No assists');
   }
-  if (tid === 704) {
+  if (tid === 704 || tid === 710) {
     const s = (r.yellowCards || []).join(', ');
-    return s ? `Yellow: ${s}` : 'No yellow cards';
+    return s ? `${T('Sarı kart','Yellow')}: ${s}` : T('Sarı kart yok','No yellow cards');
   }
   if (tid === 722) {
     const s = (r.anyCards || []).join(', ');
-    return s ? `Carded: ${s}` : 'No cards';
+    return s ? `${T('Kart','Carded')}: ${s}` : T('Kart yok','No cards');
   }
   if (tid === 709) {
     const s = (r.redCards || []).join(', ');
-    return s ? `Red card: ${s}` : 'No red cards';
+    return s ? `${T('Kırmızı kart','Red card')}: ${s}` : T('Kırmızı kart yok','No red cards');
   }
   if (tid === 765) {
     const s = (r.scorers || []).concat(r.assisters || []).filter((v,i,a)=>a.indexOf(v)===i).join(', ');
-    return s ? `G/A: ${s}` : 'No goals or assists';
+    return s ? `${T('Gol/Asist','G/A')}: ${s}` : T('Gol veya asist yok','No goals or assists');
   }
 
   // ── Statistics-based markets ──────────────────────────────────────────
@@ -1458,66 +1453,70 @@ function _koCorrectOutcome(bet, r) {
   const hs = stats.home || {};
   const as_ = stats.away || {};
 
+  const _sideLabel = lbl => {
+    const l = lbl.toLowerCase();
+    return (l.includes('away') || l.includes('deplasman')) ? away_s : home_s;
+  };
+  const _sideStats = lbl => {
+    const l = lbl.toLowerCase();
+    return (l.includes('away') || l.includes('deplasman')) ? as_ : hs;
+  };
+
   // Corners — full-match
   if ([216, 424, 338, 583, 220, 299, 601, 602, 798, 864, 867].includes(tid)) {
     const hc = hs.corners != null ? Number(hs.corners) : null;
     const ac = as_.corners != null ? Number(as_.corners) : null;
-    if (hc != null) return `Corners: ${hc}–${ac} (total ${hc + ac})`;
+    if (hc != null) return `${T('Korner','Corners')}: ${hc}–${ac} (${T('toplam','total')} ${hc + ac})`;
   }
   // Corners — 1st half
   const h1c = r.h1Corners || {};
   if ([222, 340, 862, 799].includes(tid) && h1c.home != null)
-    return `1H Corners: ${h1c.home}–${h1c.away}`;
+    return `${T('1Y Korner','1H Corners')}: ${h1c.home}–${h1c.away}`;
   // First corner
   if (tid === 224 && r.firstCornerTeam != null)
-    return `First corner: ${r.firstCornerTeam === 1 ? 'Home' : 'Away'}`;
+    return `${T('İlk korner','First corner')}: ${r.firstCornerTeam === 1 ? home_s : away_s}`;
   // Card points / most card points
   if ([218, 301, 863, 603].includes(tid) && hs.yellowCards != null) {
     const hYel = Number(hs.yellowCards || 0), aYel = Number(as_.yellowCards || 0);
     const hRed = Number(hs.redCards    || 0), aRed = Number(as_.redCards    || 0);
     const hCp = hYel + hRed * 2, aCp = aYel + aRed * 2;
-    return `Card pts: ${hCp}–${aCp} (total ${hCp + aCp})`;
+    return `${T('Kart puanı','Card pts')}: ${hCp}–${aCp} (${T('toplam','total')} ${hCp + aCp})`;
   }
   // Saves O/U
   if (tid === 803 && hs.saves != null) {
     const hSav = Number(hs.saves || 0), aSav = Number(as_.saves || 0);
-    return `Saves: ${hSav}–${aSav} (total ${hSav + aSav})`;
+    return `${T('Kurtarış','Saves')}: ${hSav}–${aSav} (${T('toplam','total')} ${hSav + aSav})`;
   }
   // Shots (home or away — determined by outcome label)
   if ([805, 806].includes(tid)) {
-    const key = tid === 805 ? 'totalShots' : 'shotsOnGoal';
-    const lbl = (bet.outcomeLabelEn || bet.outcomeLabel || '').toLowerCase();
-    const isAway = lbl.includes('away') || lbl.includes('deplasman');
-    const side = isAway ? as_ : hs;
-    if (side[key] != null) {
-      const metric = tid === 805 ? 'shots' : 'shots on goal';
-      return `${isAway ? 'Away' : 'Home'} ${metric}: ${Number(side[key])}`;
-    }
+    const key    = tid === 805 ? 'totalShots' : 'shotsOnGoal';
+    const lbl    = bet.outcomeLabel || '';
+    const metric = tid === 805 ? T('şut','shots') : T('isabetli şut','shots on goal');
+    const side   = _sideStats(lbl);
+    const slbl   = _sideLabel(lbl);
+    if (side[key] != null) return `${slbl} ${metric}: ${Number(side[key])}`;
   }
   // Offsides O/U
   if (tid === 808) {
-    const lbl = (bet.outcomeLabelEn || bet.outcomeLabel || '').toLowerCase();
-    const isAway = lbl.includes('away') || lbl.includes('deplasman');
-    const val = isAway ? as_.offsides : hs.offsides;
-    if (val != null) return `${isAway ? 'Away' : 'Home'} offsides: ${Number(val)}`;
+    const lbl = bet.outcomeLabel || '';
+    const val = _sideStats(lbl).offsides;
+    if (val != null) return `${_sideLabel(lbl)} ${T('ofsayt','offsides')}: ${Number(val)}`;
   }
   // Fouls O/U
   if (tid === 807) {
-    const lbl = (bet.outcomeLabelEn || bet.outcomeLabel || '').toLowerCase();
-    const isAway = lbl.includes('away') || lbl.includes('deplasman');
-    const val = isAway ? as_.fouls : hs.fouls;
-    if (val != null) return `${isAway ? 'Away' : 'Home'} fouls: ${Number(val)}`;
+    const lbl = bet.outcomeLabel || '';
+    const val = _sideStats(lbl).fouls;
+    if (val != null) return `${_sideLabel(lbl)} ${T('faul','fouls')}: ${Number(val)}`;
   }
   // Possession O/U
   if (tid === 809) {
-    const lbl = (bet.outcomeLabelEn || bet.outcomeLabel || '').toLowerCase();
-    const isAway = lbl.includes('away') || lbl.includes('deplasman');
-    const val = isAway ? as_.possession : hs.possession;
-    if (val != null) return `${isAway ? 'Away' : 'Home'} possession: ${Number(val)}%`;
+    const lbl = bet.outcomeLabel || '';
+    const val = _sideStats(lbl).possession;
+    if (val != null) return `${_sideLabel(lbl)} ${T('top hakimiyeti','possession')}: ${Number(val)}%`;
   }
 
   // ── Universal fallback ────────────────────────────────────────
-  return `FT: ${h}–${a}`;
+  return `${T('MS','FT')}: ${h}–${a}`;
 }
 
 async function loadAllKoBets() {
@@ -1572,6 +1571,8 @@ function renderAllKoBets() {
                 return txt ? `<span class="ko-bet-correct">${esc(txt)}</span>` : '';
               })()
             : '';
+          const detailHtml = b.resultDetail && b.won !== undefined && b.won !== null
+            ? `<span class="ko-bet-result-detail">${esc(b.resultDetail)}</span>` : '';
           return `
             <div class="ko-bet-row">
               <div class="ko-bet-user">
@@ -1587,7 +1588,7 @@ function renderAllKoBets() {
                 <span class="ko-bet-sep">·</span>
                 <span class="ko-bet-amount">${b.amount} la</span>
               </div>
-              <div class="ko-bet-status">${wonIcon}${payoutHtml}${correctHtml}</div>
+              <div class="ko-bet-status">${wonIcon}${payoutHtml}${correctHtml}${detailHtml}</div>
             </div>`;
         }).join('')
       : `<div class="ko-empty-msg">${lang === 'tr' ? 'Bu maç için bahis girilmedi.' : 'No bets for this match.'}</div>`;
@@ -1597,9 +1598,7 @@ function renderAllKoBets() {
         <div class="ko-submitted-card-header">
           <div class="ko-submitted-card-title">
             ${esc((lang === 'en' && m.nameEn) ? m.nameEn : (m.name || mId))}
-            ${resultScore ? `<span class="ko-result-score">${esc(resultScore)}</span>`
-              : liveScores[mId] ? `<span class="ko-result-score live-score">🔴 ${liveScores[mId].homeScore} – ${liveScores[mId].awayScore}${liveScores[mId].clock ? ' · ' + liveScores[mId].clock : ''}</span>`
-              : ''}
+            ${resultScore ? `<span class="ko-result-score">${esc(resultScore)}</span>` : ''}
           </div>
           <div class="ko-submitted-card-date">${esc(dateLabel)}</div>
         </div>
@@ -1642,3 +1641,16 @@ document.getElementById('ko-profile-form')?.addEventListener('submit', submitKoP
 document.addEventListener('keydown', e => {
   if (e.key === 'Escape') { closeCouponPanel(); closeLoginModal(); closeKoProfileModal(); }
 });
+
+/* ── Dynamic header offset ───────────────────────────────────────
+   Keep --gs-header-offset in sync with the real header height so
+   the sticky tab bar never slides under the header on mobile.    */
+function _syncHeaderOffset() {
+  const h = document.querySelector('header');
+  if (h) document.documentElement.style.setProperty('--gs-header-offset', h.offsetHeight + 'px');
+}
+_syncHeaderOffset();
+window.addEventListener('resize', _syncHeaderOffset);
+if (typeof ResizeObserver !== 'undefined') {
+  new ResizeObserver(_syncHeaderOffset).observe(document.querySelector('header'));
+}

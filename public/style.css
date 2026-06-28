@@ -339,7 +339,6 @@ main { max-width: 1400px; margin: 0 auto; padding: 0 1rem 3rem; }
 }
 .team-name { font-weight: 600; font-size: .97rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .vs-sep { font-size: .72rem; color: var(--muted); margin: .1rem 0; }
-.vs-sep.live-score { font-size: 1.05rem; font-weight: 700; color: #ef4444; letter-spacing: .04em; }
 
 .match-badges {
   display: flex;
@@ -681,6 +680,36 @@ main { max-width: 1400px; margin: 0 auto; padding: 0 1rem 3rem; }
 }
 .modal-bet-btn:hover { border-color: var(--yellow); color: var(--yellow); background: rgba(245,158,11,.07); }
 .modal-bet-btn.is-current { border-color: var(--yellow); color: var(--yellow); background: rgba(245,158,11,.12); }
+
+/* Floating bet confirmation sheet (slides up from bottom, above modal) */
+.ko-bet-sheet {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: var(--surface);
+  border-top: 2px solid var(--accent);
+  border-radius: 14px 14px 0 0;
+  padding: .65rem 1.5rem calc(env(safe-area-inset-bottom, 0px) + 1.1rem);
+  z-index: 1200;
+  box-shadow: 0 -6px 32px rgba(0,0,0,.55);
+  transform: translateY(110%);
+  transition: transform .22s cubic-bezier(.4,0,.2,1);
+}
+.ko-bet-sheet.active { transform: translateY(0); }
+.ko-sheet-handle {
+  width: 36px; height: 4px;
+  background: var(--border);
+  border-radius: 2px;
+  margin: 0 auto .55rem;
+}
+.ko-sheet-sel {
+  font-size: .88rem;
+  margin-bottom: .55rem;
+  line-height: 1.4;
+}
+.ko-sheet-sel strong { color: var(--accent); }
+.ko-sheet-mkt { font-size: .75rem; opacity: .55; margin-left: .2rem; }
 
 /* Amount picker (shown in modal footer when placing a bet) */
 .ko-bet-confirm {
@@ -2101,8 +2130,8 @@ main { max-width: 1400px; margin: 0 auto; padding: 0 1rem 3rem; }
 .ko-bet-pending { color: var(--muted); }
 .ko-bet-payout  { font-size: .78rem; font-weight: 700; color: var(--green); }
 .ko-bet-correct { font-size: .72rem; color: var(--muted); margin-left: .3rem; }
+.ko-bet-result-detail { font-size: .72rem; color: var(--muted); margin-left: .4rem; font-style: italic; }
 .ko-result-score { font-size: .78rem; font-weight: 600; color: var(--green); margin-left: .5rem; }
-.ko-result-score.live-score { color: #ef4444; }
 .ko-empty-msg {
   padding: .85rem;
   color: var(--muted);

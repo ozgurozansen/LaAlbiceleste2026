@@ -91,9 +91,10 @@ _KO_BETS_FILE      = os.path.join(DATA_DIR, "knockout_bets.json")
 _KO_MATCH_LOG_FILE = os.path.join(DATA_DIR, "knockout_match_log.json")
 _KO_RESULTS_FILE   = os.path.join(DATA_DIR, "knockout_results.json")
 
-KNOCKOUT_CREDIT_BASE = 100
-KNOCKOUT_MIN_BET     = 4
-KNOCKOUT_MAX_BET     = 8
+KNOCKOUT_CREDIT_BASE  = 100
+KNOCKOUT_MIN_BET      = 1
+KNOCKOUT_MAX_BET      = 8
+KNOCKOUT_NO_BET_PENALTY = 5
 
 POINTS_CFG  = CONFIG.get("points", {"correct_score": 5, "correct_result": 3,
                                      "correct_fh_bonus": 1, "correct_sh_bonus": 1})
@@ -414,28 +415,44 @@ def _ko_compute_credit(username):
         except (ValueError, TypeError):
             continue
         if now_ts >= ts_sec and mid not in bets:
-            penalties += KNOCKOUT_MIN_BET
+            penalties += KNOCKOUT_NO_BET_PENALTY
 
     return base - spent - penalties + winnings
 
 
 # ── Knockout result fetching & settlement ─────────────────────────────────────
 
+def _parse_label_threshold(label):
+    """Parse 'Name N+' or 'Name N-' labels into (name_part, threshold, is_over).
+    Returns (label, None, None) if no numeric threshold token found."""
+    parts = (label or "").strip().rsplit(None, 1)
+    if len(parts) == 2:
+        m = re.match(r'^(\d+)(\+|-)$', parts[1])
+        if m:
+            thr = int(m.group(1))
+            is_over = m.group(2) == '+'
+            return parts[0].strip(), thr, is_over
+    return label, None, None
+
+
 def _ko_find_player(players_dict, name_query):
     """Best-effort fuzzy match a player name against the players dict (keyed by lowercase name)."""
     if not name_query or not players_dict:
         return None
-    q = name_query.lower().strip()
-    if q in players_dict:
-        return players_dict[q]
+    def _n(s):
+        return unicodedata.normalize("NFKD", s).encode("ascii", "ignore").decode().lower().strip()
+    q = _n(name_query)
+    norm_map = {_n(k): v for k, v in players_dict.items()}
+    if q in norm_map:
+        return norm_map[q]
     q_parts = q.split()
     if q_parts:
-        for pkey, pdata in players_dict.items():
-            p_parts = pkey.split()
+        for nk, pdata in norm_map.items():
+            p_parts = nk.split()
             if p_parts and q_parts[-1] == p_parts[-1]:
                 return pdata
-    for pkey, pdata in players_dict.items():
-        if q in pkey or pkey in q:
+    for nk, pdata in norm_map.items():
+        if q in nk or nk in q:
             return pdata
     return None
 
@@ -825,15 +842,31 @@ def _ko_settle_bet(bet, result):
             return {1: cw == 1, 2: cw == 2, 3: cw == 3}.get(n)
 
     # ── Shots (total / on target) O/U ─────────────────────────────────────────
-    if tid in (805, 806) and sov:
+    if tid in (805, 806):
         if not hs and not as_:
             return None
-        label = (bet.get("outcomeLabel") or "").lower()
-        key   = "totalShots" if tid == 805 else "shotsOnGoal"
-        side_stats = as_ if ("away" in label or "deplasman" in label) else hs
+        raw_label = (bet.get("outcomeLabel") or "").strip()
+        key = "totalShots" if tid == 805 else "shotsOnGoal"
+        team_name, thr, is_over = _parse_label_threshold(raw_label)
+        effective_sov = thr if thr is not None else sov
+        if not effective_sov:
+            return None
+        # Identify home vs away by matching team name against matchNameEn / matchName
+        def _nn(s): return unicodedata.normalize("NFKD", s or "").encode("ascii", "ignore").decode().lower()
+        mn = bet.get("matchNameEn") or bet.get("matchName") or ""
+        mn_parts = mn.split(" vs ", 1)
+        if len(mn_parts) == 2 and team_name:
+            tn = _nn(team_name)
+            away_n = _nn(mn_parts[1].strip())
+            side_stats = as_ if (tn in away_n or away_n in tn) else hs
+        else:
+            lbl_l = raw_label.lower()
+            side_stats = as_ if ("away" in lbl_l or "deplasman" in lbl_l) else hs
         shots = int(side_stats.get(key) or 0)
-        if n == 1: return shots < sov
-        if n == 2: return shots > sov
+        if is_over is not None:
+            return shots >= effective_sov if is_over else shots < effective_sov
+        if n == 1: return shots < effective_sov
+        if n == 2: return shots >= effective_sov
         return None
 
     # ── Goalkeeper saves O/U (typeId 803) ────────────────────────────────────
@@ -930,17 +963,19 @@ def _ko_settle_bet(bet, result):
         if not players: return None
         fgp = result.get("firstGoalPlayer") or ""
         if not fgp: return None
-        q_parts = label.lower().split()
-        f_parts = fgp.lower().split()
+        def _nn(s): return unicodedata.normalize("NFKD", s).encode("ascii", "ignore").decode().lower()
+        q_parts = _nn(label).split()
+        f_parts = _nn(fgp).split()
         return bool(q_parts and f_parts and q_parts[-1] == f_parts[-1])
 
     if tid == 703:   # Player scores in both halves
         goal_scorers = result.get("goalScorers") or []
         if not goal_scorers: return None
-        label_q = label.lower().strip()
+        def _nn(s): return unicodedata.normalize("NFKD", s).encode("ascii", "ignore").decode().lower().strip()
+        label_q = _nn(label)
         q_parts = label_q.split()
         def _gs_match(name):
-            nk = (name or "").lower().strip()
+            nk = _nn(name or "")
             if nk == label_q: return True
             n_parts = nk.split()
             if q_parts and n_parts and q_parts[-1] == n_parts[-1]: return True
@@ -978,10 +1013,25 @@ def _ko_settle_bet(bet, result):
         p = _ko_find_player(players, label)
         return (p["assists"] > 0) if p else None
 
-    if tid == 714:   # Player shots on target
+    if tid == 714:   # Player shots on target (label: "Name N+" or just "Name")
         if not players: return None
-        p = _ko_find_player(players, label)
-        return (p["shotsOnTarget"] > 0) if p else None
+        name_part, thr, is_over = _parse_label_threshold(label)
+        p = _ko_find_player(players, name_part or label)
+        if not p: return None
+        shots = p["shotsOnTarget"]
+        if thr is not None:
+            return shots >= thr if is_over else shots < thr
+        return shots > 0
+
+    if tid == 740:   # Player total shots (label: "Name N+" or just "Name")
+        if not players: return None
+        name_part, thr, is_over = _parse_label_threshold(label)
+        p = _ko_find_player(players, name_part or label)
+        if not p: return None
+        shots = p["totalShots"]
+        if thr is not None:
+            return shots >= thr if is_over else shots < thr
+        return shots > 0
 
     if tid == 705:   # Player goal + team wins
         if not players: return None
@@ -1279,7 +1329,14 @@ def _ko_fetch_match_result_for_log_entry(minfo):
             hn = names.get("home", "")
             an = names.get("away", "")
             t1n, t2n = _norm(t1), _norm(t2)
-            if (t1n in hn or hn in t1n) and (t2n in an or an in t2n):
+            def _names_match(a, b):
+                if a in b or b in a:
+                    return True
+                # token overlap: any significant word (>3 chars) shared
+                ta = set(w for w in a.split() if len(w) > 3)
+                tb = set(w for w in b.split() if len(w) > 3)
+                return bool(ta & tb)
+            if _names_match(t1n, hn) and _names_match(t2n, an):
                 event_id = ev.get("id")
                 break
         if event_id:
@@ -1371,6 +1428,78 @@ def _ko_fetch_match_result_for_log_entry(minfo):
     return result
 
 
+def _ko_bet_result_detail(bet, result):
+    """Return a human-readable string of the actual stat for the bet outcome, or None."""
+    if not result:
+        return None
+    tid   = int(bet.get("typeId") or 0)
+    label = (bet.get("outcomeLabel") or "").strip()
+    players = result.get("players") or {}
+    stats   = result.get("statistics") or {}
+    h_goals = result.get("homeGoals")
+    a_goals = result.get("awayGoals")
+
+    def _nn(s):
+        return unicodedata.normalize("NFKD", s or "").encode("ascii", "ignore").decode().lower().strip()
+
+    # ── Player stat markets ───────────────────────────────────────────────────
+    _player_stats = {
+        701: ("goals",         "gol"),
+        702: ("goals",         "gol"),
+        703: ("goals",         "gol"),
+        704: ("yellowCards",   "sarı kart"),
+        709: ("redCards",      "kırmızı kart"),
+        710: ("yellowCards",   "sarı kart"),
+        707: ("assists",       "asist"),
+        711: ("goals",         "gol"),
+        712: ("assists",       "asist"),
+        713: ("goals",         "gol"),
+        714: ("shotsOnTarget", "isabetli şut"),
+        740: ("totalShots",    "şut"),
+    }
+    if tid in _player_stats:
+        stat_key, stat_label = _player_stats[tid]
+        name_part, thr, _ = _parse_label_threshold(label)
+        player_name = name_part or label
+        p = _ko_find_player(players, player_name)
+        if p:
+            val = p.get(stat_key, 0)
+            return f"{p['name']}: {val} {stat_label}"
+        if tid == 702:
+            fgp = result.get("firstGoalPlayer") or ""
+            if fgp:
+                return f"İlk gol: {fgp}"
+        return None
+
+    # ── Team shots markets ────────────────────────────────────────────────────
+    if tid in (805, 806):
+        name_part, thr, _ = _parse_label_threshold(label)
+        key = "totalShots" if tid == 805 else "shotsOnGoal"
+        stat_label = "şut" if tid == 805 else "isabetli şut"
+        mn = bet.get("matchNameEn") or bet.get("matchName") or ""
+        mn_parts = mn.split(" vs ", 1)
+        if len(mn_parts) == 2 and name_part:
+            tn = _nn(name_part)
+            away_n = _nn(mn_parts[1].strip())
+            side = "away" if (tn in away_n or away_n in tn) else "home"
+        else:
+            side = "home"
+        val = (stats.get(side) or {}).get(key)
+        if val is not None:
+            return f"{name_part}: {val} {stat_label}"
+        return None
+
+    # ── Score markets ─────────────────────────────────────────────────────────
+    if tid in (777, 779, 571) and h_goals is not None:
+        ht_h = result.get("htHomeGoals")
+        ht_a = result.get("htAwayGoals")
+        if tid == 779 and ht_h is not None:
+            return f"HT: {ht_h}-{ht_a}"
+        return f"FT: {h_goals}-{a_goals}"
+
+    return None
+
+
 def _ko_settle_match_bets(match_id, result):
     """Settle all users' bets for a finished match."""
     with _data_lock:
@@ -1398,6 +1527,7 @@ def _ko_check_and_settle_finished_matches():
     for match_id, minfo in list(log["matches"].items()):
         res_data = _jload(_KO_RESULTS_FILE, {"results": {}})
         if match_id in res_data.get("results", {}):
+            _ko_settle_match_bets(match_id, res_data["results"][match_id])
             continue
 
         start_ts = minfo.get("startTimestamp")
@@ -1432,76 +1562,6 @@ def _ko_check_and_settle_finished_matches():
 
 _ko_last_settle_ts   = 0.0
 _ko_settle_ts_lock   = threading.Lock()
-_live_scores_cache   = {"data": None, "fetched_at": 0}
-_live_scores_lock    = threading.Lock()
-
-
-def _get_live_scores():
-    """Return current live scores from ESPN keyed by Nesine match ID. Cached 60s."""
-    with _live_scores_lock:
-        now = time.time()
-        if _live_scores_cache["data"] is not None and now - _live_scores_cache["fetched_at"] < 60:
-            return _live_scores_cache["data"]
-
-    cfg  = CONFIG.get("ko_results_api", {})
-    slug = cfg.get("competition_slug", "fifa.world")
-    base = f"https://site.api.espn.com/apis/site/v2/sports/soccer/{slug}"
-
-    log    = _jload(_KO_MATCH_LOG_FILE, {"matches": {}})
-    now_ts = time.time()
-
-    candidates = {
-        mid: minfo for mid, minfo in log["matches"].items()
-        if (ts := minfo.get("startTimestamp")) and
-           (float(ts) / 1000.0 if float(ts) > 1e10 else float(ts)) <= now_ts
-    }
-
-    scores = {}
-    if candidates:
-        today  = datetime.now(timezone.utc)
-        espn_events = []
-        for d in [today.strftime("%Y%m%d"), (today - timedelta(days=1)).strftime("%Y%m%d")]:
-            try:
-                espn_events.extend(_ko_espn_get(f"{base}/scoreboard?dates={d}&limit=50").get("events", []))
-            except Exception:
-                pass
-
-        def _norm(s):
-            return unicodedata.normalize("NFKD", s).encode("ascii", "ignore").decode().lower()
-
-        live_statuses = {"in progress", "halftime"}
-
-        for mid, minfo in candidates.items():
-            parts = _match_name_en(minfo).split(" vs ", 1)
-            if len(parts) != 2:
-                continue
-            t1n, t2n = _norm(parts[0].strip()), _norm(parts[1].strip())
-            for ev in espn_events:
-                comp   = (ev.get("competitions") or [{}])[0]
-                st     = (comp.get("status") or {})
-                st_desc = st.get("type", {}).get("description", "").lower()
-                if not any(s in st_desc for s in live_statuses):
-                    continue
-                teams  = comp.get("competitors") or []
-                tnames = {t.get("homeAway"): _norm((t.get("team") or {}).get("displayName", "")) for t in teams}
-                if not ((t1n in tnames.get("home","") or tnames.get("home","") in t1n) and
-                        (t2n in tnames.get("away","") or tnames.get("away","") in t2n)):
-                    continue
-                ht = next((t for t in teams if t.get("homeAway") == "home"), {})
-                at = next((t for t in teams if t.get("homeAway") == "away"), {})
-                scores[mid] = {
-                    "homeScore": int(ht.get("score") or 0),
-                    "awayScore": int(at.get("score") or 0),
-                    "clock":     st.get("displayClock", ""),
-                    "period":    st.get("type", {}).get("shortDetail", st_desc),
-                }
-                break
-
-    with _live_scores_lock:
-        _live_scores_cache["data"]       = scores
-        _live_scores_cache["fetched_at"] = time.time()
-    return scores
-
 
 def _ko_maybe_settle():
     """Throttled wrapper — runs at most once every 5 minutes."""
@@ -2209,10 +2269,6 @@ class Handler(BaseHTTPRequestHandler):
                 })
                 return
 
-            # ── /api/knockout/live-scores ─────────────────────────────────
-            if path == "/api/knockout/live-scores":
-                self.send_json(200, {"scores": _get_live_scores()})
-                return
 
             # ── /api/knockout/leaderboard ─────────────────────────────────
             if path == "/api/knockout/leaderboard":
@@ -2257,13 +2313,14 @@ class Handler(BaseHTTPRequestHandler):
                             "spreadValue":     _sov,
                             "outcomeN":        _n,
                             "outcomeLabel":    bet.get("outcomeLabel"),
-                            "outcomeLabelTr":  _outcome_label(_tid, _n, _sov, None, "tr"),
-                            "outcomeLabelEn":  _outcome_label(_tid, _n, _sov, None, "en"),
+                            "outcomeLabelTr":  _outcome_label(_tid, _n, _sov, bet.get("outcomeLabel"), "tr"),
+                            "outcomeLabelEn":  _outcome_label(_tid, _n, _sov, bet.get("outcomeLabelEn") or bet.get("outcomeLabel"), "en"),
                             "odds":            bet.get("odds"),
                             "amount":          bet.get("amount"),
                             "won":             bet.get("won"),
                             "payout":          bet.get("payout"),
                             "settledAt":       bet.get("settledAt"),
+                            "resultDetail":    _ko_bet_result_detail(bet, res_data.get(match_id)),
                         })
                     # Build compact result summary for this match
                     r = res_data.get(match_id, {})

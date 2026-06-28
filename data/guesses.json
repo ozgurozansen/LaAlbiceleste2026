@@ -462,6 +462,48 @@
         "fhBonus": "Maxim De Cuyper",
         "shBonus": "Tim Payne",
         "savedAt": "2026-06-26T22:57:37.312030+00:00"
+      },
+      "70": {
+        "homeScore": 0,
+        "awayScore": 3,
+        "fhBonus": "Michael Amir Murillo",
+        "shBonus": "Jude Bellingham",
+        "savedAt": "2026-06-27T20:40:09.396370+00:00"
+      },
+      "71": {
+        "homeScore": 1,
+        "awayScore": 2,
+        "fhBonus": "27",
+        "shBonus": "6",
+        "savedAt": "2026-06-27T20:48:34.544852+00:00"
+      },
+      "64": {
+        "homeScore": 1,
+        "awayScore": 2,
+        "fhBonus": "36",
+        "shBonus": "46",
+        "savedAt": "2026-06-27T20:45:46.764704+00:00"
+      },
+      "65": {
+        "homeScore": 3,
+        "awayScore": 1,
+        "fhBonus": "Samuel Moutoussamy",
+        "shBonus": "Cédric Bakambu",
+        "savedAt": "2026-06-27T20:49:13.160543+00:00"
+      },
+      "58": {
+        "homeScore": 2,
+        "awayScore": 1,
+        "fhBonus": "32",
+        "shBonus": "Konrad Laimer",
+        "savedAt": "2026-06-27T20:49:36.520911+00:00"
+      },
+      "59": {
+        "homeScore": 0,
+        "awayScore": 3,
+        "fhBonus": "Nicolás González",
+        "shBonus": "88",
+        "savedAt": "2026-06-27T20:50:33.781993+00:00"
       }
     },
     "palyaco": {
@@ -1390,6 +1432,48 @@
         "fhBonus": "Francis de Vries",
         "shBonus": "Tommy Smith",
         "savedAt": "2026-06-26T10:19:01.401641+00:00"
+      },
+      "70": {
+        "homeScore": 1,
+        "awayScore": 5,
+        "fhBonus": "Aníbal Godoy ( captain )",
+        "shBonus": "Harry Kane ( captain )",
+        "savedAt": "2026-06-27T12:09:35.792653+00:00"
+      },
+      "71": {
+        "homeScore": 2,
+        "awayScore": 3,
+        "fhBonus": "41",
+        "shBonus": "8",
+        "savedAt": "2026-06-27T12:10:04.165958+00:00"
+      },
+      "64": {
+        "homeScore": 2,
+        "awayScore": 2,
+        "fhBonus": "34",
+        "shBonus": "46",
+        "savedAt": "2026-06-27T12:10:34.151374+00:00"
+      },
+      "65": {
+        "homeScore": 1,
+        "awayScore": 1,
+        "fhBonus": "Akmal Mozgovoy",
+        "shBonus": "Chancel Mbemba ( captain )",
+        "savedAt": "2026-06-27T12:11:10.259060+00:00"
+      },
+      "58": {
+        "homeScore": 2,
+        "awayScore": 2,
+        "fhBonus": "33",
+        "shBonus": "David Alaba ( captain )",
+        "savedAt": "2026-06-27T12:11:47.657047+00:00"
+      },
+      "59": {
+        "homeScore": 0,
+        "awayScore": 4,
+        "fhBonus": "Rodrigo De Paul",
+        "shBonus": "80",
+        "savedAt": "2026-06-27T12:13:52.215776+00:00"
       }
     },
     "ozancayir": {
@@ -1840,6 +1924,48 @@
         "fhBonus": "Joe Bell",
         "shBonus": "Liberato Cacace",
         "savedAt": "2026-06-26T15:08:48.732148+00:00"
+      },
+      "70": {
+        "homeScore": 0,
+        "awayScore": 3,
+        "fhBonus": "Fidel Escobar",
+        "shBonus": "Harry Kane ( captain )",
+        "savedAt": "2026-06-27T20:18:08.675289+00:00"
+      },
+      "71": {
+        "homeScore": 2,
+        "awayScore": 1,
+        "fhBonus": "32",
+        "shBonus": "8",
+        "savedAt": "2026-06-27T20:19:21.783746+00:00"
+      },
+      "64": {
+        "homeScore": 1,
+        "awayScore": 1,
+        "fhBonus": "36",
+        "shBonus": "46",
+        "savedAt": "2026-06-27T20:20:42.917017+00:00"
+      },
+      "65": {
+        "homeScore": 2,
+        "awayScore": 1,
+        "fhBonus": "Otabek Shukurov",
+        "shBonus": "Yoane Wissa",
+        "savedAt": "2026-06-27T20:23:54.973572+00:00"
+      },
+      "58": {
+        "homeScore": 1,
+        "awayScore": 2,
+        "fhBonus": "21",
+        "shBonus": "Riyad Mahrez ( captain )",
+        "savedAt": "2026-06-27T20:26:24.602050+00:00"
+      },
+      "59": {
+        "homeScore": 0,
+        "awayScore": 4,
+        "fhBonus": "Yazan Al-Arab",
+        "shBonus": "86",
+        "savedAt": "2026-06-27T20:28:19.738622+00:00"
       }
     },
     "boncuk": {
@@ -2297,6 +2423,48 @@
         "fhBonus": "Marko Stamenić",
         "shBonus": "Michael Boxall",
         "savedAt": "2026-06-26T18:49:02.797364+00:00"
+      },
+      "70": {
+        "homeScore": 0,
+        "awayScore": 2,
+        "fhBonus": "Carlos Harvey",
+        "shBonus": "Ollie Watkins",
+        "savedAt": "2026-06-27T14:26:39.693153+00:00"
+      },
+      "71": {
+        "homeScore": 1,
+        "awayScore": 0,
+        "fhBonus": "43",
+        "shBonus": "8",
+        "savedAt": "2026-06-27T14:26:40.599707+00:00"
+      },
+      "64": {
+        "homeScore": 1,
+        "awayScore": 1,
+        "fhBonus": "41",
+        "shBonus": "46",
+        "savedAt": "2026-06-27T14:26:41.498544+00:00"
+      },
+      "65": {
+        "homeScore": 2,
+        "awayScore": 1,
+        "fhBonus": "Chancel Mbemba ( captain )",
+        "shBonus": "Yoane Wissa",
+        "savedAt": "2026-06-27T14:26:42.294771+00:00"
+      },
+      "58": {
+        "homeScore": 1,
+        "awayScore": 1,
+        "fhBonus": "42",
+        "shBonus": "Konrad Laimer",
+        "savedAt": "2026-06-27T14:26:43.898897+00:00"
+      },
+      "59": {
+        "homeScore": 0,
+        "awayScore": 3,
+        "fhBonus": "Nizar Al-Rashdan",
+        "shBonus": "89",
+        "savedAt": "2026-06-27T14:26:44.506501+00:00"
       }
     },
     "ceo": {
@@ -3267,6 +3435,48 @@
         "fhBonus": "Mohamed Salah ( captain )",
         "shBonus": "Mohamed Salah ( captain )",
         "savedAt": "2026-06-26T15:17:40.305657+00:00"
+      },
+      "70": {
+        "homeScore": 0,
+        "awayScore": 1,
+        "fhBonus": "José Fajardo",
+        "shBonus": "Declan Rice",
+        "savedAt": "2026-06-27T14:38:34.451787+00:00"
+      },
+      "71": {
+        "homeScore": 0,
+        "awayScore": 0,
+        "fhBonus": "46",
+        "shBonus": "5",
+        "savedAt": "2026-06-27T14:39:29.307804+00:00"
+      },
+      "64": {
+        "homeScore": 1,
+        "awayScore": 1,
+        "fhBonus": "46",
+        "shBonus": "46",
+        "savedAt": "2026-06-27T14:41:50.811412+00:00"
+      },
+      "65": {
+        "homeScore": 2,
+        "awayScore": 0,
+        "fhBonus": "Abdukodir Khusanov",
+        "shBonus": "Cédric Bakambu",
+        "savedAt": "2026-06-27T14:42:46.175022+00:00"
+      },
+      "58": {
+        "homeScore": 2,
+        "awayScore": 2,
+        "fhBonus": "46",
+        "shBonus": "Saša Kalajdžić",
+        "savedAt": "2026-06-27T23:30:45.723863+00:00"
+      },
+      "59": {
+        "homeScore": 1,
+        "awayScore": 3,
+        "fhBonus": "Saed Al-Rosan",
+        "shBonus": "87",
+        "savedAt": "2026-06-27T23:31:10.799347+00:00"
       }
     },
     "lavlibolin": {
@@ -3724,6 +3934,48 @@
         "fhBonus": "Hans Vanaken",
         "shBonus": "Michael Boxall",
         "savedAt": "2026-06-26T13:02:39.929648+00:00"
+      },
+      "70": {
+        "homeScore": 0,
+        "awayScore": 3,
+        "fhBonus": "José Luis Rodríguez",
+        "shBonus": "Noni Madueke",
+        "savedAt": "2026-06-27T11:18:00.588569+00:00"
+      },
+      "71": {
+        "homeScore": 1,
+        "awayScore": 1,
+        "fhBonus": "31",
+        "shBonus": "6",
+        "savedAt": "2026-06-27T11:19:07.893806+00:00"
+      },
+      "64": {
+        "homeScore": 2,
+        "awayScore": 2,
+        "fhBonus": "42",
+        "shBonus": "46",
+        "savedAt": "2026-06-27T11:20:21.109004+00:00"
+      },
+      "65": {
+        "homeScore": 2,
+        "awayScore": 0,
+        "fhBonus": "Odiljon Hamrobekov",
+        "shBonus": "Arthur Masuaku",
+        "savedAt": "2026-06-27T11:21:53.218366+00:00"
+      },
+      "58": {
+        "homeScore": 1,
+        "awayScore": 1,
+        "fhBonus": "33",
+        "shBonus": "Xaver Schlager",
+        "savedAt": "2026-06-27T11:23:06.620795+00:00"
+      },
+      "59": {
+        "homeScore": 0,
+        "awayScore": 3,
+        "fhBonus": "Ihsan Haddad ( captain )",
+        "shBonus": "86",
+        "savedAt": "2026-06-27T11:24:19.547484+00:00"
       }
     },
     "dna": {
@@ -4659,6 +4911,48 @@
         "fhBonus": "Joe Bell",
         "shBonus": "Chris Wood ( captain )",
         "savedAt": "2026-06-26T20:46:48.103956+00:00"
+      },
+      "70": {
+        "homeScore": 0,
+        "awayScore": 6,
+        "fhBonus": "Carlos Harvey",
+        "shBonus": "Harry Kane ( captain )",
+        "savedAt": "2026-06-27T19:16:43.826760+00:00"
+      },
+      "71": {
+        "homeScore": 0,
+        "awayScore": 0,
+        "fhBonus": "35",
+        "shBonus": "6",
+        "savedAt": "2026-06-27T19:16:58.664724+00:00"
+      },
+      "64": {
+        "homeScore": 3,
+        "awayScore": 2,
+        "fhBonus": "42",
+        "shBonus": "46",
+        "savedAt": "2026-06-27T19:18:26.921615+00:00"
+      },
+      "65": {
+        "homeScore": 2,
+        "awayScore": 1,
+        "fhBonus": "Akmal Mozgovoy",
+        "shBonus": "Yoane Wissa",
+        "savedAt": "2026-06-27T19:19:26.990404+00:00"
+      },
+      "58": {
+        "homeScore": 0,
+        "awayScore": 0,
+        "fhBonus": "33",
+        "shBonus": "Stefan Posch",
+        "savedAt": "2026-06-27T19:22:10.165291+00:00"
+      },
+      "59": {
+        "homeScore": 1,
+        "awayScore": 2,
+        "fhBonus": "Nico Paz",
+        "shBonus": "88",
+        "savedAt": "2026-06-27T19:23:15.955026+00:00"
       }
     }
   }

@@ -659,6 +659,66 @@
       "shBonusAnswer": "Elijah Just",
       "scored": true,
       "enteredAt": "2026-06-27T05:15:58.000749+00:00"
+    },
+    "70": {
+      "score": {
+        "home": 0,
+        "away": 2
+      },
+      "fhBonusAnswer": null,
+      "shBonusAnswer": "Harry Kane ( captain )",
+      "scored": true,
+      "enteredAt": "2026-06-27T23:19:15.712977+00:00"
+    },
+    "71": {
+      "score": {
+        "home": 2,
+        "away": 1
+      },
+      "fhBonusAnswer": "31",
+      "shBonusAnswer": "7",
+      "scored": true,
+      "enteredAt": "2026-06-27T23:22:12.853237+00:00"
+    },
+    "58": {
+      "score": {
+        "home": 3,
+        "away": 3
+      },
+      "fhBonusAnswer": "45",
+      "shBonusAnswer": null,
+      "scored": true,
+      "enteredAt": "2026-06-28T07:53:43.872793+00:00"
+    },
+    "59": {
+      "score": {
+        "home": 1,
+        "away": 3
+      },
+      "fhBonusAnswer": "Mohannad Abu Taha",
+      "shBonusAnswer": "90",
+      "scored": true,
+      "enteredAt": "2026-06-28T07:55:52.477566+00:00"
+    },
+    "64": {
+      "score": {
+        "home": 0,
+        "away": 0
+      },
+      "fhBonusAnswer": null,
+      "shBonusAnswer": "46",
+      "scored": true,
+      "enteredAt": "2026-06-28T07:57:25.923257+00:00"
+    },
+    "65": {
+      "score": {
+        "home": 3,
+        "away": 1
+      },
+      "fhBonusAnswer": "Noah Sadiki",
+      "shBonusAnswer": "Yoane Wissa",
+      "scored": true,
+      "enteredAt": "2026-06-28T07:59:32.083333+00:00"
     }
   }
 }

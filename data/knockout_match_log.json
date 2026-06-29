@@ -53,6 +53,48 @@
       "nameEn": "Argentina vs Cape Verde",
       "startTimestamp": 1783116000000,
       "firstSeenAt": "2026-06-27T12:52:21.999784+00:00"
+    },
+    "2970232": {
+      "name": "Meksika vs Ekvador",
+      "nameEn": "Mexico vs Ecuador",
+      "startTimestamp": 1782867600000,
+      "firstSeenAt": "2026-06-28T16:57:02.327176+00:00"
+    },
+    "2970265": {
+      "name": "İngiltere vs D. Kongo Cum.",
+      "nameEn": "England vs DR Congo",
+      "startTimestamp": 1782921600000,
+      "firstSeenAt": "2026-06-28T16:57:02.327194+00:00"
+    },
+    "2970218": {
+      "name": "Belçika vs Senegal",
+      "nameEn": "Belgium vs Senegal",
+      "startTimestamp": 1782936000000,
+      "firstSeenAt": "2026-06-28T16:57:02.327200+00:00"
+    },
+    "2972357": {
+      "name": "İspanya vs Avusturya",
+      "nameEn": "Spain vs Austria",
+      "startTimestamp": 1783018800000,
+      "firstSeenAt": "2026-06-28T16:57:02.327204+00:00"
+    },
+    "2972335": {
+      "name": "Portekiz vs Hırvatistan",
+      "nameEn": "Portugal vs Croatia",
+      "startTimestamp": 1783033200000,
+      "firstSeenAt": "2026-06-28T16:57:02.327209+00:00"
+    },
+    "2974026": {
+      "name": "İsviçre vs Cezayir",
+      "nameEn": "Switzerland vs Algeria",
+      "startTimestamp": 1783047600000,
+      "firstSeenAt": "2026-06-28T17:00:26.816906+00:00"
+    },
+    "2976624": {
+      "name": "Kolombiya vs Gana",
+      "nameEn": "Colombia vs Ghana",
+      "startTimestamp": 1783128600000,
+      "firstSeenAt": "2026-06-28T17:00:26.816918+00:00"
     }
   }
 }

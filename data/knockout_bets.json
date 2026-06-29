@@ -29,12 +29,15 @@
         "outcomeLabel": "1 (Ev Sahibi)",
         "outcomeLabelEn": "1 (Home)",
         "outcomeN": 1,
-        "typeId": 0,
+        "typeId": 1,
         "spreadValue": 0.0,
         "odds": 1.53,
         "amount": 20,
         "startTimestamp": 1782752400000,
-        "savedAt": "2026-06-29T13:46:37.157668+00:00"
+        "savedAt": "2026-06-29T13:46:37.157668+00:00",
+        "won": true,
+        "payout": 30.6,
+        "settledAt": "2026-06-29T19:30:36.193301+00:00"
       },
       "2966425": {
         "matchName": "Almanya vs Paraguay",
@@ -45,7 +48,7 @@
         "outcomeLabel": "1+Var",
         "outcomeLabelEn": "1+Yes",
         "outcomeN": 1,
-        "typeId": 0,
+        "typeId": 414,
         "spreadValue": 0.0,
         "odds": 2.92,
         "amount": 21,
@@ -88,9 +91,9 @@
         "amount": 8,
         "startTimestamp": 1782752400000,
         "savedAt": "2026-06-29T16:54:44.541955+00:00",
-        "won": true,
-        "payout": 32.64,
-        "settledAt": "2026-06-29T19:03:43.468439+00:00"
+        "won": false,
+        "payout": 0.0,
+        "settledAt": "2026-06-29T19:30:36.193301+00:00"
       },
       "2966425": {
         "matchName": "Almanya vs Paraguay",
@@ -216,6 +219,22 @@
         "won": false,
         "payout": 0.0,
         "settledAt": "2026-06-28T21:00:50.061628+00:00"
+      },
+      "2966425": {
+        "matchName": "Almanya vs Paraguay",
+        "matchNameEn": "Germany vs Paraguay",
+        "marketId": "73987289",
+        "marketName": "Sonuç + Alt/Üst",
+        "marketNameEn": "Result + O/U",
+        "outcomeLabel": "1+Üst",
+        "outcomeLabelEn": "1+Üst",
+        "outcomeN": 4,
+        "typeId": 343,
+        "spreadValue": 2.5,
+        "odds": 1.68,
+        "amount": 30,
+        "startTimestamp": 1782765000000,
+        "savedAt": "2026-06-29T19:30:21.144155+00:00"
       }
     },
     "lavlibolin": {
@@ -432,6 +451,38 @@
         "won": true,
         "payout": 48.8,
         "settledAt": "2026-06-29T19:03:43.468475+00:00"
+      },
+      "2966425": {
+        "matchName": "Almanya vs Paraguay",
+        "matchNameEn": "Germany vs Paraguay",
+        "marketId": "73987264",
+        "marketName": "Maç Sonucu ve Karşılıklı Gol",
+        "marketNameEn": "Match Result and BTTS",
+        "outcomeLabel": "1+Yok",
+        "outcomeLabelEn": "1+No",
+        "outcomeN": 2,
+        "typeId": 414,
+        "spreadValue": 0.0,
+        "odds": 1.94,
+        "amount": 25,
+        "startTimestamp": 1782765000000,
+        "savedAt": "2026-06-29T19:18:04.836113+00:00"
+      },
+      "2968808": {
+        "matchName": "Hollanda vs Fas",
+        "matchNameEn": "Netherlands vs Morocco",
+        "marketId": "73987380",
+        "marketName": "İlk yarı Skoru",
+        "marketNameEn": "İlk yarı Skoru",
+        "outcomeLabel": "1:1",
+        "outcomeLabelEn": "1:1",
+        "outcomeN": 2,
+        "typeId": 779,
+        "spreadValue": 0.0,
+        "odds": 8.41,
+        "amount": 6,
+        "startTimestamp": 1782781200000,
+        "savedAt": "2026-06-29T19:27:28.651421+00:00"
       }
     },
     "dna": {

@@ -514,12 +514,12 @@ def _ko_settle_bet(bet, result):
         if n == 2: return tot > sov
         return None  # push
 
-    if tid in (20, 29, 212, 326, 455, 161) and sov:   # O/U home goals
+    if tid in (20, 212, 326, 455, 161) and sov:   # O/U home goals
         if n == 1: return h < sov
         if n == 2: return h > sov
         return None
 
-    if tid in (15, 164, 207, 256, 327, 328, 329, 604) and sov:   # O/U away goals
+    if tid in (15, 29, 164, 207, 256, 327, 328, 329, 604) and sov:   # O/U away goals (29=Deplasman Alt/Üst)
         if n == 1: return a < sov
         if n == 2: return a > sov
         return None

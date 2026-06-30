@@ -469,6 +469,29 @@ def _ko_settle_bet(bet, result):
     pen_h = result.get("penHome")
     pen_a = result.get("penAway")
 
+    # When typeId=0 (Nesine bulletin omitted MTID), infer market type from stored labels
+    if not tid and n:
+        import re as _re
+        mname = (bet.get("marketNameEn") or bet.get("marketName") or "").lower()
+        label = (bet.get("outcomeLabelEn") or bet.get("outcomeLabel") or "")
+        # Over/Under total goals: "Alt/Üst" or "Over/Under" (not home/away/half variants)
+        if ("over/under" in mname or "alt/üst" in mname) and not any(
+            x in mname for x in ["home", "away", "1st half", "half", "deplasman", "ev sahibi", "btts", "karşılıklı"]
+        ):
+            m = _re.search(r'(?:over|under|üst|alt)\s+(\d+\.?\d*)', label, _re.IGNORECASE)
+            if m:
+                sov = float(m.group(1))
+                tid = 12
+        # European handicap: "Handikaplı Maç Sonucu" or "Handicap Match Result"
+        elif "handikap" in mname or "handicap" in mname:
+            m = _re.search(r'\(([-+]?\d+\.?\d*)\)', label)
+            if m:
+                sov = float(m.group(1))
+                tid = 268
+        # Result + BTTS: "Maç Sonucu ve Karşılıklı Gol" or "Match Result and BTTS"
+        elif "karşılıklı gol" in mname or "btts" in mname or "match result and" in mname:
+            tid = 414
+
     if h is None or a is None or not tid or not n:
         return None
 

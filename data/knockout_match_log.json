@@ -101,6 +101,18 @@
       "nameEn": "Canada vs Morocco",
       "startTimestamp": 1783184400000,
       "firstSeenAt": "2026-06-30T12:43:31.224444+00:00"
+    },
+    "2976694": {
+      "name": "Paraguay vs Fransa",
+      "nameEn": "Paraguay vs France",
+      "startTimestamp": 1783198800000,
+      "firstSeenAt": "2026-07-01T04:05:46.394315+00:00"
+    },
+    "2978276": {
+      "name": "Brezilya vs Norveç",
+      "nameEn": "Brazil vs Norway",
+      "startTimestamp": 1783281600000,
+      "firstSeenAt": "2026-07-01T04:05:46.394328+00:00"
     }
   }
 }

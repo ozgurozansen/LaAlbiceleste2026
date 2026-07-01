@@ -734,7 +734,7 @@ function renderAuthUI() {
   if (!authEl) return;
   if (koUser) {
     const betCount  = Object.keys(koBets).length;
-    const creditTxt = koCredit !== null ? `${koCredit} la` : '';
+    const creditTxt = koCredit !== null ? `${koCredit.toFixed(2)} la` : '';
     const logoHtml  = _koUserLogo(koUser.logoData);
     const flagHtml  = _koFlag(koUser.supportedTeam);
     authEl.innerHTML = `
@@ -1114,6 +1114,8 @@ function _updateMatchBetBadge(matchId, bet) {
 
 // ── Coupon panel ─────────────────────────────────────────────────────────────
 
+let _couponRefreshTimer = null;
+
 function openCouponPanel() {
   const panel = document.getElementById('coupon-panel');
   const backdrop = document.getElementById('coupon-backdrop');
@@ -1122,6 +1124,7 @@ function openCouponPanel() {
   panel.classList.remove('hidden');
   if (backdrop) backdrop.classList.remove('hidden');
   document.body.style.overflow = 'hidden';
+  if (!_couponRefreshTimer) _couponRefreshTimer = setInterval(renderCouponPanel, 15_000);
 }
 
 function closeCouponPanel() {
@@ -1130,6 +1133,7 @@ function closeCouponPanel() {
   if (panel) panel.classList.add('hidden');
   if (backdrop) backdrop.classList.add('hidden');
   document.body.style.overflow = '';
+  if (_couponRefreshTimer) { clearInterval(_couponRefreshTimer); _couponRefreshTimer = null; }
 }
 
 function renderCouponPanel() {
@@ -1152,7 +1156,8 @@ function renderCouponPanel() {
           ? `<span class="coupon-bet-tag coupon-bet-tag-won">✓ ${lang === 'tr' ? 'Kazandı' : 'Won'} +${bet.payout} la</span>`
           : `<span class="coupon-bet-tag coupon-bet-tag-lost">✗ ${lang === 'tr' ? 'Kaybetti' : 'Lost'}</span>`)
       : '';
-    const deleteBtn = isSettled
+    const hasStarted = bet.startTimestamp != null && Date.now() >= Number(bet.startTimestamp);
+    const deleteBtn = (isSettled || hasStarted)
       ? ''
       : `<button class="coupon-bet-delete" data-match-id="${esc(matchId)}" title="Remove bet">✕ ${lang === 'tr' ? 'Kaldır' : 'Remove'}</button>`;
     return `
@@ -1197,7 +1202,7 @@ function _renderCouponFooter(staked, potential, returned) {
   footerEl.innerHTML = `
     <div class="coupon-footer-row">
       <span class="coupon-footer-label">${isTr ? 'Kalan Kredi' : 'Credits left'}</span>
-      <span class="coupon-footer-val">${koCredit !== null ? koCredit : '—'} la</span>
+      <span class="coupon-footer-val">${koCredit !== null ? koCredit.toFixed(2) : '—'} la</span>
     </div>
     <div class="coupon-footer-row">
       <span class="coupon-footer-label">${isTr ? 'Toplam Bahis' : 'Total staked'}</span>

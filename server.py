@@ -389,11 +389,15 @@ def _ko_update_match_log(matches):
             _jsave(_KO_MATCH_LOG_FILE, log)
 
 
-def _ko_compute_credit(username):
+def _ko_compute_credit(username, count_pending=True):
     """Compute current knockout betting credit.
 
     credit = base - sum(placed bet amounts) - penalty for each started match with no bet
     base = koStartingCredit from users.json if set (exported from group stage), else KNOCKOUT_CREDIT_BASE
+
+    count_pending: when False, bets on matches that haven't started yet are excluded from
+    the spent total. Used by the public leaderboard so a user's pending bet (and its amount)
+    isn't revealed to other users before kickoff; personal-balance call sites keep the default.
     """
     now_ts = time.time()
     log   = _jload(_KO_MATCH_LOG_FILE, {"matches": {}})
@@ -401,7 +405,22 @@ def _ko_compute_credit(username):
     users = _jload(_USERS_FILE, {"users": {}})
     base  = users.get("users", {}).get(username, {}).get("koStartingCredit", KNOCKOUT_CREDIT_BASE)
 
-    spent    = sum(float(b.get("amount", KNOCKOUT_MIN_BET)) for b in bets.values())
+    def _has_started(b):
+        ts = b.get("startTimestamp")
+        if ts is None:
+            return True
+        try:
+            ts_f = float(ts)
+            ts_sec = ts_f / 1000.0 if ts_f > 1e10 else ts_f
+        except (ValueError, TypeError):
+            return True
+        return now_ts >= ts_sec
+
+    spent = sum(
+        float(b.get("amount", KNOCKOUT_MIN_BET))
+        for b in bets.values()
+        if count_pending or _has_started(b)
+    )
     winnings = sum(float(b.get("payout", 0)) for b in bets.values() if b.get("won") is True)
 
     penalties = 0
@@ -488,9 +507,12 @@ def _ko_settle_bet(bet, result):
             if m:
                 sov = float(m.group(1))
                 tid = 268
-        # Result + BTTS: "Maç Sonucu ve Karşılıklı Gol" or "Match Result and BTTS"
-        elif "karşılıklı gol" in mname or "btts" in mname or "match result and" in mname:
+        # Result + BTTS combo: "Maç Sonucu ve Karşılıklı Gol" or "Match Result and BTTS"
+        elif "match result and" in mname or "sonucu ve karşılıklı" in mname:
             tid = 414
+        # Plain BTTS: "Karşılıklı Gol" or "Both Teams to Score"
+        elif "karşılıklı gol" in mname or "both teams to score" in mname or "btts" in mname:
+            tid = 38
 
     if h is None or a is None or not tid or not n:
         return None
@@ -559,7 +581,10 @@ def _ko_settle_bet(bet, result):
         return None  # push on exact line
 
     if tid == 182:  # Who Advances: n=1→Home, n=2→Away
-        if fr != 0: return {1: fr == 1, 2: fr == 2}.get(n)
+        agg_h = result.get("aggHomeGoals")
+        agg_a = result.get("aggAwayGoals")
+        afr = _fr(agg_h, agg_a) if agg_h is not None and agg_a is not None else fr
+        if afr != 0: return {1: afr == 1, 2: afr == 2}.get(n)
         if pen_h is not None and pen_a is not None:
             winner = 1 if pen_h > pen_a else 2
             return {1: winner == 1, 2: winner == 2}.get(n)
@@ -893,11 +918,18 @@ def _ko_settle_bet(bet, result):
         return None
 
     # ── Goalkeeper saves O/U (typeId 803) ────────────────────────────────────
-    if tid == 803 and sov:
+    if tid == 803:
         if not hs and not as_: return None
+        raw_label = (bet.get("outcomeLabel") or "").strip()
+        _, thr, is_over = _parse_label_threshold(raw_label)
+        effective_sov = thr if thr is not None else sov
+        if not effective_sov:
+            return None
         total_saves = int(hs.get("saves") or 0) + int(as_.get("saves") or 0)
-        if n == 1: return total_saves < sov
-        if n == 2: return total_saves > sov
+        if is_over is not None:
+            return total_saves >= effective_sov if is_over else total_saves < effective_sov
+        if n == 1: return total_saves < effective_sov
+        if n == 2: return total_saves > effective_sov
         return None
 
     # ── Team fouls / offsides / possession O/U (807/808/809) ─────────────────
@@ -1388,6 +1420,7 @@ def _ko_fetch_match_result_for_log_entry(minfo):
         status_short = "FT"
 
     h_goals = a_goals = ht_h = ht_a = pen_h = pen_a = home_id = home_name = None
+    agg_h   = agg_a   = None
 
     for team in comp_hdr.get("competitors") or []:
         ha  = team.get("homeAway", "")
@@ -1402,20 +1435,33 @@ def _ko_fetch_match_result_for_log_entry(minfo):
                 ht_val = int(ls[0].get("displayValue") or 0)
             except (ValueError, TypeError):
                 pass
-        pen_val = None
-        if status_short == "PEN" and len(ls) >= 3:
+        # ESPN's "score" aggregates extra-time goals too once a match goes to
+        # AET/PEN, but standard markets (1X2, O/U, combos, ...) settle on the
+        # 90-minute regulation score — so sum just the first two periods when
+        # they're present, and keep the true aggregate separately for the
+        # "Who Advances" market, which does care about the AET result.
+        reg_val = sc
+        if len(ls) >= 2:
             try:
-                pen_val = int(ls[2].get("displayValue") or 0)
+                reg_val = int(ls[0].get("displayValue") or 0) + int(ls[1].get("displayValue") or 0)
+            except (ValueError, TypeError):
+                pass
+        pen_val = None
+        if status_short == "PEN" and len(ls) >= 5:
+            try:
+                pen_val = int(ls[-1].get("displayValue") or 0)
             except (ValueError, TypeError):
                 pass
         if ha == "home":
-            h_goals = sc
+            h_goals = reg_val
+            agg_h   = sc
             ht_h    = ht_val
             pen_h   = pen_val
             home_id   = (team.get("team") or {}).get("id")
             home_name = (team.get("team") or {}).get("displayName", "").lower()
         else:
-            a_goals = sc
+            a_goals = reg_val
+            agg_a   = sc
             ht_a    = ht_val
             pen_a   = pen_val
 
@@ -1423,14 +1469,16 @@ def _ko_fetch_match_result_for_log_entry(minfo):
         return None
 
     result = {
-        "homeGoals":   h_goals,
-        "awayGoals":   a_goals,
-        "htHomeGoals": ht_h,
-        "htAwayGoals": ht_a,
-        "penHome":     pen_h,
-        "penAway":     pen_a,
-        "status":      status_short,
-        "eventId":     event_id,
+        "homeGoals":    h_goals,
+        "awayGoals":    a_goals,
+        "aggHomeGoals": agg_h,
+        "aggAwayGoals": agg_a,
+        "htHomeGoals":  ht_h,
+        "htAwayGoals":  ht_a,
+        "penHome":      pen_h,
+        "penAway":      pen_a,
+        "status":       status_short,
+        "eventId":      event_id,
     }
 
     # ── Step 4: goal / card events ────────────────────────────────────────────
@@ -1600,7 +1648,7 @@ def _ko_compute_leaderboard():
     users_data = _jload(_USERS_FILE, {"users": {}})
     lb = []
     for uname, uinfo in users_data.get("users", {}).items():
-        credit   = _ko_compute_credit(uname)
+        credit   = _ko_compute_credit(uname, count_pending=False)
         bets_all = _jload(_KO_BETS_FILE, {"bets": {}}).get("bets", {}).get(uname, {})
         lb.append({
             "username":      uname,

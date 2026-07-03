@@ -96,6 +96,17 @@
     .adm-ko-fetch-btn:hover:not(:disabled) { background:#27ae60; color:#fff; }
     .adm-ko-fetch-btn:disabled { opacity:.45; cursor:not-allowed; }
     .adm-ko-fetch-msg { font-size:.78rem; white-space:nowrap; }
+
+    .adm-flags-panel { background:#111827; border:1px solid #7f1d1d; border-radius:10px;
+                        padding:1rem; margin-bottom:1.25rem; }
+    .adm-flags-panel h3 { margin:0 0 .6rem; font-size:.95rem; color:#f87171; }
+    .adm-flags-empty { font-size:.82rem; color:#888; }
+    .adm-flags-table { width:100%; border-collapse:collapse; font-size:.8rem; }
+    .adm-flags-table th, .adm-flags-table td { text-align:left; padding:.35rem .5rem;
+                        border-bottom:1px solid #1e2030; white-space:nowrap; }
+    .adm-flags-table th { color:#888; font-weight:600; text-transform:uppercase;
+                        font-size:.7rem; letter-spacing:.04em; }
+    .adm-flags-gap { color:#f87171; font-weight:600; }
   </style>
 </head>
 <body>
@@ -140,8 +151,14 @@
       <span id="adm-ko-fetch-msg" class="adm-ko-fetch-msg"></span>
       <button id="adm-gs-export-btn" class="adm-ko-fetch-btn" style="border-color:#f59e0b;color:#f59e0b" title="Export group stage points as knockout starting credits">🏆 GS → KO Kredi</button>
       <span id="adm-gs-export-msg" class="adm-ko-fetch-msg"></span>
+      <button id="adm-bet-flags-btn" class="adm-ko-fetch-btn" style="border-color:#e74c3c;color:#e74c3c" title="Show unusually fast bet placements (possible scripted betting)">🚩 Bahis Uyarıları</button>
       <button id="adm-logout-btn" class="adm-logout-btn">Çıkış</button>
     </div>
+  </div>
+
+  <div id="adm-flags-panel" class="adm-flags-panel hidden">
+    <h3>🚩 Hızlı Bahis Uyarıları <small style="color:#888;font-weight:400">— art arda 5 saniyeden kısa sürede yapılan bahisler</small></h3>
+    <div id="adm-flags-body"></div>
   </div>
 
   <div class="adm-filters" id="adm-filters">

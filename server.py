@@ -90,6 +90,7 @@ _BONUS_ASSIGN_FILE = os.path.join(DATA_DIR, "bonus_assignments.json")
 _KO_BETS_FILE      = os.path.join(DATA_DIR, "knockout_bets.json")
 _KO_MATCH_LOG_FILE = os.path.join(DATA_DIR, "knockout_match_log.json")
 _KO_RESULTS_FILE   = os.path.join(DATA_DIR, "knockout_results.json")
+_KO_BET_FLAGS_FILE = os.path.join(DATA_DIR, "knockout_bet_flags.json")
 
 KNOCKOUT_CREDIT_BASE  = 100
 KNOCKOUT_MIN_BET      = 1
@@ -1647,6 +1648,34 @@ def _ko_check_and_settle_finished_matches():
 _ko_last_settle_ts   = 0.0
 _ko_settle_ts_lock   = threading.Lock()
 
+# Minimum seconds between two bets from the same user — blocks scripted/bot
+# bet placement, which places bets far faster than a human can pick a
+# market/outcome/amount and confirm through the UI.
+_KO_BET_COOLDOWN_SECS = 2.0
+_ko_last_bet_lock     = threading.Lock()
+_ko_last_bet_ts       = {}
+
+# Bets that clear the cooldown but still land unusually close together get
+# logged (not blocked) for admin review — the fastest gap seen from genuine
+# manual clicking across this app's actual bet history is ~16s, so anything
+# under this is worth a human looking at.
+_KO_BET_FLAG_GAP_SECS = 5.0
+_KO_BET_FLAGS_MAX     = 500
+
+
+def _ko_record_bet_flag(username, match_id, market_name_en, gap_seconds):
+    with _data_lock:
+        flags_data = _jload(_KO_BET_FLAGS_FILE, {"flags": []})
+        flags_data.setdefault("flags", []).append({
+            "username":    username,
+            "matchId":     match_id,
+            "marketName":  market_name_en,
+            "gapSeconds":  round(gap_seconds, 3),
+            "detectedAt":  datetime.now(timezone.utc).isoformat(),
+        })
+        flags_data["flags"] = flags_data["flags"][-_KO_BET_FLAGS_MAX:]
+        _jsave(_KO_BET_FLAGS_FILE, flags_data)
+
 def _ko_maybe_settle():
     """Throttled wrapper — runs at most once every 5 minutes."""
     global _ko_last_settle_ts
@@ -2443,6 +2472,17 @@ class Handler(BaseHTTPRequestHandler):
                 self.send_json(200, {"matches": out})
                 return
 
+            # ── /api/knockout/admin/bet-flags  (admin: suspiciously fast bets) ─
+            if path == "/api/knockout/admin/bet-flags":
+                token    = qs.get("token", [""])[0]
+                username = _validate_token(token)
+                if not username or not _is_admin(username):
+                    self.send_json(403, {"error": "Admin access required"})
+                    return
+                flags_data = _jload(_KO_BET_FLAGS_FILE, {"flags": []})
+                self.send_json(200, {"flags": list(reversed(flags_data.get("flags", [])))})
+                return
+
             # ── /api/knockout/results ─────────────────────────────────────
             if path == "/api/knockout/results":
                 results = _jload(_KO_RESULTS_FILE, {"results": {}})
@@ -2914,27 +2954,63 @@ class Handler(BaseHTTPRequestHandler):
                 if not username:
                     self.send_json(401, {"error": "Unauthorized"})
                     return
-                match_id       = str(data.get("matchId") or "").strip()
-                match_name     = str(data.get("matchName") or "").strip()
-                match_name_en  = str(data.get("matchNameEn") or "").strip()
-                start_ts       = data.get("startTimestamp")
-                market_id        = str(data.get("marketId") or "").strip()
-                market_name      = str(data.get("marketName") or "").strip()
-                market_name_en   = str(data.get("marketNameEn") or "").strip()
-                outcome_label    = str(data.get("outcomeLabel") or "").strip()
-                outcome_label_en = str(data.get("outcomeLabelEn") or "").strip()
-                odds          = data.get("odds")
-                amount_raw    = data.get("amount")
-                if not match_id or not outcome_label or odds is None:
-                    self.send_json(400, {"error": "matchId, outcomeLabel, and odds are required"})
+
+                now_mono = time.time()
+                with _ko_last_bet_lock:
+                    last_bet_ts = _ko_last_bet_ts.get(username, 0)
+                    bet_gap = now_mono - last_bet_ts
+                    if bet_gap < _KO_BET_COOLDOWN_SECS:
+                        self.send_json(429, {"error": "Please slow down – wait a moment between bets"})
+                        return
+                    _ko_last_bet_ts[username] = now_mono
+
+                match_id   = str(data.get("matchId") or "").strip()
+                market_id  = str(data.get("marketId") or "").strip()
+                try:
+                    outcome_n = int(data.get("outcomeN"))
+                except (ValueError, TypeError):
+                    outcome_n = None
+                amount_raw = data.get("amount")
+                if not match_id or not market_id or outcome_n is None:
+                    self.send_json(400, {"error": "matchId, marketId, and outcomeN are required"})
                     return
+
+                # Derive match/market/outcome/odds from the live bulletin instead of
+                # trusting the client — prevents spoofed odds and stale/incomplete
+                # typeId data from a scripted or out-of-sync client.
+                raw_bulletin, _ = fetch_bulletin()
+                ev = next((e for e in parse_events(raw_bulletin) if str(e.get("C")) == match_id), None)
+                if ev is None:
+                    self.send_json(404, {"error": "Match not found or no longer available"})
+                    return
+                market = next((m for m in ev.get("MA", []) if str(m.get("ID")) == market_id), None)
+                if market is None:
+                    self.send_json(404, {"error": "Market not found or no longer available"})
+                    return
+                outcome = next((oc for oc in market.get("OCA", []) if oc.get("N") == outcome_n), None)
+                if outcome is None:
+                    self.send_json(404, {"error": "Outcome not found or no longer available"})
+                    return
+                odds = outcome.get("O")
                 try:
                     odds = float(odds)
-                    if odds <= 0:
+                    if odds <= 1:
                         raise ValueError
                 except (ValueError, TypeError):
-                    self.send_json(400, {"error": "odds must be a positive number"})
+                    self.send_json(409, {"error": "This outcome is suspended or unavailable"})
                     return
+
+                type_id      = market.get("MTID", 0)
+                spread_value = market.get("SOV") or 0
+                mn           = market.get("MN")
+                market_name    = _market_type_name(type_id, spread_value, mn, "tr")
+                market_name_en = _market_type_name(type_id, spread_value, mn, "en")
+                outcome_label    = _outcome_label(type_id, outcome_n, spread_value, outcome.get("ON"), "tr")
+                outcome_label_en = _outcome_label(type_id, outcome_n, spread_value, outcome.get("ON"), "en")
+                match_name    = f"{ev.get('HN', '')} vs {ev.get('AN', '')}"
+                match_name_en = f"{_team_en(ev.get('HN', ''))} vs {_team_en(ev.get('AN', ''))}"
+                start_ts      = ev.get("ESD")
+
                 credit_now = _ko_compute_credit(username)
                 dynamic_max = max(KNOCKOUT_MIN_BET, int(credit_now * 0.20))
                 try:
@@ -2962,13 +3038,6 @@ class Handler(BaseHTTPRequestHandler):
                 if current_credit + old_amount - amount < 0:
                     self.send_json(400, {"error": "Insufficient credits"})
                     return
-                try:
-                    outcome_n    = int(data.get("outcomeN") or 0)
-                    type_id      = int(data.get("typeId") or 0)
-                    spread_value = float(data.get("spreadValue") or 0)
-                except (ValueError, TypeError):
-                    outcome_n = type_id = 0
-                    spread_value = 0.0
 
                 bet = {
                     "matchName":   match_name,
@@ -2999,6 +3068,8 @@ class Handler(BaseHTTPRequestHandler):
                             "firstSeenAt":    datetime.now(timezone.utc).isoformat(),
                         }
                         _jsave(_KO_MATCH_LOG_FILE, log)
+                if last_bet_ts and bet_gap < _KO_BET_FLAG_GAP_SECS:
+                    _ko_record_bet_flag(username, match_id, market_name_en, bet_gap)
                 credit = _ko_compute_credit(username)
                 self.send_json(200, {"ok": True, "bet": bet, "credit": credit})
                 return

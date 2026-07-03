@@ -499,6 +499,48 @@ async function gsExportCredits() {
   btn.textContent = '🏆 GS → KO Kredi';
 }
 
+// ── Bet activity flags (possible scripted/bot betting) ───────────────────────
+function formatFlagTime(iso) {
+  if (!iso) return '—';
+  try {
+    return new Intl.DateTimeFormat('tr-TR', {
+      day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit',
+      second: '2-digit', timeZone: 'UTC', timeZoneName: 'short',
+    }).format(new Date(iso));
+  } catch { return iso; }
+}
+
+async function toggleBetFlags() {
+  const panel = $('adm-flags-panel');
+  const isHidden = panel.classList.contains('hidden');
+  if (!isHidden) { panel.classList.add('hidden'); return; }
+
+  panel.classList.remove('hidden');
+  const body = $('adm-flags-body');
+  body.innerHTML = '<p class="adm-flags-empty">Yükleniyor…</p>';
+
+  const d = await api('GET', `/api/knockout/admin/bet-flags?token=${S.token}`);
+  const flags = d.flags || [];
+  if (!flags.length) {
+    body.innerHTML = '<p class="adm-flags-empty">Şu ana kadar hiç uyarı yok.</p>';
+    return;
+  }
+  body.innerHTML = `
+    <table class="adm-flags-table">
+      <thead><tr><th>Zaman</th><th>Kullanıcı</th><th>Maç</th><th>Pazar</th><th>Boşluk</th></tr></thead>
+      <tbody>
+        ${flags.map(f => `
+          <tr>
+            <td>${esc(formatFlagTime(f.detectedAt))}</td>
+            <td>${esc(f.username)}</td>
+            <td>#${esc(f.matchId)}</td>
+            <td>${esc(f.marketName || '—')}</td>
+            <td class="adm-flags-gap">${f.gapSeconds}s</td>
+          </tr>`).join('')}
+      </tbody>
+    </table>`;
+}
+
 // ── Show panel ────────────────────────────────────────────────────────────────
 function showPanel() {
   $('adm-login-screen').classList.add('hidden');
@@ -507,6 +549,7 @@ function showPanel() {
   $('adm-logout-btn').addEventListener('click', doLogout);
   $('adm-ko-fetch-btn').addEventListener('click', koFetchResults);
   $('adm-gs-export-btn').addEventListener('click', gsExportCredits);
+  $('adm-bet-flags-btn').addEventListener('click', toggleBetFlags);
   _acSetup();
   loadData();
 }

@@ -113,6 +113,24 @@
       "nameEn": "Brazil vs Norway",
       "startTimestamp": 1783281600000,
       "firstSeenAt": "2026-07-01T04:05:46.394328+00:00"
+    },
+    "2981912": {
+      "name": "ABD vs Belçika",
+      "nameEn": "USA vs Belgium",
+      "startTimestamp": 1783382400000,
+      "firstSeenAt": "2026-07-02T07:36:19.235123+00:00"
+    },
+    "2980503": {
+      "name": "Meksika vs İngiltere",
+      "nameEn": "Mexico vs England",
+      "startTimestamp": 1783296000000,
+      "firstSeenAt": "2026-07-02T07:36:19.235136+00:00"
+    },
+    "2980510": {
+      "name": "Portekiz vs İspanya",
+      "nameEn": "Portugal vs Spain",
+      "startTimestamp": 1783364400000,
+      "firstSeenAt": "2026-07-03T04:59:10.185780+00:00"
     }
   }
 }

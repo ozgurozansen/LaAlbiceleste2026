@@ -1365,7 +1365,17 @@ def _ko_fetch_match_result_for_log_entry(minfo):
     finished_lower = {"full time", "after extra time", "after penalties", "final"}
 
     def _norm(s):
-        return unicodedata.normalize("NFKD", s).encode("ascii", "ignore").decode().lower()
+        ascii_s = unicodedata.normalize("NFKD", s).encode("ascii", "ignore").decode().lower()
+        for ch in "-&":
+            ascii_s = ascii_s.replace(ch, " ")
+        return " ".join(ascii_s.split())
+
+    # Some of our short team names don't share a >3-char token with ESPN's
+    # official name (e.g. "usa" vs "united states"), so the fuzzy matcher
+    # below would never find them. Canonicalize known aliases first.
+    _team_aliases = {"usa": "united states"}
+    def _canon_team(s):
+        return _team_aliases.get(s, s)
 
     for try_date in dates_to_try:
         try:
@@ -1379,11 +1389,11 @@ def _ko_fetch_match_result_for_log_entry(minfo):
             if not any(s in status for s in finished_lower):
                 continue
             teams = comps[0].get("competitors") or []
-            names = {t.get("homeAway"): _norm((t.get("team") or {}).get("displayName", ""))
+            names = {t.get("homeAway"): _canon_team(_norm((t.get("team") or {}).get("displayName", "")))
                      for t in teams}
             hn = names.get("home", "")
             an = names.get("away", "")
-            t1n, t2n = _norm(t1), _norm(t2)
+            t1n, t2n = _canon_team(_norm(t1)), _canon_team(_norm(t2))
             def _names_match(a, b):
                 if a in b or b in a:
                     return True

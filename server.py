@@ -513,6 +513,9 @@ def _ko_settle_bet(bet, result):
         # Plain BTTS: "Karşılıklı Gol" or "Both Teams to Score"
         elif "karşılıklı gol" in mname or "both teams to score" in mname or "btts" in mname:
             tid = 38
+        # Plain 1X2: "Maç Sonucu" or "1X2 (Match Result)"
+        elif "1x2" in mname or mname.strip() == "maç sonucu":
+            tid = 1
 
     if h is None or a is None or not tid or not n:
         return None

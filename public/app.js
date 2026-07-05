@@ -1436,17 +1436,17 @@ function _koCorrectOutcome(bet, r) {
     const s = (r.assisters || []).join(', ');
     return s ? `${T('Asistler','Assisted')}: ${s}` : T('Asist yok','No assists');
   }
-  if (tid === 704 || tid === 710) {
-    const s = (r.yellowCards || []).join(', ');
-    return s ? `${T('Sarı kart','Yellow')}: ${s}` : T('Sarı kart yok','No yellow cards');
+  if (tid === 704) {
+    const s = (r.scorers || []).join(', ');
+    return s ? `${T('Goller','Scored')}: ${s}` : T('Gol yok','No goals');
   }
-  if (tid === 722) {
-    const s = (r.anyCards || []).join(', ');
-    return s ? `${T('Kart','Carded')}: ${s}` : T('Kart yok','No cards');
-  }
-  if (tid === 709) {
+  if (tid === 710) {
     const s = (r.redCards || []).join(', ');
     return s ? `${T('Kırmızı kart','Red card')}: ${s}` : T('Kırmızı kart yok','No red cards');
+  }
+  if (tid === 722 || tid === 709) {
+    const s = (r.anyCards || []).join(', ');
+    return s ? `${T('Kart','Carded')}: ${s}` : T('Kart yok','No cards');
   }
   if (tid === 765) {
     const s = (r.scorers || []).concat(r.assisters || []).filter((v,i,a)=>a.indexOf(v)===i).join(', ');

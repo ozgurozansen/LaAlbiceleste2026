@@ -131,6 +131,18 @@
       "nameEn": "Portugal vs Spain",
       "startTimestamp": 1783364400000,
       "firstSeenAt": "2026-07-03T04:59:10.185780+00:00"
+    },
+    "2981899": {
+      "name": "Arjantin vs Mısır",
+      "nameEn": "Argentina vs Egypt",
+      "startTimestamp": 1783440000000,
+      "firstSeenAt": "2026-07-04T07:37:20.825408+00:00"
+    },
+    "2981906": {
+      "name": "İsviçre vs Kolombiya",
+      "nameEn": "Switzerland vs Colombia",
+      "startTimestamp": 1783454400000,
+      "firstSeenAt": "2026-07-04T07:37:20.825421+00:00"
     }
   }
 }

@@ -998,14 +998,29 @@ def _ko_settle_bet(bet, result):
                 pass
         return None
 
-    if tid == 571 and ht_h is not None and ht_a is not None:   # HT/FT exact score combo e.g. "1-0 / 2-1"
+    if tid == 571 and ht_h is not None and ht_a is not None:   # HT/FT exact score combo e.g. "1-0 / 2-1" or "1-0 / 4+"
         label = (bet.get("outcomeLabel") or "").strip()
-        nums  = re.findall(r'\d+', label)
-        if len(nums) >= 4:
+        ht_part, sep, ft_part = label.partition("/")
+        if not sep:
+            return None
+        ht_nums = re.findall(r'\d+', ht_part)
+        if len(ht_nums) < 2:
+            return None
+        try:
+            lht_h, lht_a = int(ht_nums[0]), int(ht_nums[1])
+        except ValueError:
+            return None
+        if ht_h != lht_h or ht_a != lht_a:
+            return False
+        ft_part = ft_part.strip()
+        plus_m = re.match(r'^(\d+)\+$', ft_part)
+        if plus_m:
+            return (h + a) >= int(plus_m.group(1))
+        ft_nums = re.findall(r'\d+', ft_part)
+        if len(ft_nums) >= 2:
             try:
-                lht_h, lht_a, lft_h, lft_a = int(nums[0]), int(nums[1]), int(nums[2]), int(nums[3])
-                return ht_h == lht_h and ht_a == lht_a and h == lft_h and a == lft_a
-            except (ValueError, IndexError):
+                return h == int(ft_nums[0]) and a == int(ft_nums[1])
+            except ValueError:
                 pass
         return None
 
@@ -1047,12 +1062,17 @@ def _ko_settle_bet(bet, result):
         scored_h2 = any(_ghalf(g) == 2 for g in player_goals)
         return scored_h1 and scored_h2
 
-    if tid in (704, 710):   # Player yellow card
+    if tid == 704:   # Player hat-trick
         if not players: return None
         p = _ko_find_player(players, label)
-        return (p["yellowCards"] > 0) if p else None
+        return (p["goals"] >= 3) if p else None
 
-    if tid == 709:   # Player red card
+    if tid == 709:   # Player any card
+        if not players: return None
+        p = _ko_find_player(players, label)
+        return ((p["yellowCards"] + p["redCards"]) > 0) if p else None
+
+    if tid == 710:   # Player red card
         if not players: return None
         p = _ko_find_player(players, label)
         return (p["redCards"] > 0) if p else None
@@ -1532,9 +1552,8 @@ def _ko_bet_result_detail(bet, result):
         701: ("goals",         "gol"),
         702: ("goals",         "gol"),
         703: ("goals",         "gol"),
-        704: ("yellowCards",   "sarı kart"),
-        709: ("redCards",      "kırmızı kart"),
-        710: ("yellowCards",   "sarı kart"),
+        704: ("goals",         "gol"),
+        710: ("redCards",      "kırmızı kart"),
         707: ("assists",       "asist"),
         711: ("goals",         "gol"),
         712: ("assists",       "asist"),
@@ -1542,6 +1561,14 @@ def _ko_bet_result_detail(bet, result):
         714: ("shotsOnTarget", "isabetli şut"),
         740: ("totalShots",    "şut"),
     }
+    if tid in (709, 722, 837):   # Player any card / 2+ cards
+        if not players: return None
+        p = _ko_find_player(players, label)
+        if p:
+            val = p.get("yellowCards", 0) + p.get("redCards", 0)
+            return f"{p['name']}: {val} kart"
+        return None
+
     if tid in _player_stats:
         stat_key, stat_label = _player_stats[tid]
         name_part, thr, _ = _parse_label_threshold(label)

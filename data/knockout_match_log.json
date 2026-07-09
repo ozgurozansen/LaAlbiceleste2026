@@ -143,6 +143,30 @@
       "nameEn": "Switzerland vs Colombia",
       "startTimestamp": 1783454400000,
       "firstSeenAt": "2026-07-04T07:37:20.825421+00:00"
+    },
+    "2985153": {
+      "name": "Fransa vs Fas",
+      "nameEn": "France vs Morocco",
+      "startTimestamp": 1783627200000,
+      "firstSeenAt": "2026-07-06T05:38:54.807770+00:00"
+    },
+    "2990958": {
+      "name": "Norveç vs İngiltere",
+      "nameEn": "Norway vs England",
+      "startTimestamp": 1783803600000,
+      "firstSeenAt": "2026-07-06T05:38:54.807783+00:00"
+    },
+    "2990494": {
+      "name": "İspanya vs Belçika",
+      "nameEn": "Spain vs Belgium",
+      "startTimestamp": 1783710000000,
+      "firstSeenAt": "2026-07-07T05:11:26.912153+00:00"
+    },
+    "2990585": {
+      "name": "Arjantin vs İsviçre",
+      "nameEn": "Argentina vs Switzerland",
+      "startTimestamp": 1783818000000,
+      "firstSeenAt": "2026-07-08T08:08:53.395542+00:00"
     }
   }
 }

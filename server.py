@@ -95,6 +95,7 @@ _KO_BET_FLAGS_FILE = os.path.join(DATA_DIR, "knockout_bet_flags.json")
 KNOCKOUT_CREDIT_BASE  = 100
 KNOCKOUT_MIN_BET      = 1
 KNOCKOUT_MAX_BET      = 8
+KNOCKOUT_DYNAMIC_MAX_FLOOR = 4
 KNOCKOUT_NO_BET_PENALTY = 5
 
 POINTS_CFG  = CONFIG.get("points", {"correct_score": 5, "correct_result": 3,
@@ -1087,10 +1088,15 @@ def _ko_settle_bet(bet, result):
         p = _ko_find_player(players, label)
         return ((p["yellowCards"] + p["redCards"]) >= 2) if p else None
 
-    if tid == 707:   # Player assist
+    if tid == 707:   # Player assist (label: "Name N+" or just "Name")
         if not players: return None
-        p = _ko_find_player(players, label)
-        return (p["assists"] > 0) if p else None
+        name_part, thr, is_over = _parse_label_threshold(label)
+        p = _ko_find_player(players, name_part or label)
+        if not p: return None
+        assists = p["assists"]
+        if thr is not None:
+            return assists >= thr if is_over else assists < thr
+        return assists > 0
 
     if tid == 714:   # Player shots on target (label: "Name N+" or just "Name")
         if not players: return None
@@ -1155,10 +1161,15 @@ def _ko_settle_bet(bet, result):
         if ofs is None: return None
         return ofs > 0
 
-    if tid == 712:   # Player gets an assist (binary yes/no, cf. 707)
+    if tid == 712:   # Player gets an assist (label: "Name N+" or just "Name", cf. 707)
         if not players: return None
-        p = _ko_find_player(players, label)
-        return (p["assists"] > 0) if p else None
+        name_part, thr, is_over = _parse_label_threshold(label)
+        p = _ko_find_player(players, name_part or label)
+        if not p: return None
+        assists = p["assists"]
+        if thr is not None:
+            return assists >= thr if is_over else assists < thr
+        return assists > 0
 
     if tid == 742:   # Player commits a foul
         if not players: return None
@@ -3039,7 +3050,7 @@ class Handler(BaseHTTPRequestHandler):
                 start_ts      = ev.get("ESD")
 
                 credit_now = _ko_compute_credit(username)
-                dynamic_max = max(KNOCKOUT_MIN_BET, int(credit_now * 0.20))
+                dynamic_max = max(KNOCKOUT_DYNAMIC_MAX_FLOOR, int(credit_now * 0.20))
                 try:
                     amount = int(amount_raw) if amount_raw is not None else KNOCKOUT_MIN_BET
                     if not (KNOCKOUT_MIN_BET <= amount <= dynamic_max):
@@ -3056,15 +3067,6 @@ class Handler(BaseHTTPRequestHandler):
                             return
                     except (ValueError, TypeError):
                         pass
-                # Check the user has enough credit (refund old bet amount first)
-                current_credit = _ko_compute_credit(username)
-                with _data_lock:
-                    bets_data = _jload(_KO_BETS_FILE, {"bets": {}})
-                    old_bet   = bets_data.get("bets", {}).get(username, {}).get(match_id, {})
-                old_amount = float(old_bet.get("amount", 0)) if old_bet else 0
-                if current_credit + old_amount - amount < 0:
-                    self.send_json(400, {"error": "Insufficient credits"})
-                    return
 
                 bet = {
                     "matchName":   match_name,

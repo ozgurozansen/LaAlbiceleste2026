@@ -44,8 +44,9 @@ let koBets       = {};   // { matchId: { outcomeLabel, odds, amount, marketId, m
 let koCredit     = null;
 let koMinBet     = 1;
 let koMaxBet     = 1;
+const KO_DYNAMIC_MAX_FLOOR = 4;
 function _updateBetLimits() {
-  koMaxBet = Math.max(koMinBet, Math.floor((koCredit || 0) * 0.20));
+  koMaxBet = Math.max(KO_DYNAMIC_MAX_FLOOR, Math.floor((koCredit || 0) * 0.20));
 }
 let koOpenModal   = null;    // { matchId, marketId } currently-open market modal
 let koPendingBet  = null;    // { match, market, outcome, amount } – amount picker in progress

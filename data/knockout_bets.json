@@ -433,7 +433,10 @@
         "odds": 5.56,
         "amount": 40,
         "startTimestamp": 1783627200000,
-        "savedAt": "2026-07-08T07:41:38.662694+00:00"
+        "savedAt": "2026-07-08T07:41:38.662694+00:00",
+        "won": false,
+        "payout": 0.0,
+        "settledAt": "2026-07-09T22:03:07.540871+00:00"
       }
     },
     "facessi": {
@@ -835,6 +838,25 @@
         "won": false,
         "payout": 0.0,
         "settledAt": "2026-07-07T23:00:32.576558+00:00"
+      },
+      "2985153": {
+        "matchName": "Fransa vs Fas",
+        "matchNameEn": "France vs Morocco",
+        "marketId": "74726839",
+        "marketName": "Maç Skoru",
+        "marketNameEn": "Maç Skoru",
+        "outcomeLabel": "1:3",
+        "outcomeLabelEn": "1:3",
+        "outcomeN": 21,
+        "typeId": 777,
+        "spreadValue": 0,
+        "odds": 63.0,
+        "amount": 3,
+        "startTimestamp": 1783627200000,
+        "savedAt": "2026-07-09T19:54:28.160620+00:00",
+        "won": false,
+        "payout": 0.0,
+        "settledAt": "2026-07-09T22:03:07.540893+00:00"
       }
     },
     "boncuk": {
@@ -1308,7 +1330,10 @@
         "odds": 22.65,
         "amount": 5,
         "startTimestamp": 1783627200000,
-        "savedAt": "2026-07-09T15:18:10.493308+00:00"
+        "savedAt": "2026-07-09T15:18:10.493308+00:00",
+        "won": false,
+        "payout": 0.0,
+        "settledAt": "2026-07-09T22:03:07.540902+00:00"
       }
     },
     "ozancayir": {
@@ -1748,6 +1773,25 @@
         "won": false,
         "payout": 0.0,
         "settledAt": "2026-07-07T23:00:32.576624+00:00"
+      },
+      "2985153": {
+        "matchName": "Fransa vs Fas",
+        "matchNameEn": "France vs Morocco",
+        "marketId": "74726839",
+        "marketName": "Maç Skoru",
+        "marketNameEn": "Maç Skoru",
+        "outcomeLabel": "4:2",
+        "outcomeLabelEn": "4:2",
+        "outcomeN": 9,
+        "typeId": 777,
+        "spreadValue": 0,
+        "odds": 64.0,
+        "amount": 5,
+        "startTimestamp": 1783627200000,
+        "savedAt": "2026-07-09T19:22:42.549214+00:00",
+        "won": false,
+        "payout": 0.0,
+        "settledAt": "2026-07-09T22:03:07.540911+00:00"
       }
     },
     "lavlibolin": {
@@ -2187,6 +2231,41 @@
         "won": false,
         "payout": 0.0,
         "settledAt": "2026-07-07T23:00:32.576632+00:00"
+      },
+      "2985153": {
+        "matchName": "Fransa vs Fas",
+        "matchNameEn": "France vs Morocco",
+        "marketId": "74726861",
+        "marketName": "İlk Yarı / Maç Skoru",
+        "marketNameEn": "İlk Yarı / Maç Skoru",
+        "outcomeLabel": "0:0 / 1:1",
+        "outcomeLabelEn": "0:0 / 1:1",
+        "outcomeN": 6,
+        "typeId": 571,
+        "spreadValue": 0,
+        "odds": 22.65,
+        "amount": 4,
+        "startTimestamp": 1783627200000,
+        "savedAt": "2026-07-09T15:37:54.708522+00:00",
+        "won": false,
+        "payout": 0.0,
+        "settledAt": "2026-07-09T22:03:07.541062+00:00"
+      },
+      "2990494": {
+        "matchName": "İspanya vs Belçika",
+        "matchNameEn": "Spain vs Belgium",
+        "marketId": "74928805",
+        "marketName": "İlk Yarı / Maç Skoru",
+        "marketNameEn": "İlk Yarı / Maç Skoru",
+        "outcomeLabel": "0:0 / 2:1",
+        "outcomeLabelEn": "0:0 / 2:1",
+        "outcomeN": 9,
+        "typeId": 571,
+        "spreadValue": 0,
+        "odds": 48.5,
+        "amount": 5,
+        "startTimestamp": 1783710000000,
+        "savedAt": "2026-07-09T22:52:29.699088+00:00"
       }
     },
     "tudu_08": {
@@ -2660,7 +2739,10 @@
         "odds": 105.0,
         "amount": 3,
         "startTimestamp": 1783627200000,
-        "savedAt": "2026-07-07T21:26:47.158479+00:00"
+        "savedAt": "2026-07-07T21:26:47.158479+00:00",
+        "won": false,
+        "payout": 0.0,
+        "settledAt": "2026-07-09T22:03:07.541073+00:00"
       },
       "2990494": {
         "matchName": "İspanya vs Belçika",
@@ -2673,10 +2755,10 @@
         "outcomeN": 9,
         "typeId": 777,
         "spreadValue": 0,
-        "odds": 54.0,
+        "odds": 53.0,
         "amount": 2,
         "startTimestamp": 1783710000000,
-        "savedAt": "2026-07-07T21:27:19.630921+00:00"
+        "savedAt": "2026-07-10T04:20:36.689309+00:00"
       },
       "2990958": {
         "matchName": "Norveç vs İngiltere",
@@ -2684,15 +2766,15 @@
         "marketId": "74842142",
         "marketName": "İlk Yarı / Maç Skoru",
         "marketNameEn": "İlk Yarı / Maç Skoru",
-        "outcomeLabel": "0:3 / 0:3",
-        "outcomeLabelEn": "0:3 / 0:3",
-        "outcomeN": 44,
+        "outcomeLabel": "0:0 / 0:3",
+        "outcomeLabelEn": "0:0 / 0:3",
+        "outcomeN": 4,
         "typeId": 571,
         "spreadValue": 0,
-        "odds": 130.0,
-        "amount": 1,
+        "odds": 77.0,
+        "amount": 2,
         "startTimestamp": 1783803600000,
-        "savedAt": "2026-07-07T21:28:30.595750+00:00"
+        "savedAt": "2026-07-10T04:24:05.993142+00:00"
       }
     },
     "cookie_monster": {
@@ -3166,7 +3248,58 @@
         "odds": 51.0,
         "amount": 6,
         "startTimestamp": 1783627200000,
-        "savedAt": "2026-07-08T18:09:45.341637+00:00"
+        "savedAt": "2026-07-08T18:09:45.341637+00:00",
+        "won": false,
+        "payout": 0.0,
+        "settledAt": "2026-07-09T22:03:07.541087+00:00"
+      },
+      "2990958": {
+        "matchName": "Norveç vs İngiltere",
+        "matchNameEn": "Norway vs England",
+        "marketId": "74842142",
+        "marketName": "İlk Yarı / Maç Skoru",
+        "marketNameEn": "İlk Yarı / Maç Skoru",
+        "outcomeLabel": "0:0 / 1:0",
+        "outcomeLabelEn": "0:0 / 1:0",
+        "outcomeN": 5,
+        "typeId": 571,
+        "spreadValue": 0,
+        "odds": 20.85,
+        "amount": 20,
+        "startTimestamp": 1783803600000,
+        "savedAt": "2026-07-09T16:12:39.876066+00:00"
+      },
+      "2990494": {
+        "matchName": "İspanya vs Belçika",
+        "matchNameEn": "Spain vs Belgium",
+        "marketId": "74928805",
+        "marketName": "İlk Yarı / Maç Skoru",
+        "marketNameEn": "İlk Yarı / Maç Skoru",
+        "outcomeLabel": "0:1 / 2:1",
+        "outcomeLabelEn": "0:1 / 2:1",
+        "outcomeN": 24,
+        "typeId": 571,
+        "spreadValue": 0,
+        "odds": 50.0,
+        "amount": 8,
+        "startTimestamp": 1783710000000,
+        "savedAt": "2026-07-09T16:14:33.192224+00:00"
+      },
+      "2990585": {
+        "matchName": "Arjantin vs İsviçre",
+        "matchNameEn": "Argentina vs Switzerland",
+        "marketId": "74997294",
+        "marketName": "İlk Yarı / Maç Skoru",
+        "marketNameEn": "İlk Yarı / Maç Skoru",
+        "outcomeLabel": "0:0 / 1:1",
+        "outcomeLabelEn": "0:0 / 1:1",
+        "outcomeN": 6,
+        "typeId": 571,
+        "spreadValue": 0,
+        "odds": 20.8,
+        "amount": 15,
+        "startTimestamp": 1783818000000,
+        "savedAt": "2026-07-09T16:15:23.480141+00:00"
       }
     },
     "dna": {
@@ -3621,7 +3754,10 @@
         "odds": 12.55,
         "amount": 2,
         "startTimestamp": 1783627200000,
-        "savedAt": "2026-07-08T04:33:11.915245+00:00"
+        "savedAt": "2026-07-08T04:33:11.915245+00:00",
+        "won": false,
+        "payout": 0.0,
+        "settledAt": "2026-07-09T22:03:07.541094+00:00"
       },
       "2990494": {
         "matchName": "İspanya vs Belçika",
@@ -3629,31 +3765,15 @@
         "marketId": "74928805",
         "marketName": "İlk Yarı / Maç Skoru",
         "marketNameEn": "İlk Yarı / Maç Skoru",
-        "outcomeLabel": "0:0 / 2:0",
-        "outcomeLabelEn": "0:0 / 2:0",
-        "outcomeN": 8,
+        "outcomeLabel": "0:1 / 0:3",
+        "outcomeLabelEn": "0:1 / 0:3",
+        "outcomeN": 21,
         "typeId": 571,
         "spreadValue": 0,
-        "odds": 21.8,
+        "odds": 130.0,
         "amount": 1,
         "startTimestamp": 1783710000000,
-        "savedAt": "2026-07-08T04:34:32.234077+00:00"
-      },
-      "2990958": {
-        "matchName": "Norveç vs İngiltere",
-        "matchNameEn": "Norway vs England",
-        "marketId": "74842115",
-        "marketName": "Maç Skoru",
-        "marketNameEn": "Maç Skoru",
-        "outcomeLabel": "4:2",
-        "outcomeLabelEn": "4:2",
-        "outcomeN": 9,
-        "typeId": 777,
-        "spreadValue": 0,
-        "odds": 125.0,
-        "amount": 1,
-        "startTimestamp": 1783803600000,
-        "savedAt": "2026-07-08T04:35:57.532109+00:00"
+        "savedAt": "2026-07-09T21:37:59.115687+00:00"
       }
     },
     "ceo": {
@@ -4127,7 +4247,10 @@
         "odds": 4.3,
         "amount": 6,
         "startTimestamp": 1783627200000,
-        "savedAt": "2026-07-09T15:10:01.813748+00:00"
+        "savedAt": "2026-07-09T15:10:01.813748+00:00",
+        "won": false,
+        "payout": 0.0,
+        "settledAt": "2026-07-09T22:03:07.541100+00:00"
       }
     },
     "direnc": {

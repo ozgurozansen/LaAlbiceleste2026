@@ -167,6 +167,30 @@
       "nameEn": "Argentina vs Switzerland",
       "startTimestamp": 1783818000000,
       "firstSeenAt": "2026-07-08T08:08:53.395542+00:00"
+    },
+    "2994784": {
+      "name": "Fransa vs İspanya",
+      "nameEn": "France vs Spain",
+      "startTimestamp": 1784055600000,
+      "firstSeenAt": "2026-07-11T00:01:35.508712+00:00"
+    },
+    "2996405": {
+      "name": "İngiltere vs Arjantin",
+      "nameEn": "England vs Argentina",
+      "startTimestamp": 1784142000000,
+      "firstSeenAt": "2026-07-12T19:15:40.789377+00:00"
+    },
+    "3001172": {
+      "name": "Fransa vs İngiltere",
+      "nameEn": "France vs England",
+      "startTimestamp": 1784408400000,
+      "firstSeenAt": "2026-07-16T06:41:31.061371+00:00"
+    },
+    "3003405": {
+      "name": "İspanya vs Arjantin",
+      "nameEn": "Spain vs Argentina",
+      "startTimestamp": 1784487600000,
+      "firstSeenAt": "2026-07-16T06:41:31.061397+00:00"
     }
   }
 }

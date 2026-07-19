@@ -44,9 +44,15 @@ let koBets       = {};   // { matchId: { outcomeLabel, odds, amount, marketId, m
 let koCredit     = null;
 let koMinBet     = 1;
 let koMaxBet     = 1;
-const KO_DYNAMIC_MAX_FLOOR = 4;
+let koUnlimitedBetting = false;
+const KO_DYNAMIC_MAX_FLOOR    = 4;
+const KO_UNLIMITED_MODE_FLOOR = 10;
 function _updateBetLimits() {
-  koMaxBet = Math.max(KO_DYNAMIC_MAX_FLOOR, Math.floor((koCredit || 0) * 0.20));
+  if (koUnlimitedBetting) {
+    koMaxBet = (koCredit || 0) < KO_UNLIMITED_MODE_FLOOR ? KO_UNLIMITED_MODE_FLOOR : Math.floor(koCredit);
+  } else {
+    koMaxBet = Math.max(KO_DYNAMIC_MAX_FLOOR, Math.floor((koCredit || 0) * 0.20));
+  }
 }
 let koOpenModal   = null;    // { matchId, marketId } currently-open market modal
 let koPendingBet  = null;    // { match, market, outcome, amount } – amount picker in progress
@@ -679,6 +685,7 @@ async function boot() {
   await koCheckAuth();
   loadKoLeaderboard();
   loadMatches();
+  checkChampionPanel();
 }
 boot();
 
@@ -710,6 +717,7 @@ async function koCheckAuth() {
       const bJson = await bRes.json();
       koBets   = bJson.bets   || {};
       koCredit = bJson.credit;
+      koUnlimitedBetting = bJson.unlimitedBetting || false;
       _updateBetLimits();
     }
   } catch (_) {}
@@ -724,6 +732,7 @@ async function koRefreshBets() {
     const json = await res.json();
     koBets   = json.bets   || {};
     koCredit = json.credit;
+    koUnlimitedBetting = json.unlimitedBetting || false;
     _updateBetLimits();
   } catch (_) {}
   renderAuthUI();
@@ -1318,6 +1327,159 @@ function renderKoLeaderboardFull() {
       </thead>
       <tbody>${rows}</tbody>
     </table>`;
+}
+
+// ── Champion celebration panel ────────────────────────────────────────────────
+
+let _championFxTimer = null;
+let _championFxRaf   = null;
+
+function _championFireworks(canvas) {
+  const ctx = canvas.getContext('2d');
+  const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  let particles = [];
+  const COLORS = ['#e7b84e', '#ff6b5b', '#8fe1ee', '#e2e8f0'];
+
+  function resize() { canvas.width = canvas.clientWidth; canvas.height = canvas.clientHeight; }
+  resize();
+  window.addEventListener('resize', resize);
+
+  function burst() {
+    const x = canvas.width * (0.18 + Math.random() * 0.64);
+    const y = canvas.height * (0.14 + Math.random() * 0.32);
+    const n = 26 + Math.floor(Math.random() * 14);
+    const color = COLORS[Math.floor(Math.random() * COLORS.length)];
+    for (let i = 0; i < n; i++) {
+      const angle = (Math.PI * 2 * i) / n + Math.random() * 0.3;
+      const speed = 1.4 + Math.random() * 2.4;
+      particles.push({
+        x, y,
+        vx: Math.cos(angle) * speed, vy: Math.sin(angle) * speed,
+        life: 1, decay: 0.011 + Math.random() * 0.012,
+        color, size: 1.6 + Math.random() * 1.8,
+      });
+    }
+  }
+
+  function tick() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    for (let i = particles.length - 1; i >= 0; i--) {
+      const p = particles[i];
+      p.x += p.vx; p.y += p.vy; p.vy += 0.028; p.life -= p.decay;
+      if (p.life <= 0) { particles.splice(i, 1); continue; }
+      ctx.globalAlpha = Math.max(p.life, 0);
+      ctx.fillStyle = p.color;
+      ctx.beginPath(); ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2); ctx.fill();
+    }
+    ctx.globalAlpha = 1;
+    _championFxRaf = requestAnimationFrame(tick);
+  }
+
+  if (reduceMotion) {
+    burst();
+    particles.forEach(p => {
+      ctx.globalAlpha = 0.8;
+      ctx.fillStyle = p.color;
+      ctx.beginPath(); ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2); ctx.fill();
+    });
+    ctx.globalAlpha = 1;
+    return () => window.removeEventListener('resize', resize);
+  }
+
+  burst();
+  _championFxRaf   = requestAnimationFrame(tick);
+  _championFxTimer = setInterval(burst, 1500);
+  return () => {
+    window.removeEventListener('resize', resize);
+    if (_championFxTimer) clearInterval(_championFxTimer);
+    if (_championFxRaf)   cancelAnimationFrame(_championFxRaf);
+    _championFxTimer = null; _championFxRaf = null;
+  };
+}
+
+function _championCountUp(target) {
+  const el = document.getElementById('champ-credit-value');
+  if (!el) return;
+  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    el.innerHTML = `${target.toFixed(2)}<span> la</span>`;
+    return;
+  }
+  const duration = 1400;
+  let start = null;
+  function step(ts) {
+    if (!start) start = ts;
+    const t = Math.min((ts - start) / duration, 1);
+    const eased = 1 - Math.pow(1 - t, 3);
+    el.innerHTML = `${(target * eased).toFixed(2)}<span> la</span>`;
+    if (t < 1) requestAnimationFrame(step);
+  }
+  requestAnimationFrame(step);
+}
+
+function renderChampionPanel(champ) {
+  const el = document.getElementById('champion-panel');
+  if (!el) return;
+
+  const avatarInner = champ.hasLogo
+    ? `<img src="/api/user/avatar/${esc(champ.username)}" alt="" onerror="this.replaceWith(Object.assign(document.createElement('span'),{className:'champ-avatar-fallback',textContent:'👤'}))">`
+    : '<span class="champ-avatar-fallback">👤</span>';
+
+  const flagCode = champ.supportedTeam && _KO_FLAG_CODES[champ.supportedTeam];
+  const flagBlock = flagCode ? `
+      <div class="champ-flag-banner"><img class="champ-flag-img" src="https://flagcdn.com/w320/${flagCode}.png" alt=""></div>
+      <p class="champ-flag-caption">${lang === 'tr' ? 'Desteklediği takım' : 'Supports'}: ${esc(champ.supportedTeam)}</p>` : '';
+
+  el.innerHTML = `
+    <div class="champ-backdrop"></div>
+    <canvas class="champ-fx" id="champ-fx"></canvas>
+    <div class="champ-card">
+      <button class="champ-close" id="champ-close" type="button" aria-label="${lang === 'tr' ? 'Kapat' : 'Close'}">✕</button>
+      <p class="champ-eyebrow">${lang === 'tr' ? '2026 Dünya Kupası · Bahis Ligi' : '2026 World Cup · Betting League'}</p>
+      <div class="champ-ribbon">🏆 ${lang === 'tr' ? 'Şampiyon' : 'Champion'}</div>
+      <div class="champ-avatar-wrap">
+        <div class="champ-avatar-ring"></div>
+        <div class="champ-avatar">${avatarInner}</div>
+      </div>
+      ${flagBlock}
+      <h1 class="champ-name">${esc(champ.displayName)}</h1>
+      <p class="champ-sub">${lang === 'tr'
+        ? 'İspanya – Arjantin finalinin ardından turnuvayı en yüksek kredi ile zirvede tamamladı.'
+        : 'Finished the tournament on top with the highest credit after the Spain–Argentina final.'}</p>
+      <div class="champ-scoreboard">
+        <span class="champ-scoreboard-label">${lang === 'tr' ? 'Toplam Kredi' : 'Total Credit'}</span>
+        <span class="champ-scoreboard-value" id="champ-credit-value">0.00<span> la</span></span>
+      </div>
+      <button class="champ-cta" id="champ-cta" type="button">${lang === 'tr' ? 'Puan Tablosuna Git →' : 'Go to Leaderboard →'}</button>
+    </div>`;
+  el.classList.remove('hidden');
+  document.body.style.overflow = 'hidden';
+
+  const stopFx = _championFireworks(document.getElementById('champ-fx'));
+  _championCountUp(champ.credit);
+
+  function close() {
+    if (stopFx) stopFx();
+    el.classList.add('hidden');
+    el.innerHTML = '';
+    document.body.style.overflow = '';
+    switchKoTab('leaderboard');
+    document.removeEventListener('keydown', onEsc);
+  }
+  function onEsc(e) { if (e.key === 'Escape') close(); }
+
+  document.getElementById('champ-close').addEventListener('click', close);
+  document.getElementById('champ-cta').addEventListener('click', close);
+  document.addEventListener('keydown', onEsc);
+}
+
+async function checkChampionPanel() {
+  try {
+    const res = await fetch('/api/knockout/champion');
+    if (!res.ok) return;
+    const json = await res.json();
+    if (!json.ready || !json.champion) return;
+    renderChampionPanel(json.champion);
+  } catch (_) {}
 }
 
 // ── All submitted KO bets ─────────────────────────────────────────────────────

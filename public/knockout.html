@@ -15,6 +15,7 @@
         <span class="gs-page-title" data-tr="Eleme Aşaması Bahisleri" data-en="Knockout Stage Bets">Eleme Aşaması Bahisleri</span>
       </div>
       <div class="header-right">
+        <a href="stats.html" class="header-meta" style="text-decoration:none;color:var(--accent)" data-tr="📊 İstatistikler" data-en="📊 Statistics">📊 İstatistikler</a>
         <div class="header-meta" id="cache-info"></div>
         <div id="auth-area" class="auth-area"></div>
         <div class="lang-toggle" style="display:none">
@@ -120,6 +121,9 @@
 
   <!-- Floating bet confirmation sheet (appears above modal when outcome selected) -->
   <div id="ko-bet-sheet" class="ko-bet-sheet"></div>
+
+  <!-- Champion celebration panel (shown once, after the final settles) -->
+  <div id="champion-panel" class="champion-panel hidden"></div>
 
   <script src="app.js?v=20260628-1"></script>
 </body>

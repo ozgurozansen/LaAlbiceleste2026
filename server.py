@@ -91,12 +91,18 @@ _KO_BETS_FILE      = os.path.join(DATA_DIR, "knockout_bets.json")
 _KO_MATCH_LOG_FILE = os.path.join(DATA_DIR, "knockout_match_log.json")
 _KO_RESULTS_FILE   = os.path.join(DATA_DIR, "knockout_results.json")
 _KO_BET_FLAGS_FILE = os.path.join(DATA_DIR, "knockout_bet_flags.json")
+_KO_SETTINGS_FILE  = os.path.join(DATA_DIR, "knockout_settings.json")
 
 KNOCKOUT_CREDIT_BASE  = 100
 KNOCKOUT_MIN_BET      = 1
 KNOCKOUT_MAX_BET      = 8
 KNOCKOUT_DYNAMIC_MAX_FLOOR = 4
+KNOCKOUT_UNLIMITED_MODE_FLOOR = 10   # when unlimited betting is on: max bet = credit (floored at this for under-10-credit players)
 KNOCKOUT_NO_BET_PENALTY = 5
+
+
+def _ko_get_settings():
+    return _jload(_KO_SETTINGS_FILE, {"unlimitedBetting": False})
 
 POINTS_CFG  = CONFIG.get("points", {"correct_score": 5, "correct_result": 3,
                                      "correct_fh_bonus": 1, "correct_sh_bonus": 1})
@@ -444,16 +450,37 @@ def _ko_compute_credit(username, count_pending=True):
 # ── Knockout result fetching & settlement ─────────────────────────────────────
 
 def _parse_label_threshold(label):
-    """Parse 'Name N+' or 'Name N-' labels into (name_part, threshold, is_over).
+    """Parse 'Name N+', 'Name N-' or 'Name %N+' labels into (name_part, threshold, is_over).
     Returns (label, None, None) if no numeric threshold token found."""
     parts = (label or "").strip().rsplit(None, 1)
     if len(parts) == 2:
-        m = re.match(r'^(\d+)(\+|-)$', parts[1])
+        m = re.match(r'^%?(\d+)(\+|-)$', parts[1])
         if m:
             thr = int(m.group(1))
             is_over = m.group(2) == '+'
             return parts[0].strip(), thr, is_over
     return label, None, None
+
+
+def _ko_side_by_team_name(bet, team_name, hs, as_):
+    """Resolve which side (home/away stats dict) a threshold-market team name refers
+    to, checking both the Turkish and English match name fields on the bet — the
+    team name embedded in outcomeLabel is often Turkish while matchNameEn is English,
+    so checking only one field risks silently matching the wrong side."""
+    if not team_name:
+        return None
+    def _nn(s): return unicodedata.normalize("NFKD", s or "").encode("ascii", "ignore").decode().lower()
+    tn = _nn(team_name)
+    for mn in (bet.get("matchName"), bet.get("matchNameEn")):
+        parts = (mn or "").split(" vs ", 1)
+        if len(parts) != 2:
+            continue
+        home_n, away_n = _nn(parts[0].strip()), _nn(parts[1].strip())
+        if tn in away_n or away_n in tn:
+            return as_
+        if tn in home_n or home_n in tn:
+            return hs
+    return None
 
 
 def _ko_find_player(players_dict, name_query):
@@ -904,15 +931,8 @@ def _ko_settle_bet(bet, result):
         effective_sov = thr if thr is not None else sov
         if not effective_sov:
             return None
-        # Identify home vs away by matching team name against matchNameEn / matchName
-        def _nn(s): return unicodedata.normalize("NFKD", s or "").encode("ascii", "ignore").decode().lower()
-        mn = bet.get("matchNameEn") or bet.get("matchName") or ""
-        mn_parts = mn.split(" vs ", 1)
-        if len(mn_parts) == 2 and team_name:
-            tn = _nn(team_name)
-            away_n = _nn(mn_parts[1].strip())
-            side_stats = as_ if (tn in away_n or away_n in tn) else hs
-        else:
+        side_stats = _ko_side_by_team_name(bet, team_name, hs, as_)
+        if side_stats is None:
             lbl_l = raw_label.lower()
             side_stats = as_ if ("away" in lbl_l or "deplasman" in lbl_l) else hs
         shots = int(side_stats.get(key) or 0)
@@ -938,14 +958,26 @@ def _ko_settle_bet(bet, result):
         return None
 
     # ── Team fouls / offsides / possession O/U (807/808/809) ─────────────────
-    if tid in (807, 808, 809) and sov:
+    # Two label shapes seen from the bulletin: a plain O/U line ("Üst"/"Alt" with
+    # sov as the threshold), or a team-named threshold baked into the label itself
+    # (e.g. "İspanya %55+", sov=0) — same pattern as the shots markets (805/806).
+    if tid in (807, 808, 809):
         if not hs and not as_: return None
-        lbl  = (bet.get("outcomeLabel") or "").lower()
-        side = as_ if ("away" in lbl or "deplasman" in lbl) else hs
-        key  = "fouls" if tid == 807 else ("offsides" if tid == 808 else "possession")
-        val  = int(side.get(key) or 0)
-        if n == 1: return val < sov
-        if n == 2: return val > sov
+        raw_label = (bet.get("outcomeLabel") or "").strip()
+        team_name, thr, is_over = _parse_label_threshold(raw_label)
+        effective_sov = thr if thr is not None else sov
+        if not effective_sov:
+            return None
+        side = _ko_side_by_team_name(bet, team_name, hs, as_)
+        if side is None:
+            lbl_l = raw_label.lower()
+            side = as_ if ("away" in lbl_l or "deplasman" in lbl_l) else hs
+        key = "fouls" if tid == 807 else ("offsides" if tid == 808 else "possession")
+        val = int(side.get(key) or 0)
+        if is_over is not None:
+            return val >= effective_sov if is_over else val < effective_sov
+        if n == 1: return val < effective_sov
+        if n == 2: return val > effective_sov
         return None
 
     # ── VAR decisions O/U (typeId 804) — from commentary ────────────────────
@@ -1744,6 +1776,36 @@ def _ko_compute_leaderboard():
     return lb
 
 
+_KO_FINAL_MATCH_NAMES = {"Spain vs Argentina", "Argentina vs Spain"}
+
+
+def _ko_get_champion():
+    """Return the tournament champion (top-credit user) once the final has a
+    settled result, else None."""
+    log = _jload(_KO_MATCH_LOG_FILE, {"matches": {}}).get("matches", {})
+    final_match_id = next(
+        (mid for mid, minfo in log.items() if _match_name_en(minfo, mid) in _KO_FINAL_MATCH_NAMES),
+        None,
+    )
+    if not final_match_id:
+        return None
+    result = _jload(_KO_RESULTS_FILE, {"results": {}}).get("results", {}).get(final_match_id)
+    if not result or result.get("status") not in ("FT", "AET", "PEN"):
+        return None
+    lb = _ko_compute_leaderboard()
+    if not lb:
+        return None
+    top = lb[0]
+    return {
+        "username":      top["username"],
+        "displayName":   top["displayName"],
+        "supportedTeam": top["supportedTeam"],
+        "hasLogo":       top["hasLogo"],
+        "credit":        top["credit"],
+        "matchId":       final_match_id,
+    }
+
+
 # ── Scoring ────────────────────────────────────────────────────────────────────
 def _calc_points(guess, result_score, fh_answer, sh_answer):
     pts = {"score": 0, "result": 0, "fhBonus": 0, "shBonus": 0, "total": 0}
@@ -1813,6 +1875,81 @@ def _compute_leaderboard():
         "matchPoints": {},
     })
     return lb
+
+
+def _gs_compute_stats():
+    """Per-user group-stage prediction stats: correct exact-score / correct-result /
+    correct-bonus counts, plus correct-bonus counts split by the bonus question's
+    inputType (per bonus_assignments.json, indexed by match) — "player" for guess-a-
+    player questions, "minute" for guess-a-minute questions."""
+    guesses_data = _jload(_GUESS_FILE, {"guesses": {}})
+    results_data = _jload(_RES_FILE, {"results": {}})
+    users_data   = _jload(_USERS_FILE, {"users": {}})
+    bonus_data   = _jload(_BONUS_ASSIGN_FILE, {})
+    fh_sched = bonus_data.get("fhSchedule", [])
+    sh_sched = bonus_data.get("shSchedule", [])
+    results  = results_data.get("results", {})
+
+    stats = []
+    for uname, uinfo in users_data.get("users", {}).items():
+        user_guesses = guesses_data.get("guesses", {}).get(uname, {})
+        entry = {
+            "username": uname, "displayName": uinfo.get("displayName", uname),
+            "correctScore": 0, "correctResult": 0,
+            "correctBonus": 0, "correctPlayerBonus": 0, "correctMinuteBonus": 0,
+        }
+        for idx_s, guess in user_guesses.items():
+            res = results.get(idx_s)
+            if not res:
+                continue
+            pts = _calc_points(guess, res.get("score"), res.get("fhBonusAnswer"), res.get("shBonusAnswer"))
+            if pts["score"]  > 0: entry["correctScore"]  += 1
+            if pts["result"] > 0: entry["correctResult"] += 1
+            try:
+                mi = int(idx_s)
+            except ValueError:
+                mi = -1
+            if pts["fhBonus"] > 0:
+                entry["correctBonus"] += 1
+                fh_type = fh_sched[mi].get("inputType") if 0 <= mi < len(fh_sched) else None
+                if fh_type == "player": entry["correctPlayerBonus"] += 1
+                if fh_type == "minute": entry["correctMinuteBonus"] += 1
+            if pts["shBonus"] > 0:
+                entry["correctBonus"] += 1
+                sh_type = sh_sched[mi].get("inputType") if 0 <= mi < len(sh_sched) else None
+                if sh_type == "player": entry["correctPlayerBonus"] += 1
+                if sh_type == "minute": entry["correctMinuteBonus"] += 1
+        stats.append(entry)
+    return stats
+
+
+def _ko_compute_stats():
+    """Per-user knockout betting stats: won-bet count, biggest single payout, and
+    highest odds among won bets (each with the underlying bet's match/outcome)."""
+    bets_all   = _jload(_KO_BETS_FILE, {"bets": {}}).get("bets", {})
+    users_data = _jload(_USERS_FILE, {"users": {}})
+
+    stats = []
+    for uname, uinfo in users_data.get("users", {}).items():
+        won_bets = [b for b in bets_all.get(uname, {}).values() if b.get("won") is True]
+        entry = {
+            "username": uname, "displayName": uinfo.get("displayName", uname),
+            "wonCount": len(won_bets),
+            "bestPayout": None, "bestPayoutMatch": None, "bestPayoutOutcome": None,
+            "bestOdds": None, "bestOddsMatch": None, "bestOddsOutcome": None,
+        }
+        if won_bets:
+            bp = max(won_bets, key=lambda b: float(b.get("payout", 0) or 0))
+            entry["bestPayout"]        = round(float(bp.get("payout", 0) or 0), 2)
+            entry["bestPayoutMatch"]   = bp.get("matchNameEn") or bp.get("matchName")
+            entry["bestPayoutOutcome"] = bp.get("outcomeLabelEn") or bp.get("outcomeLabel")
+
+            bo = max(won_bets, key=lambda b: float(b.get("odds", 0) or 0))
+            entry["bestOdds"]        = float(bo.get("odds", 0) or 0)
+            entry["bestOddsMatch"]   = bo.get("matchNameEn") or bo.get("matchName")
+            entry["bestOddsOutcome"] = bo.get("outcomeLabelEn") or bo.get("outcomeLabel")
+        stats.append(entry)
+    return stats
 
 
 def _fetch_result_api(match):
@@ -2417,6 +2554,7 @@ class Handler(BaseHTTPRequestHandler):
                     "creditBase": KNOCKOUT_CREDIT_BASE,
                     "minBet":     KNOCKOUT_MIN_BET,
                     "maxBet":     KNOCKOUT_MAX_BET,
+                    "unlimitedBetting": bool(_ko_get_settings().get("unlimitedBetting", False)),
                 })
                 return
 
@@ -2424,6 +2562,12 @@ class Handler(BaseHTTPRequestHandler):
             # ── /api/knockout/leaderboard ─────────────────────────────────
             if path == "/api/knockout/leaderboard":
                 self.send_json(200, {"leaderboard": _ko_compute_leaderboard()})
+                return
+
+            # ── /api/knockout/champion  (tournament champion, once final settles) ─
+            if path == "/api/knockout/champion":
+                champion = _ko_get_champion()
+                self.send_json(200, {"ready": champion is not None, "champion": champion})
                 return
 
             # ── /api/knockout/bets/all ────────────────────────────────────
@@ -2519,6 +2663,17 @@ class Handler(BaseHTTPRequestHandler):
                     return
                 flags_data = _jload(_KO_BET_FLAGS_FILE, {"flags": []})
                 self.send_json(200, {"flags": list(reversed(flags_data.get("flags", [])))})
+                return
+
+            # ── /api/knockout/admin/betting-mode  (admin: view unlimited-betting toggle) ─
+            if path == "/api/knockout/admin/betting-mode":
+                token    = qs.get("token", [""])[0]
+                username = _validate_token(token)
+                if not username or not _is_admin(username):
+                    self.send_json(403, {"error": "Admin access required"})
+                    return
+                settings = _ko_get_settings()
+                self.send_json(200, {"unlimitedBetting": bool(settings.get("unlimitedBetting", False))})
                 return
 
             # ── /api/knockout/results ─────────────────────────────────────
@@ -2664,6 +2819,17 @@ class Handler(BaseHTTPRequestHandler):
             if path == "/api/groupstage/leaderboard":
                 self.send_json(200, {"leaderboard": _compute_leaderboard()})
                 return
+
+            # ── /api/stats/groupstage ──────────────────────────────────────
+            if path == "/api/stats/groupstage":
+                self.send_json(200, {"stats": _gs_compute_stats()})
+                return
+
+            # ── /api/stats/knockout ─────────────────────────────────────────
+            if path == "/api/stats/knockout":
+                self.send_json(200, {"stats": _ko_compute_stats()})
+                return
+
             # ── Static files ───────────────────────────────────────────────
             if path == "/":
                 self.send_file(os.path.join(PUBLIC_DIR, "index.html"))
@@ -3050,7 +3216,10 @@ class Handler(BaseHTTPRequestHandler):
                 start_ts      = ev.get("ESD")
 
                 credit_now = _ko_compute_credit(username)
-                dynamic_max = max(KNOCKOUT_DYNAMIC_MAX_FLOOR, int(credit_now * 0.20))
+                if _ko_get_settings().get("unlimitedBetting"):
+                    dynamic_max = KNOCKOUT_UNLIMITED_MODE_FLOOR if credit_now < KNOCKOUT_UNLIMITED_MODE_FLOOR else int(credit_now)
+                else:
+                    dynamic_max = max(KNOCKOUT_DYNAMIC_MAX_FLOOR, int(credit_now * 0.20))
                 try:
                     amount = int(amount_raw) if amount_raw is not None else KNOCKOUT_MIN_BET
                     if not (KNOCKOUT_MIN_BET <= amount <= dynamic_max):
@@ -3145,6 +3314,19 @@ class Handler(BaseHTTPRequestHandler):
                     "fetched": fetched,
                     "settled": settled,
                 })
+                return
+
+            # ── /api/knockout/admin/betting-mode  (admin: set unlimited-betting toggle) ─
+            if path == "/api/knockout/admin/betting-mode":
+                token    = data.get("token") or ""
+                username = _validate_token(token)
+                if not username or not _is_admin(username):
+                    self.send_json(403, {"error": "Admin access required"})
+                    return
+                enabled = bool(data.get("unlimitedBetting"))
+                with _data_lock:
+                    _jsave(_KO_SETTINGS_FILE, {"unlimitedBetting": enabled})
+                self.send_json(200, {"ok": True, "unlimitedBetting": enabled})
                 return
 
             # ── /api/knockout/admin/export-gs-credits  (admin: copy GS points → KO starting credits) ─

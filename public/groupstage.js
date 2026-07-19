@@ -61,6 +61,7 @@ function teamName(n) { return (S.lang === 'tr' && TEAM_TR[n]) ? TEAM_TR[n] : n; 
 const I18N = {
   tr: {
     title:          'Grup Aşaması Tahminleri',
+    statsLink:      '📊 İstatistikler',
     login:          'Giriş Yap',
     register:       'Kayıt Ol',
     logout:         'Çıkış',
@@ -143,6 +144,7 @@ const I18N = {
   },
   en: {
     title:          'Group Stage Predictions',
+    statsLink:      '📊 Statistics',
     login:          'Login',
     register:       'Register',
     logout:         'Logout',

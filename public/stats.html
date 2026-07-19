@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>LaAlbiceleste2026 – İstatistikler / Statistics</title>
+  <link rel="stylesheet" href="style.css?v=20260610-1" />
+</head>
+<body>
+  <header>
+    <div class="header-inner">
+      <div class="logo">
+        <a href="/"><img src="img/logo-la2026.png" alt="LaAlbiceleste 2026" class="header-logo" /></a>
+        <span class="gs-header-sep">›</span>
+        <span class="gs-page-title" data-tr="İstatistikler" data-en="Statistics">İstatistikler</span>
+      </div>
+      <div class="header-right">
+        <div class="lang-toggle">
+          <button class="lang-btn active" data-lang="tr">TR</button>
+          <button class="lang-btn" data-lang="en">EN</button>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <div class="gs-controls ko-tab-bar">
+    <nav class="ko-main-tabs gs-main-tabs">
+      <button class="gs-tab active" data-tab="groupstage" data-tr="Grup Aşaması" data-en="Group Stage">Grup Aşaması</button>
+      <button class="gs-tab" data-tab="knockout" data-tr="Eleme Aşaması" data-en="Knockout Stage">Eleme Aşaması</button>
+    </nav>
+  </div>
+
+  <!-- ── Tab 1: Group stage stats ─────────────────────────────────────────── -->
+  <div id="stats-tab-groupstage" class="gs-tab-content">
+    <div class="gs-lb-wrap stats-wrap">
+      <section class="stats-section">
+        <h2 class="gs-section-title" data-tr="Skor Doğru Tahmin Sayısı" data-en="Correct Exact-Score Guesses">Skor Doğru Tahmin Sayısı</h2>
+        <div id="stats-correct-score"></div>
+      </section>
+      <section class="stats-section">
+        <h2 class="gs-section-title" data-tr="Sonuç Doğru Tahmin Sayısı" data-en="Correct Result Guesses">Sonuç Doğru Tahmin Sayısı</h2>
+        <div id="stats-correct-result"></div>
+      </section>
+      <section class="stats-section">
+        <h2 class="gs-section-title" data-tr="Bonus Doğru Tahmin Sayısı" data-en="Correct Bonus Guesses">Bonus Doğru Tahmin Sayısı</h2>
+        <div id="stats-correct-bonus"></div>
+      </section>
+      <section class="stats-section">
+        <h2 class="gs-section-title" data-tr="Oyuncu Bonusu Doğru Tahmin Sayısı" data-en="Correct Player-Bonus Guesses">Oyuncu Bonusu Doğru Tahmin Sayısı</h2>
+        <div id="stats-correct-player-bonus"></div>
+      </section>
+      <section class="stats-section">
+        <h2 class="gs-section-title" data-tr="Kazanılan Dakika Bonusu Sayısı" data-en="Correct Minute-Bonus Guesses">Kazanılan Dakika Bonusu Sayısı</h2>
+        <div id="stats-correct-minute-bonus"></div>
+      </section>
+    </div>
+  </div>
+
+  <!-- ── Tab 2: Knockout stage stats ───────────────────────────────────────── -->
+  <div id="stats-tab-knockout" class="gs-tab-content hidden">
+    <div class="gs-lb-wrap stats-wrap">
+      <section class="stats-section">
+        <h2 class="gs-section-title" data-tr="Kazanılan Bahis Sayısı" data-en="Bets Won">Kazanılan Bahis Sayısı</h2>
+        <div id="stats-ko-won-count"></div>
+      </section>
+      <section class="stats-section">
+        <h2 class="gs-section-title" data-tr="Tek Seferde Kazanılan En Fazla Kredi" data-en="Biggest Single Win">Tek Seferde Kazanılan En Fazla Kredi</h2>
+        <div id="stats-ko-best-payout"></div>
+      </section>
+      <section class="stats-section">
+        <h2 class="gs-section-title" data-tr="Kazanılan En Yüksek Oranlı Bahisler" data-en="Highest-Odds Winning Bets">Kazanılan En Yüksek Oranlı Bahisler</h2>
+        <div id="stats-ko-best-odds"></div>
+      </section>
+    </div>
+  </div>
+
+  <script src="stats.js?v=20260720-1"></script>
+</body>
+</html>

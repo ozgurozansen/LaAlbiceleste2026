@@ -499,6 +499,40 @@ async function gsExportCredits() {
   btn.textContent = '🏆 GS → KO Kredi';
 }
 
+// ── Unlimited betting toggle ──────────────────────────────────────────────────
+function _renderUnlimitedBetBtn(enabled) {
+  const btn = $('adm-unlimited-bet-btn');
+  btn.textContent = enabled ? '🔓 Sınırsız Bahis: Açık' : '🔓 Sınırsız Bahis: Kapalı';
+  btn.style.background = enabled ? '#8e44ad' : 'transparent';
+  btn.style.color      = enabled ? '#fff'    : '#8e44ad';
+}
+
+async function loadUnlimitedBetState() {
+  try {
+    const d = await api('GET', `/api/knockout/admin/betting-mode?token=${S.token}`);
+    _renderUnlimitedBetBtn(!!d.unlimitedBetting);
+  } catch (e) {}
+}
+
+async function toggleUnlimitedBet() {
+  const btn = $('adm-unlimited-bet-btn');
+  const currentlyOn = btn.textContent.includes('Açık');
+  const next = !currentlyOn;
+  if (next && !confirm('Sınırsız bahis modu açılacak: maksimum bahis, %20 limiti yerine kullanıcının mevcut kredisi olacak (10 kredinin altındakiler yine de en fazla 10 oynayabilir). Onaylıyor musunuz?')) return;
+  btn.disabled = true;
+  try {
+    const d = await api('POST', '/api/knockout/admin/betting-mode', { token: S.token, unlimitedBetting: next });
+    if (d.ok) {
+      _renderUnlimitedBetBtn(d.unlimitedBetting);
+    } else {
+      alert(d.error || 'Hata oluştu.');
+    }
+  } catch (e) {
+    alert('Bağlantı hatası.');
+  }
+  btn.disabled = false;
+}
+
 // ── Bet activity flags (possible scripted/bot betting) ───────────────────────
 function formatFlagTime(iso) {
   if (!iso) return '—';
@@ -550,6 +584,8 @@ function showPanel() {
   $('adm-ko-fetch-btn').addEventListener('click', koFetchResults);
   $('adm-gs-export-btn').addEventListener('click', gsExportCredits);
   $('adm-bet-flags-btn').addEventListener('click', toggleBetFlags);
+  $('adm-unlimited-bet-btn').addEventListener('click', toggleUnlimitedBet);
+  loadUnlimitedBetState();
   _acSetup();
   loadData();
 }
